@@ -1,0 +1,10 @@
+*.aux
+*.log
+*.out
+*.pdf
+*.pyc
+*.swp
+*.tar
+*~
+.__afs*
+.DS_Store
