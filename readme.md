@@ -4,5 +4,10 @@ cmu 15-418 final project
 
 ## authors
 
-- Ariel Davis (azdavis)
-- Jerry Yu (jyu)
+| name        | andrew ID | github      |
+|-------------|-----------|-------------|
+| Ariel Davis | azdavis   | [azdavis][] |
+| Jerry Yu    | jerryy    | [jyu][]     |
+
+[azdavis]: https://github.com/azdavis
+[jyu]: https://github.com/jyu
