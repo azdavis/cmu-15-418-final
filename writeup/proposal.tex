@@ -11,7 +11,7 @@
 \frenchspacing
 \author{Ariel Davis (azdavis), Jerry Yu (jerryy)}
 \date{\today}
-\title{15-418 Final Project Proposal}
+\title{15-418 Final Project Proposal Checkpoint}
 \begin{document}
 \maketitle
 
@@ -85,6 +85,17 @@ utilize parallelism. OpenMP can be utilized here if there are around 12 points
 used in the snake. There are several implementations of active contour, mainly
 with OpenCV, which can be benchamrked against for performance. \cite{cv-active}
 
+Other methods of segmentation seemed much more challenging to implement.
+We looked into Principle Component Analysis. \cite{pca-git} \cite{pca-paper}
+And also the default implementaton of foreground extraction on OpenCV, with
+graph cuts. \cite{cv-graphcut} \cite{grabcut-paper}
+
+By the proposal, we will have solidified the algorithm we will use for
+segmentation.
+
+\subsection*{Part 2: Bokeh Blur}
+
+
 \subsection*{Hardware}
 We will use the gates machines, as they have GPUS if we use CUDA and a high
 number of hyperthreads for OMP processing.
@@ -106,5 +117,21 @@ number of hyperthreads for OMP processing.
 \href
 {http://eric-yuan.me/active-contour-snakes/}
 {OpenCV Active Contour Snakes}
+\bibitem{pca-git}
+\href
+{https://github.com/fastai/numerical-linear-algebra/blob/master/nbs/3.\%20background\%20removal\%20with\%20robust\%20pca.ipynb}
+{background removal with pca}
+\bibitem{pca-paper}
+\href
+{http://cdn.intechopen.com/pdfs/30443.pdf}
+{Robust Principle Component Analysis for Background Subtraction}
+\bibitem{cv-graphcut}
+\href
+{https://docs.opencv.org/trunk/d8/d83/tutorial_py_grabcut.html}
+{OpenCV Graph Cut}
+\bibitem{grabcut-paper}
+\href
+{https://dl.acm.org/citation.cfm?id=1015720}
+{OpenCV Graph Cut}
 \end{thebibliography}
 \end{document}
