@@ -66,13 +66,24 @@ and edges in the images, which are contours that the snake uses to determine
 its energy and the energy of the pixels in the image. The energy is then used
 to make decisions for the points of a snake.
 
+An alternative way to calculate the energy is to apply the Canny Edge Detection
+Algorithm. \cite{canny-edge} It first applies a filter to remove noise in the
+image, finds intensity gradients taking derivatives of the pixels,
+applies non-maximum suppression, applies thresholds to find potential edges,
+and removing weak edges not connected to strong edges. Finding intensity
+gradients involves convolving filters in the image to detect the vertical,
+horizontal and diagonal edges. A version of the canny edge detection algorithm
+is implemented in OpenCV at \cite{canny-edge}. This can be used to benchmark
+our parallel performance.
+
 \includegraphics{snake-contour-example.jpg}
 \cite{contour-model}
 
 Each point of the snake has its own energy and the decision to move the point
 is independent to the other points of the snake, so there is opportunity to
 utilize parallelism. OpenMP can be utilized here if there are around 12 points
-used in the snake.
+used in the snake. There are several implementations of active contour, mainly
+with OpenCV, which can be benchamrked against for performance. \cite{cv-active}
 
 \subsection*{Hardware}
 We will use the gates machines, as they have GPUS if we use CUDA and a high
@@ -86,6 +97,14 @@ number of hyperthreads for OMP processing.
 \bibitem{contour-model}
 \href
 {https://en.wikipedia.org/wiki/Active_contour_model}
-{Active contour model}
+{Active Contour Model}
+\bibitem{canny-edge}
+\href
+{http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_canny/py_canny.html}
+{Canny Edge Detector OpenCV}
+\bibitem{cv-active}
+\href
+{http://eric-yuan.me/active-contour-snakes/}
+{OpenCV Active Contour Snakes}
 \end{thebibliography}
 \end{document}
