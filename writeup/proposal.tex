@@ -60,11 +60,11 @@ what it has seen previously, it proceeds towards the center. Otherwise, it
 stops because it believes it has reached the foreground of the image.
 
 In terms of computation, a gradient of the pixels must be first calculated in
-order to find differences in pixel values. This gradient can be heavily parallelized with
-CUDA. The gradient is then used in order to calculate lines and edges in the
-images, which are contours that the snake uses to determine its energy and
-the energy of the pixels in the image. The energy is then used to make
-decisions for the points of a snake.
+order to find differences in pixel values. This gradient can be heavily
+parallelized with CUDA. The gradient is then used in order to calculate lines
+and edges in the images, which are contours that the snake uses to determine
+its energy and the energy of the pixels in the image. The energy is then used
+to make decisions for the points of a snake.
 
 \includegraphics{snake-contour-example.jpg}
 \cite{contour-model}
