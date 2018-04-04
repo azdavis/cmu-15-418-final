@@ -27,6 +27,11 @@ detection and blur done mainly with image processing. (Google Pixel 2) Many
 smartphones in the market currently use multiple cameras (IPhone X) for
 depth detection but our project will focus on the image processing method.
 
+\begin{center}
+\includegraphics[scale=0.5]{ex.jpg}
+\cite{pixel-ml}
+\end{center}
+
 Portrait mode can be seperated into two main steps. The first is the segment
 the given image into a foreground and background. Segmentation is done in order
 to replicate the DSLR camera being able to capture foregrounds in focus and
@@ -76,8 +81,10 @@ horizontal and diagonal edges. A version of the canny edge detection algorithm
 is implemented in OpenCV at \cite{canny-edge}. This can be used to benchmark
 our parallel performance.
 
-\includegraphics{snake-contour-example.jpg}
+\begin{center}
+\includegraphics[scale=0.5]{snake-contour-example.jpg}
 \cite{contour-model}
+\end{center}
 
 Each point of the snake has its own energy and the decision to move the point
 is independent to the other points of the snake, so there is opportunity to
