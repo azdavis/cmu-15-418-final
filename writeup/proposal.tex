@@ -94,11 +94,31 @@ By the proposal, we will have solidified the algorithm we will use for
 segmentation.
 
 \subsection*{Part 2: Bokeh Blur}
-
+The Bokeh effect is implemented by applying a filter in the shape of a polygon
+across an image. Values are accumulated by shifting the image in a shape and
+computing a weighted sum. This can be heavily parallelized across CUDA.
+\cite{bokeh}
 
 \subsection*{Hardware}
 We will use the gates machines, as they have GPUS if we use CUDA and a high
 number of hyperthreads for OMP processing.
+
+\subsection*{Overall}
+Overall, we are looking to use CUDAs on GPUs because we are often able to
+parallelize across all the pixels of an image to apply all our filters and
+algorithms.
+However, we are open to trying OpenMP and seeing if it gives us speedup for
+algorithms like the snake active contour map, where there is not as many points
+to parallelize over.
+
+Some of the challenges will be finding speedup across every step of the portrait
+mode process, from segmentation to bokeh blur. This is because Amdahls law
+and having overall speedup by limited by the slowest parts. Additionally, we
+are required to syncrhonize after each of the major steps, which leads to
+additional time being used. We must have each CUDA core process an individual
+part of the image as much as possible to reduce this. Like in assignment 2, we
+have to find the best way to map the CUDA cores to the image, in order for
+optimal shared memory and cache access.
 
 \begin{thebibliography}{999}
 \bibitem{pixel-ml}
@@ -132,6 +152,10 @@ number of hyperthreads for OMP processing.
 \bibitem{grabcut-paper}
 \href
 {https://dl.acm.org/citation.cfm?id=1015720}
-{OpenCV Graph Cut}
+{Grab Cut Research Paper - OpenCV Implementation}
+\bibitem{bokeh}
+\href
+{https://www.scratchapixel.com/lessons/digital-imaging/simple-image-manipulations/bookeh-effect}
+{Grab Cut Research Paper - OpenCV Implementation}
 \end{thebibliography}
 \end{document}
