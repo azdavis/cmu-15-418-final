@@ -8,7 +8,7 @@ TEXFLAGS = -halt-on-error
 all: proposal.pdf
 
 clean:
-	rm -rf *.aux *.log *.pdf
+	rm -rf *.aux *.log *.out *.pdf
 
 %.pdf: %.tex
 	for x in 1 2; do $(TEXC) $(TEXFLAGS) $< $(Q); done
