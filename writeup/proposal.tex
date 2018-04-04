@@ -65,7 +65,7 @@ the energy of the pixels in the image. The energy is then used to make
 decisions for the points of a snake.
 
 (put some algos from the wikipedia page here in latex)
-https://en.wikipedia.org/wiki/Active_contour_model
+\cite{contour-model}
 
 Each point of the snake has its own energy and the decision to move the point
 is independent to the other points of the snake, so there is opportunity to
@@ -76,10 +76,14 @@ used in the snake.
 We will use the gates machines, as they have GPUS if we use CUDA and a high
 number of hyperthreads for OMP processing.
 
-\begin{thebibliography}{1}
+\begin{thebibliography}{999}
 \bibitem{pixel-ml}
 \href
 {https://research.googleblog.com/2017/10/portrait-mode-on-pixel-2-and-pixel-2-xl.html}
 {Google Research - Portrait Mode}
+\bibitem{contour-model}
+\href
+{https://en.wikipedia.org/wiki/Active_contour_model}
+{Active contour model}
 \end{thebibliography}
 \end{document}
