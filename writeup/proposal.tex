@@ -32,4 +32,53 @@ The second is the bokeh blur, which is applied to the background parts of the
 image. A bokeh blur must be calculated with a polygon, in order to replicate the
 fractions of light let through the specific apertures a DSLR camera.
 
+We believe that parallelism can be utilized in both of these steps. For the
+blur, the entire region can be entirely completed in parallel as there are
+little dependencies after the blur process. Depending on which segmentation
+algorithm we utilize (options explained in next section), we will also
+implement it in parallel to achieve speedup.
+
+\subsection*{Part 1: Segmentation}
+There are several different implementations of foreground/background removal
+and extraction algorithms. In order to maximize parallelism and due to our lack
+of knowledge for machine learning, we will focus on classic computer vision
+methods rather than identifying foreground with convolutional neural nets
+\cite{pixel-ml}.
+
+Some of the main algorithms we have looked at are active contour methods
+(snake), principle component analysis, and graph cut algorithms.
+
+We will most likely implement the active contour method, as it is the easiest
+to implement. The algorithm uses a spline known as a snake that is influenced
+by energy values in the image calculated by the pixel values. Essentially,
+snakes start from the outside of an image as a line and try to continue towards
+the center. If it believes there is not that large of a pixel difference with
+what it has seen previously, it proceeds towards the center. Otherwise, it
+stops because it believes it has reached the foreground of the image.
+
+In terms of computation, a gradient of the pixels must be first calculated in
+order to find differences in pixel values. This gradient can be heavily parallelized with
+CUDA. The gradient is then used in order to calculate lines and edges in the
+images, which are contours that the snake uses to determine its energy and
+the energy of the pixels in the image. The energy is then used to make
+decisions for the points of a snake.
+
+(put some algos from the wikipedia page here in latex)
+https://en.wikipedia.org/wiki/Active_contour_model
+
+Each point of the snake has its own energy and the decision to move the point
+is independent to the other points of the snake, so there is opportunity to
+utilize parallelism. OpenMP can be utilized here if there are around 12 points
+used in the snake.
+
+\subsection*{Hardware}
+We will use the gates machines, as they have GPUS if we use CUDA and a high
+number of hyperthreads for OMP processing.
+
+\begin{thebibliography}{1}
+\bibitem{pixel-ml}
+\href
+{https://research.googleblog.com/2017/10/portrait-mode-on-pixel-2-and-pixel-2-xl.html}
+{Google Research - Portrait Mode}
+\end{thebibliography}
 \end{document}
