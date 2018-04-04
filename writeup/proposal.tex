@@ -12,6 +12,24 @@
 \begin{document}
 \maketitle
 
-TODO
+\subsection*{Overview}
+We have decided to build bokeh portrait mode in parallel.
+
+Bokeh portrait mode has been popularized largely by DSLR cameras, where the
+foreground of the subject is in focus and the background is blurred by bokeh
+shapes. Up until recently, images with bokeh portrait mode had to be taken
+from high end DSLR cameras that cost up to thousands of dollars. But now,
+portrait mode has been integrated into smartphones, with the foreground
+detection and blur done mainly with image processing. (Google Pixel 2) Many
+smartphones in the market currently use multiple cameras (IPhone X) for
+depth detection but our project will focus on the image processing method.
+
+Portrait mode can be seperated into two main steps. The first is the segment
+the given image into a foreground and background. Segmentation is done in order
+to replicate the DSLR camera being able to capture foregrounds in focus and
+backgrounds out of focus.
+The second is the bokeh blur, which is applied to the background parts of the
+image. A bokeh blur must be calculated with a polygon, in order to replicate the
+fractions of light let through the specific apertures a DSLR camera.
 
 \end{document}
