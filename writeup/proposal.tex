@@ -16,16 +16,17 @@
 \maketitle
 
 \subsection*{Overview}
+
 We have decided to build bokeh portrait mode in parallel.
 
 Bokeh portrait mode has been popularized largely by DSLR cameras, where the
 foreground of the subject is in focus and the background is blurred by bokeh
-shapes. Up until recently, images with bokeh portrait mode had to be taken
-from high end DSLR cameras that cost up to thousands of dollars. But now,
-portrait mode has been integrated into smartphones, with the foreground
-detection and blur done mainly with image processing. (Google Pixel 2) Many
-smartphones in the market currently use multiple cameras (IPhone X) for
-depth detection but our project will focus on the image processing method.
+shapes. Up until recently, images with bokeh portrait mode had to be taken from
+high end DSLR cameras that cost up to thousands of dollars. But now, portrait
+mode has been integrated into smartphones, with the foreground detection and
+blur done mainly with image processing. (Google Pixel 2) Many smartphones in
+the market currently use multiple cameras (IPhone X) for depth detection but
+our project will focus on the image processing method.
 
 \begin{center}
 \includegraphics[scale=0.5]{ex.jpg}
@@ -35,10 +36,10 @@ depth detection but our project will focus on the image processing method.
 Portrait mode can be seperated into two main steps. The first is the segment
 the given image into a foreground and background. Segmentation is done in order
 to replicate the DSLR camera being able to capture foregrounds in focus and
-backgrounds out of focus.
-The second is the bokeh blur, which is applied to the background parts of the
-image. A bokeh blur must be calculated with a polygon, in order to replicate the
-fractions of light let through the specific apertures a DSLR camera.
+backgrounds out of focus. The second is the bokeh blur, which is applied to the
+background parts of the image. A bokeh blur must be calculated with a polygon,
+in order to replicate the fractions of light let through the specific apertures
+a DSLR camera.
 
 We believe that parallelism can be utilized in both of these steps. For the
 blur, the entire region can be entirely completed in parallel as there are
@@ -47,11 +48,12 @@ algorithm we utilize (options explained in next section), we will also
 implement it in parallel to achieve speedup.
 
 \subsection*{Part 1: Segmentation}
+
 There are several different implementations of foreground/background removal
 and extraction algorithms. In order to maximize parallelism and due to our lack
 of knowledge for machine learning, we will focus on classic computer vision
-methods rather than identifying foreground with convolutional neural nets
-\cite{pixel-ml}.
+methods rather than identifying foreground with convolutional neural nets.
+\cite{pixel-ml}
 
 Some of the main algorithms we have looked at are active contour methods
 (snake), principle component analysis, and graph cut algorithms.
@@ -73,13 +75,13 @@ to make decisions for the points of a snake.
 
 An alternative way to calculate the energy is to apply the Canny Edge Detection
 Algorithm. \cite{canny-edge} It first applies a filter to remove noise in the
-image, finds intensity gradients taking derivatives of the pixels,
-applies non-maximum suppression, applies thresholds to find potential edges,
-and removing weak edges not connected to strong edges. Finding intensity
-gradients involves convolving filters in the image to detect the vertical,
-horizontal and diagonal edges. A version of the canny edge detection algorithm
-is implemented in OpenCV at \cite{canny-edge}. This can be used to benchmark
-our parallel performance.
+image, finds intensity gradients taking derivatives of the pixels, applies non-
+maximum suppression, applies thresholds to find potential edges, and removing
+weak edges not connected to strong edges. Finding intensity gradients involves
+convolving filters in the image to detect the vertical, horizontal and diagonal
+edges. A version of the canny edge detection algorithm is implemented in
+OpenCV. \cite{canny-edge} This can be used to benchmark our parallel
+performance.
 
 \begin{center}
 \includegraphics[scale=0.5]{snake-contour-example.jpg}
@@ -92,36 +94,40 @@ utilize parallelism. OpenMP can be utilized here if there are around 12 points
 used in the snake. There are several implementations of active contour, mainly
 with OpenCV, which can be benchamrked against for performance. \cite{cv-active}
 
-Other methods of segmentation seemed much more challenging to implement.
-We looked into Principle Component Analysis. \cite{pca-git} \cite{pca-paper}
-And also the default implementaton of foreground extraction on OpenCV, with
-graph cuts. \cite{cv-graphcut} \cite{grabcut-paper}
+Other methods of segmentation seemed much more challenging to implement. We
+looked into Principle Component Analysis. \cite{pca-git} \cite{pca-paper} And
+also the default implementaton of foreground extraction on OpenCV, with graph
+cuts. \cite{cv-graphcut} \cite{grabcut-paper}
 
 By the proposal, we will have solidified the algorithm we will use for
 segmentation.
 
 \subsection*{Part 2: Bokeh Blur}
+
 The Bokeh effect is implemented by applying a filter in the shape of a polygon
 across an image. Values are accumulated by shifting the image in a shape and
 computing a weighted sum. This can be heavily parallelized across CUDA.
 \cite{bokeh}
 
 \subsection*{Hardware}
+
 We will use the gates machines, as they have GPUS if we use CUDA and a high
 number of hyperthreads for OMP processing.
 
 \subsection*{Overall}
+
 Overall, we are looking to use CUDAs on GPUs because we are often able to
 parallelize across all the pixels of an image to apply all our filters and
 algorithms.
+
 However, we are open to trying OpenMP and seeing if it gives us speedup for
 algorithms like the snake active contour map, where there is not as many points
 to parallelize over.
 
-Some of the challenges will be finding speedup across every step of the portrait
-mode process, from segmentation to bokeh blur. This is because Amdahls law
-and having overall speedup by limited by the slowest parts. Additionally, we
-are required to syncrhonize after each of the major steps, which leads to
+Some of the challenges will be finding speedup across every step of the
+portrait mode process, from segmentation to bokeh blur. This is because Amdahls
+law and having overall speedup by limited by the slowest parts. Additionally,
+we are required to syncrhonize after each of the major steps, which leads to
 additional time being used. We must have each CUDA core process an individual
 part of the image as much as possible to reduce this. Like in assignment 2, we
 have to find the best way to map the CUDA cores to the image, in order for
