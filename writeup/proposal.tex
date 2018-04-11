@@ -67,6 +67,7 @@ energy difference above a threshold.
         snake)
 \end{enumerate}
 
+When Converged:
 \begin{enumerate}
     \item
         Convolve the image with the bokeh filter. (Highly parallelizable across
@@ -75,22 +76,56 @@ energy difference above a threshold.
 
 \section*{The Challenge}
 
-TODO
+A challenge is to use parallelism to speed up each step of the portrait mode
+process. A bottleneck in one process can significantly reduce speedup across
+the entire process due to Amdahl's law. Also, we have to launch
+and synchronize CUDA cores for each step, which takes time.
+
+Another restriction is that each of the points of the snake have to be
+synchronized in order to maintain the internal energy of the snake. This allows
+for different snake mappings of spatial locality in the image versus each point
+of the snake.
+
+Overall, many of the steps are computationally heavy, with the convolutions
+of filters and calculating gradients in the image. Because we are processing
+the entire image, spatially dividing it up will allow for locality.
 
 \section*{Resources}
 
-TODO
+We will use the Gates cluster machines with the GPUs. We will follow the snake
+implementation outlined in the paper by Kass, Witkin, and Terzopoulous.
+\cite{paper} We are also planning on using the starter code in the github repo
+by adl1995 for implementations of Canny-Edge and Marr Hildreth. \cite{edge} To
+implement the Bokeh effect, we will follow the starter code in the tutorial.
+\cite{bokeh}
 
 \section*{Goals and Deliverables}
 
-TODO
+We plan to be able to implement portrait mode with kernels on a GPU. Any image
+will be taken as an input and the output would make it look like the image was
+originally taken in portrait mode. By using GPUs to for many of the pixel
+operations, we hope to be significantly faster than sequential methods.
+
+If we have time, we hope to adapt this algorithm to work for videos or gifs.
+Ideally, we can achieve realtime portrait mode in 30 fps. (30ms per image)
 
 \section*{Platform Choice}
 
-TODO
+We will run this on GPUs, which are ideal for image processing.
 
 \section*{Schedule}
 
 TODO
 
+\begin{thebibliography}{999}
+\bibitem{edge}
+\url
+{https://github.com/adl1995/edge-detectors}
+\bibitem{paper}
+\url
+{http://www.cs.ait.ac.th/~mdailey/cvreadings/Kass-Snakes.pdf}
+\bibitem{bokeh}
+\url
+{https://www.scratchapixel.com/lessons/digital-imaging/simple-image-manipulations/bookeh-effect}
+\end{thebibliography}
 \end{document}
