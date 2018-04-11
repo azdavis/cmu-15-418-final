@@ -27,7 +27,26 @@ detection and manipulation methods, which is what we will implement.
 
 \section*{Background}
 
-TODO
+There are two main stages to our application, extracting the background and
+blurring.
+
+We will extract the background using active contour model, known as the snake
+method. Essentially, we will calculate an energy for each pixel in the image.
+The energy is a weighted sum of the filtered intensity of the pixel and edge
+value of a pixel, calculated with the Canny Edge detector or Marr Hildreth.
+We will use the energy values to iteratively update snakes, a set of points
+that move from the outer edge to the center based on the difference in energies.
+
+Additionally, each snake has internal energy that prevents points from being
+too far apart and prevents oscillations in the points.
+At the termination of the algorithm, the snakes will have fit the foreground
+of the image, which is where the energy difference is the highest.
+
+The second step is to apply the bokeh blur. We will apply a filter in the shape
+of a polygon across an image. Values are accumulated by shifting the image in a
+shape and computing a weighted sum.
+
+
 
 \section*{The Challenge}
 
