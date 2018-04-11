@@ -28,14 +28,14 @@ blurring.
 We will extract the background using active contour model, known as the snake
 method. Essentially, we will calculate an energy for each pixel in the image.
 The energy is a weighted sum of the filtered intensity of the pixel and edge
-value of a pixel, calculated with the Canny Edge detector or Marr Hildreth.
-We will use the energy values to iteratively update snakes, a set of points
-that move from the outer edge to the center based on the difference in energies.
+value of a pixel, calculated with the Canny Edge detector or Marr Hildreth. We
+will use the energy values to iteratively update snakes, a set of points that
+move from the outer edge to the center based on the difference in energies.
 
 Additionally, each snake has internal energy that prevents points from being
-too far apart and prevents oscillations in the points.
-At the termination of the algorithm, the snakes will have fit the foreground
-of the image, which is where the energy difference is the highest.
+too far apart and prevents oscillations in the points. At the termination of
+the algorithm, the snakes will have fit the foreground of the image, which is
+where the energy difference is the highest.
 
 The second step is to apply the bokeh blur. We will apply a filter in the shape
 of a polygon across an image. Values are accumulated by shifting the image in a
@@ -46,14 +46,14 @@ energy difference above a threshold.
 \begin{enumerate}
     \item
         Calculate energy values for each pixel
-            \begin{enumerate}
-                \item
-                    Get grayscale image by averaging RGB values of each pixel.
-                    (Highly parallelizable across pixels)
-                \item
-                    Calculate edges by convolving a gaussian filter across the
-                    image. (Highly parallelizable across pixels)
-            \end{enumerate}
+        \begin{enumerate}
+            \item
+                Get grayscale image by averaging RGB values of each pixel.
+                (Highly parallelizable across pixels)
+            \item
+                Calculate edges by convolving a gaussian filter across the
+                image. (Highly parallelizable across pixels)
+        \end{enumerate}
     \item
         Move each point of snake based on energy value. (Parallelizable across
         point of snake)
@@ -73,17 +73,17 @@ When Converged:
 
 A challenge is to use parallelism to speed up each step of the portrait mode
 process. A bottleneck in one process can significantly reduce speedup across
-the entire process due to Amdahl's law. Also, we have to launch
-and synchronize CUDA cores for each step, which takes time.
+the entire process due to Amdahl's law. Also, we have to launch and synchronize
+CUDA cores for each step, which takes time.
 
 Another restriction is that each of the points of the snake have to be
 synchronized in order to maintain the internal energy of the snake. This allows
 for different snake mappings of spatial locality in the image versus each point
 of the snake.
 
-Overall, many of the steps are computationally heavy, with the convolutions
-of filters and calculating gradients in the image. Because we are processing
-the entire image, spatially dividing it up will allow for locality.
+Overall, many of the steps are computationally heavy, with the convolutions of
+filters and calculating gradients in the image. Because we are processing the
+entire image, spatially dividing it up will allow for locality.
 
 \section{Resources}
 
