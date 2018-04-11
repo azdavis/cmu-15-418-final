@@ -46,7 +46,32 @@ The second step is to apply the bokeh blur. We will apply a filter in the shape
 of a polygon across an image. Values are accumulated by shifting the image in a
 shape and computing a weighted sum.
 
+Repeat the following steps before snake converges, when each point finds a
+energy difference above a threshold.
+\begin{enumerate}
+    \item
+        Calculate energy values for each pixel
+            \begin{enumerate}
+                \item
+                    Get grayscale image by averaging RGB values of each pixel.
+                    (Highly parallelizable across pixels)
+                \item
+                    Calculate edges by convolving a gaussian filter across the
+                    image. (Highly parallelizable across pixels)
+            \end{enumerate}
+    \item
+        Move each point of snake based on energy value. (Parallelizable across
+        point of snake)
+    \item
+        Compute internal energy of snake. (Requires synchronization within a
+        snake)
+\end{enumerate}
 
+\begin{enumerate}
+    \item
+        Convolve the image with the bokeh filter. (Highly parallelizable across
+        pixels)
+\end{enumerate}
 
 \section*{The Challenge}
 
