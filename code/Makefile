@@ -1,4 +1,10 @@
-.PHONY: all
+MSG = 'nothing to do'
+
+.SUFFIXES:
+.PHONY: all clean
 
 all:
-	@echo "nothing to make"
+	@echo $(MSG)
+
+clean:
+	@echo $(MSG)
