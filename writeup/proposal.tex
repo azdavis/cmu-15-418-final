@@ -15,7 +15,7 @@
 \begin{document}
 \maketitle
 
-\section*{Summary}
+\section{Summary}
 
 We are going to build portrait mode with bokeh blur on NVIDIA GPUs.
 
@@ -25,7 +25,7 @@ shapes. Recently, smartphone cameras without specialized hardware have gained
 the ability to take portrait mode pictures by using software-only background
 detection and manipulation methods, which is what we will implement.
 
-\section*{Background}
+\section{Background}
 
 There are two main stages to our application, extracting the background and
 blurring.
@@ -74,7 +74,7 @@ When Converged:
         pixels)
 \end{enumerate}
 
-\section*{The Challenge}
+\section{The Challenge}
 
 A challenge is to use parallelism to speed up each step of the portrait mode
 process. A bottleneck in one process can significantly reduce speedup across
@@ -90,7 +90,7 @@ Overall, many of the steps are computationally heavy, with the convolutions
 of filters and calculating gradients in the image. Because we are processing
 the entire image, spatially dividing it up will allow for locality.
 
-\section*{Resources}
+\section{Resources}
 
 We will use the Gates cluster machines with the GPUs. We will follow the snake
 implementation outlined in the paper by Kass, Witkin, and Terzopoulous.
@@ -99,7 +99,7 @@ by adl1995 for implementations of Canny-Edge and Marr Hildreth. \cite{edge} To
 implement the Bokeh effect, we will follow the starter code in the tutorial.
 \cite{bokeh}
 
-\section*{Goals and Deliverables}
+\section{Goals and Deliverables}
 
 We plan to be able to implement portrait mode with kernels on a GPU. Any image
 will be taken as an input and the output would make it look like the image was
@@ -109,11 +109,11 @@ operations, we hope to be significantly faster than sequential methods.
 If we have time, we hope to adapt this algorithm to work for videos or gifs.
 Ideally, we can achieve realtime portrait mode in 30 fps. (30ms per image)
 
-\section*{Platform Choice}
+\section{Platform Choice}
 
 We will run this on GPUs, which are ideal for image processing.
 
-\section*{Schedule}
+\section{Schedule}
 
 TODO
 
