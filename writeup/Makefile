@@ -5,7 +5,7 @@ TEXFLAGS = -halt-on-error
 .PHONY: all clean
 .PRECIOUS: %.pdf
 
-all: proposal.pdf
+all: proposal-checkpoint.pdf proposal.pdf
 
 clean:
 	rm -rf *.aux *.log *.out *.pdf
