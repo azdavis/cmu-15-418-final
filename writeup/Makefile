@@ -1,14 +1,15 @@
 TEXC = pdflatex
-TEXFLAGS = -halt-on-error
+TEXFLAGS = -halt-on-error -output-directory=build
 
 .SUFFIXES:
 .PHONY: all clean
-.PRECIOUS: %.pdf
+.PRECIOUS: build/%.pdf
 
-all: proposal-checkpoint.pdf proposal.pdf
+all: build/proposal-checkpoint.pdf build/proposal.pdf
 
 clean:
-	rm -rf *.aux *.log *.out *.pdf
+	rm -rf build
 
-%.pdf: %.tex
+build/%.pdf: %.tex
+	mkdir -p $(dir $@)
 	for x in 1 2; do $(TEXC) $(TEXFLAGS) $< $(Q); done
