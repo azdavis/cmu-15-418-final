@@ -36,6 +36,25 @@ for row in range(height):
 # Line Energy
 line_energy = blurred
 
+# compute gradient
+gradient_kernel = [[0, 1, 0],
+                   [1, -4, 1],
+                   [0, 1, 0]
+                  ]
+kernel_size = len(gradient_kernel)
+edge_energy = np.zeros((height, width))
+for row in range(height):
+    for col in range(width):
+        total = 0
+        for i in range(row - (kernel_size / 2), row + (kernel_size / 2)):
+            for j in range(col - (kernel_size / 2), col + (kernel_size / 2)):
+                if (i < 0 or i >= height or j < 0 or j >= width):
+                    continue
+                k_i = (kernel_size/2) + i - row
+                k_j = (kernel_size/2) + j - col
+                total += blurred[i][j] * gradient_kernel[k_i][k_j]
+        edge_energy[row][col] = total
 
 imsave("Banana_blurred.jpg", blurred)
+imsave("Banana_edge.jpg", edge_energy)
 imsave("Banana_segmented.jpg", img)
