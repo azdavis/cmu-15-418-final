@@ -2,7 +2,8 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-guy = "img/sportsball"
+guy = "sportsball"
+guy = "img/" + guy
 
 img = imread(guy + ".jpg")
 
@@ -19,7 +20,7 @@ for row in range(height):
 
 
 # Blur with box filter, take average of square around center pixel
-box_size = 10
+box_size = 5
 blurred = np.zeros((height, width))
 for row in range(height):
     for col in range(width):
@@ -48,15 +49,27 @@ edge_energy = np.zeros((height, width))
 for row in range(height):
     for col in range(width):
         total = 0
-        for i in range(row - (kernel_size / 2), row + (kernel_size / 2)):
-            for j in range(col - (kernel_size / 2), col + (kernel_size / 2)):
-                if (i < 0 or i >= height or j < 0 or j >= width):
-                    continue
-                k_i = (kernel_size/2) + i - row
-                k_j = (kernel_size/2) + j - col
-                total += blurred[i][j] * gradient_kernel[k_i][k_j]
-        edge_energy[row][col] = total
-
+        dirs = [(-1,0), (1,0), (0,1), (0,-1)]
+        count = 0
+        for direction in dirs:
+            i = direction[0] + row
+            j = direction[1] + col
+            i_k = direction[0] + (kernel_size / 2)
+            j_k = direction[1] + (kernel_size / 2)
+            if (i < 0 or i >= height or j < 0 or j >= width):
+                continue
+            total += blurred[i][j] * gradient_kernel[i_k][j_k]
+            count += 1
+        total += blurred[row][col] * count * -1
+       # for i_k in range(kernel_size):
+       #     for j_k in range(kernel_size):
+       #         i = i_k - (kernel_size / 2) + row
+       #         j = j_k - (kernel_size / 2) + col
+       #         if (i < 0 or i >= height or j < 0 or j >= width):
+       #             continue
+       #         total += blurred[i][j] * gradient_kernel[i_k][j_k]
+        edge_energy[row][col] = abs(total)
+print edge_energy
 imsave(guy + "_blurred.jpg", blurred)
 imsave(guy + "_edge.jpg", edge_energy)
 imsave(guy + "_segmented.jpg", img)
