@@ -65,7 +65,7 @@ for row in range(height):
 
 # Energy
 total_energy = -1 * line_energy + 100 * edge_energy
-threshold = 70
+threshold = 120
 
 # Type of point in snake [(x, y), hasConverged]
 topSnake = []
