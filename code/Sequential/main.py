@@ -2,7 +2,9 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-img = imread("Banana.jpg")
+guy = "Banana"
+
+img = imread(guy + ".jpg")
 
 print np.shape(img)
 (height, width, color) = np.shape(img)
@@ -55,6 +57,6 @@ for row in range(height):
                 total += blurred[i][j] * gradient_kernel[k_i][k_j]
         edge_energy[row][col] = total
 
-imsave("Banana_blurred.jpg", blurred)
-imsave("Banana_edge.jpg", edge_energy)
-imsave("Banana_segmented.jpg", img)
+imsave(guy + "_blurred.jpg", blurred)
+imsave(guy + "_edge.jpg", edge_energy)
+imsave(guy + "_segmented.jpg", img)
