@@ -61,15 +61,7 @@ for row in range(height):
             total += blurred[i][j] * gradient_kernel[i_k][j_k]
             count += 1
         total += blurred[row][col] * count * -1
-       # for i_k in range(kernel_size):
-       #     for j_k in range(kernel_size):
-       #         i = i_k - (kernel_size / 2) + row
-       #         j = j_k - (kernel_size / 2) + col
-       #         if (i < 0 or i >= height or j < 0 or j >= width):
-       #             continue
-       #         total += blurred[i][j] * gradient_kernel[i_k][j_k]
         edge_energy[row][col] = abs(total)
-print edge_energy
 imsave(guy + "_blurred.jpg", blurred)
 imsave(guy + "_edge.jpg", edge_energy)
 imsave(guy + "_segmented.jpg", img)
