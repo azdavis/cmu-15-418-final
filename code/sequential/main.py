@@ -2,7 +2,7 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-guy = "sportsball"
+guy = "Banana"
 guy = "img/" + guy
 
 img = imread(guy + ".jpg")
@@ -62,6 +62,72 @@ for row in range(height):
             count += 1
         total += blurred[row][col] * count * -1
         edge_energy[row][col] = abs(total)
+
+# Energy
+total_energy = -1 * line_energy + 100 * edge_energy
+threshold = 70
+
+# Type of point in snake [(x, y), hasConverged]
+topSnake = []
+for i in range(width):
+    topSnake.append([(i, 0), False])
+leftSnake = []
+rightSnake = []
+for i in range(height):
+    leftSnake.append([(0, i), False])
+    rightSnake.append([(width-1, i), False])
+
+for i in range(height-1):
+    for j in range(len(topSnake)):
+        point = topSnake[j]
+        if point[1] == True:
+            continue
+        currentEnergy = total_energy[point[0][1]][point[0][0]]
+        nextEnergy = total_energy[point[0][1] + 1][point[0][0]]
+        if (abs(nextEnergy - currentEnergy) > threshold):
+            # Converged
+            topSnake[j][1] = True
+            #topSnake[j][0] = (point[0][0], point[0][1] + box_size)
+        else:
+            topSnake[j][0] = (point[0][0], point[0][1] + 1)
+
+for i in range(width-1):
+    for j in range(len(leftSnake)):
+        point = leftSnake[j]
+        if point[1] == True:
+            continue
+        currentEnergy = total_energy[point[0][1]][point[0][0]]
+        nextEnergy = total_energy[point[0][1]][point[0][0] + 1]
+        if (abs(nextEnergy - currentEnergy) > threshold):
+            # Converged
+            leftSnake[j][1] = True
+            #leftSnake[j][0] = (point[0][0] + box_size, point[0][1])
+        else:
+            leftSnake[j][0] = (point[0][0] + 1, point[0][1])
+
+for i in range(width-1):
+    for j in range(len(rightSnake)):
+        point = rightSnake[j]
+        if point[1] == True:
+            continue
+        currentEnergy = total_energy[point[0][1]][point[0][0]]
+        nextEnergy = total_energy[point[0][1]][point[0][0] - 1]
+        if (abs(nextEnergy - currentEnergy) > threshold):
+            # Converged
+            rightSnake[j][1] = True
+            #rightSnake[j][0] = (point[0][0] - box_size, point[0][1])
+        else:
+            rightSnake[j][0] = (point[0][0] - 1, point[0][1])
+
+for snake in [leftSnake, rightSnake, topSnake]:
+    for pt in snake:
+        if ((pt[0][1] == height-1) or
+            (pt[0][0] == width-1) or
+            (pt[0][0] == 0)):
+            continue
+
+        img[pt[0][1]][pt[0][0]] = np.array([0,255,0])
+
 imsave(guy + "_blurred.jpg", blurred)
 imsave(guy + "_edge.jpg", edge_energy)
 imsave(guy + "_segmented.jpg", img)
