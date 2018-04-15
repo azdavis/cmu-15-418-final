@@ -2,7 +2,7 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-guy = "elephant"
+guy = "large_elephant"
 guy = "img/" + guy
 
 img = imread(guy + ".jpg")
@@ -20,7 +20,7 @@ for row in range(height):
 
 
 # Blur with box filter, take average of square around center pixel
-box_size = 5
+box_size = 10
 blurred = np.zeros((height, width))
 for row in range(height):
     for col in range(width):
@@ -64,79 +64,73 @@ for row in range(height):
         edge_energy[row][col] = abs(total)
 
 # Energy
-total_energy = -5 * line_energy + 100 * edge_energy
-threshold = 120
+total_energy = (-5 * line_energy) + (200 * edge_energy)
+threshold = 70
 
 # Type of point in snake [(x, y), hasConverged]
 topSnake = []
 for i in range(width):
-    topSnake.append([(i, 0), False])
+    topSnake.append([(i, 0), 0, (i, 0)])
 leftSnake = []
 rightSnake = []
 for i in range(height):
-    leftSnake.append([(0, i), False])
-    rightSnake.append([(width-1, i), False])
+    leftSnake.append([(0, i), 0, (0, i)])
+    rightSnake.append([(width-1, i), 0, (width-1,i)])
 
-for i in range(height-1):
+topSnakeEnd = height / 2
+leftSnakeEnd = width / 2
+rightSnakeEnd = width / 2
+for i in range(topSnakeEnd):
     for j in range(len(topSnake)):
         point = topSnake[j]
-        if point[1] == True:
-            continue
         currentEnergy = total_energy[point[0][1]][point[0][0]]
         nextEnergy = total_energy[point[0][1] + 1][point[0][0]]
-        if (abs(nextEnergy - currentEnergy) > threshold):
-            # Converged
-            topSnake[j][1] = True
-            #topSnake[j][0] = (point[0][0], point[0][1] + box_size)
+        diff = abs(nextEnergy - currentEnergy)
+        if (diff > point[1] and (abs(point[1] - diff) > threshold)):
+            topSnake[j][1] = diff
+            topSnake[j][2] = (point[0][0], point[0][1])
+            img[point[0][1]][point[0][0]] =  np.array([0,255,0])
         else:
             topSnake[j][0] = (point[0][0], point[0][1] + 1)
 
-for i in range(width-1):
+for i in range(leftSnakeEnd):
     for j in range(len(leftSnake)):
         point = leftSnake[j]
-        if point[1] == True:
-            continue
         currentEnergy = total_energy[point[0][1]][point[0][0]]
         nextEnergy = total_energy[point[0][1]][point[0][0] + 1]
-        if (abs(nextEnergy - currentEnergy) > threshold):
-            # Converged
-            leftSnake[j][1] = True
-            #leftSnake[j][0] = (point[0][0] + box_size, point[0][1])
+        diff = abs(nextEnergy - currentEnergy)
+        if (diff > point[1] and (abs(point[1] - diff) > threshold)):
+            leftSnake[j][1] = diff
+            leftSnake[j][2] = (point[0][0], point[0][1])
+            img[point[0][1]][point[0][0]] =  np.array([255,0,0])
         else:
             leftSnake[j][0] = (point[0][0] + 1, point[0][1])
 
-for i in range(width-1):
+for i in range(rightSnakeEnd):
     for j in range(len(rightSnake)):
         point = rightSnake[j]
-        if point[1] == True:
-            continue
         currentEnergy = total_energy[point[0][1]][point[0][0]]
         nextEnergy = total_energy[point[0][1]][point[0][0] - 1]
-        if (abs(nextEnergy - currentEnergy) > threshold):
-            # Converged
-            rightSnake[j][1] = True
-            #rightSnake[j][0] = (point[0][0] - box_size, point[0][1])
+        diff = abs(nextEnergy - currentEnergy)
+        if (diff > point[1] and (abs(point[1] - diff) > threshold)):
+            rightSnake[j][1] = diff
+            rightSnake[j][2] = (point[0][0], point[0][1])
+            img[point[0][1]][point[0][0]] =  np.array([0,0,255])
         else:
             rightSnake[j][0] = (point[0][0] - 1, point[0][1])
 
 
 for pt in topSnake:
-    if (pt[0][1] == height-1):
-        continue
 
-    img[pt[0][1]][pt[0][0]] = np.array([0,255,0])
+    img[pt[2][1]][pt[2][0]] = np.array([0,255,0])
 
 for pt in leftSnake:
-    if (pt[0][1] == width-1):
-        continue
 
-    img[pt[0][1]][pt[0][0]] = np.array([255,0,0])
+    img[pt[2][1]][pt[2][0]] = np.array([255,0,0])
 
 for pt in rightSnake:
-    if (pt[0][1] == 0):
-        continue
 
-    img[pt[0][1]][pt[0][0]] = np.array([0,0,255])
+    img[pt[2][1]][pt[2][0]] = np.array([0,0,255])
 
 imsave(guy + "_blurred.jpg", blurred)
 imsave(guy + "_energy.jpg", total_energy)
