@@ -2,7 +2,7 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-guy = "Banana"
+guy = "elephant"
 guy = "img/" + guy
 
 img = imread(guy + ".jpg")
@@ -64,7 +64,7 @@ for row in range(height):
         edge_energy[row][col] = abs(total)
 
 # Energy
-total_energy = -1 * line_energy + 100 * edge_energy
+total_energy = -5 * line_energy + 100 * edge_energy
 threshold = 120
 
 # Type of point in snake [(x, y), hasConverged]
@@ -119,15 +119,26 @@ for i in range(width-1):
         else:
             rightSnake[j][0] = (point[0][0] - 1, point[0][1])
 
-for snake in [leftSnake, rightSnake, topSnake]:
-    for pt in snake:
-        if ((pt[0][1] == height-1) or
-            (pt[0][0] == width-1) or
-            (pt[0][0] == 0)):
-            continue
 
-        img[pt[0][1]][pt[0][0]] = np.array([0,255,0])
+for pt in topSnake:
+    if (pt[0][1] == height-1):
+        continue
+
+    img[pt[0][1]][pt[0][0]] = np.array([0,255,0])
+
+for pt in leftSnake:
+    if (pt[0][1] == width-1):
+        continue
+
+    img[pt[0][1]][pt[0][0]] = np.array([255,0,0])
+
+for pt in rightSnake:
+    if (pt[0][1] == 0):
+        continue
+
+    img[pt[0][1]][pt[0][0]] = np.array([0,0,255])
 
 imsave(guy + "_blurred.jpg", blurred)
+imsave(guy + "_energy.jpg", total_energy)
 imsave(guy + "_edge.jpg", edge_energy)
 imsave(guy + "_segmented.jpg", img)
