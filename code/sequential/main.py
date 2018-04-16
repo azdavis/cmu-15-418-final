@@ -2,11 +2,11 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-guy = "obama"
+guy = "farnam"
 guy = "img/" + guy
 
 img = imread(guy + ".jpg")
-
+imgcpy = imread(guy + ".jpg")
 print np.shape(img)
 (height, width, color) = np.shape(img)
 
@@ -80,9 +80,9 @@ for row in range(height):
         edge_energy[row][col] = abs(total)
 
 # Energy
-total_energy = (-1 * line_energy) + (200 * edge_energy)
+total_energy =(edge_energy)
 total_energy = np.clip(total_energy, 0, None)
-threshold = 70
+threshold = 60
 
 # Type of point in snake [(x, y), hasConverged]
 topSnake = []
@@ -94,21 +94,20 @@ for i in range(height):
     leftSnake.append([(0, i), 0, (0, i)])
     rightSnake.append([(width-1, i), 0, (width-1,i)])
 
-topSnakeEnd = height / 2
-leftSnakeEnd = width / 2
-rightSnakeEnd = width / 2
+topSnakeEnd = height - 1
+leftSnakeEnd = width - 1
+rightSnakeEnd = width - 1
 for i in range(topSnakeEnd):
     for j in range(len(topSnake)):
         point = topSnake[j]
         currentEnergy = total_energy[point[0][1]][point[0][0]]
         nextEnergy = total_energy[point[0][1] + 1][point[0][0]]
         diff = abs(nextEnergy - currentEnergy)
-        if (diff > point[1] and (diff > threshold)):
+        if (diff > threshold):
             topSnake[j][1] = diff
             topSnake[j][2] = (point[0][0], point[0][1])
             img[point[0][1]][point[0][0]] =  np.array([0,255,0])
-        else:
-            topSnake[j][0] = (point[0][0], point[0][1] + 1)
+        topSnake[j][0] = (point[0][0], point[0][1] + 1)
 
 for i in range(leftSnakeEnd):
     for j in range(len(leftSnake)):
@@ -116,12 +115,11 @@ for i in range(leftSnakeEnd):
         currentEnergy = total_energy[point[0][1]][point[0][0]]
         nextEnergy = total_energy[point[0][1]][point[0][0] + 1]
         diff = abs(nextEnergy - currentEnergy)
-        if (diff > point[1] and (diff > threshold)):
+        if (diff > threshold):
             leftSnake[j][1] = diff
             leftSnake[j][2] = (point[0][0], point[0][1])
             img[point[0][1]][point[0][0]] =  np.array([255,0,0])
-        else:
-            leftSnake[j][0] = (point[0][0] + 1, point[0][1])
+        leftSnake[j][0] = (point[0][0] + 1, point[0][1])
 
 for i in range(rightSnakeEnd):
     for j in range(len(rightSnake)):
@@ -129,27 +127,65 @@ for i in range(rightSnakeEnd):
         currentEnergy = total_energy[point[0][1]][point[0][0]]
         nextEnergy = total_energy[point[0][1]][point[0][0] - 1]
         diff = abs(nextEnergy - currentEnergy)
-        if (diff > point[1] and (diff > threshold)):
+        if (diff > threshold):
             rightSnake[j][1] = diff
             rightSnake[j][2] = (point[0][0], point[0][1])
             img[point[0][1]][point[0][0]] =  np.array([0,0,255])
-        else:
-            rightSnake[j][0] = (point[0][0] - 1, point[0][1])
+        rightSnake[j][0] = (point[0][0] - 1, point[0][1])
 
+imsave(guy + "_segmented.jpg", img)
+imsave(guy + "_energy.jpg", total_energy)
+threshold = 10
+total_energy = line_energy
+img = imgcpy
+topSnake = []
+for i in range(width):
+    topSnake.append([(i, 0), 0, (i, 0)])
+leftSnake = []
+rightSnake = []
+for i in range(height):
+    leftSnake.append([(0, i), 0, (0, i)])
+    rightSnake.append([(width-1, i), 0, (width-1,i)])
 
-for pt in topSnake:
+topSnakeEnd = height - 1
+leftSnakeEnd = width - 1
+rightSnakeEnd = width - 1
+for i in range(topSnakeEnd):
+    for j in range(len(topSnake)):
+        point = topSnake[j]
+        currentEnergy = total_energy[point[0][1]][point[0][0]]
+        nextEnergy = total_energy[point[0][1] + 1][point[0][0]]
+        diff = abs(nextEnergy - currentEnergy)
+        if (diff > threshold):
+            topSnake[j][1] = diff
+            topSnake[j][2] = (point[0][0], point[0][1])
+            img[point[0][1]][point[0][0]] =  np.array([0,255,0])
+        topSnake[j][0] = (point[0][0], point[0][1] + 1)
 
-    img[pt[2][1]][pt[2][0]] = np.array([0,255,0])
+for i in range(leftSnakeEnd):
+    for j in range(len(leftSnake)):
+        point = leftSnake[j]
+        currentEnergy = total_energy[point[0][1]][point[0][0]]
+        nextEnergy = total_energy[point[0][1]][point[0][0] + 1]
+        diff = abs(nextEnergy - currentEnergy)
+        if (diff > threshold):
+            leftSnake[j][1] = diff
+            leftSnake[j][2] = (point[0][0], point[0][1])
+            img[point[0][1]][point[0][0]] =  np.array([255,0,0])
+        leftSnake[j][0] = (point[0][0] + 1, point[0][1])
 
-for pt in leftSnake:
-
-    img[pt[2][1]][pt[2][0]] = np.array([255,0,0])
-
-for pt in rightSnake:
-
-    img[pt[2][1]][pt[2][0]] = np.array([0,0,255])
+for i in range(rightSnakeEnd):
+    for j in range(len(rightSnake)):
+        point = rightSnake[j]
+        currentEnergy = total_energy[point[0][1]][point[0][0]]
+        nextEnergy = total_energy[point[0][1]][point[0][0] - 1]
+        diff = abs(nextEnergy - currentEnergy)
+        if (diff > threshold):
+            rightSnake[j][1] = diff
+            rightSnake[j][2] = (point[0][0], point[0][1])
+            img[point[0][1]][point[0][0]] =  np.array([0,0,255])
+        rightSnake[j][0] = (point[0][0] - 1, point[0][1])
+imsave(guy + "_segmented_rough.jpg", img)
 
 imsave(guy + "_blurred.jpg", blurred)
-imsave(guy + "_energy.jpg", total_energy)
 imsave(guy + "_edge.jpg", edge_energy)
-imsave(guy + "_segmented.jpg", img)
