@@ -31,9 +31,6 @@ background = []
 for i in range(height):
     for j in range(leftWall):
         color = img[i][j]
-        if len(background) == 0:
-            background.append(color)
-            continue
         diff = True
         for bc in background:
             diff = diff and hasColorDiff(color, bc)
