@@ -2,7 +2,7 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-guy = "farnam"
+guy = "obama"
 guy = "img/" + guy
 
 img = imread(guy + ".jpg")
@@ -19,7 +19,7 @@ for row in range(height):
 
 
 
-# Blur with box filter, take average of square around center pixel
+# Blur with gaussian filter
 box_size = 5
 blurred = np.zeros((height, width))
 gauss_kernel = [
@@ -49,10 +49,6 @@ for row in range(height):
 line_energy = blurred
 
 # compute gradient
-gradient_kernel = [[0, 1, 0],
-                   [1, -4, 1],
-                   [0, 1, 0]
-                  ]
 gradient_kernel = [
                    [0, 0, 1, 0, 0],
                    [0, 0, 2, 0, 0],
@@ -84,7 +80,7 @@ total_energy =(edge_energy)
 total_energy = np.clip(total_energy, 0, None)
 threshold = 60
 
-# Type of point in snake [(x, y), hasConverged]
+# Type of point in snake [(x, y), maxThreshold, max point]
 topSnake = []
 for i in range(width):
     topSnake.append([(i, 0), 0, (i, 0)])
@@ -118,8 +114,9 @@ for i in range(leftSnakeEnd):
             img[point[0][1]][point[0][0]] =  np.array([255,0,0])
         leftSnake[j][0] = (point[0][0] + 1, point[0][1])
 
-imsave(guy + "_segmented.jpg", img)
+imsave(guy + "_segmented.jpg", img) # Edge as Energy
 imsave(guy + "_energy.jpg", total_energy)
+
 threshold = 10
 total_energy = line_energy
 img = imgcpy
@@ -156,7 +153,7 @@ for i in range(leftSnakeEnd):
             img[point[0][1]][point[0][0]] =  np.array([255,0,0])
         leftSnake[j][0] = (point[0][0] + 1, point[0][1])
 
-imsave(guy + "_segmented_rough.jpg", img)
+imsave(guy + "_segmented_rough.jpg", img) # Raw Pixel as energy
 
 imsave(guy + "_blurred.jpg", blurred)
 imsave(guy + "_edge.jpg", edge_energy)
