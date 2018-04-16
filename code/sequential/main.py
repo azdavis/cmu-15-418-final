@@ -101,7 +101,7 @@ for i in range(topSnakeEnd):
         nextEnergy = total_energy[point[1] + 1][point[0]]
         diff = abs(nextEnergy - currentEnergy)
         if (diff > threshold):
-            topSnakePts.append((point[0], point[1]))
+            topSnakePts[j].append((point[0], point[1]))
             img[point[1]][point[0]] =  np.array([0,255,0])
         topSnake[j] = (point[0], point[1] + 1)
 
@@ -112,7 +112,7 @@ for i in range(leftSnakeEnd):
         nextEnergy = total_energy[point[1]][point[0] + 1]
         diff = abs(nextEnergy - currentEnergy)
         if (diff > threshold):
-            leftSnakePts.append((point[0], point[1]))
+            leftSnakePts[j].append((point[0], point[1]))
             img[point[1]][point[0]] =  np.array([255,0,0])
         leftSnake[j] = (point[0] + 1, point[1])
 
@@ -145,7 +145,7 @@ for i in range(topSnakeEnd):
         nextEnergy = total_energy[point[1] + 1][point[0]]
         diff = abs(nextEnergy - currentEnergy)
         if (diff > threshold):
-            topSnakePts.append((point[0], point[1]))
+            topSnakePts[j].append((point[0], point[1]))
             img[point[1]][point[0]] =  np.array([0,255,0])
         topSnake[j] = (point[0], point[1] + 1)
 
@@ -156,7 +156,7 @@ for i in range(leftSnakeEnd):
         nextEnergy = total_energy[point[1]][point[0] + 1]
         diff = abs(nextEnergy - currentEnergy)
         if (diff > threshold):
-            leftSnakePts.append((point[0], point[1]))
+            leftSnakePts[j].append((point[0], point[1]))
             img[point[1]][point[0]] =  np.array([255,0,0])
         leftSnake[j] = (point[0] + 1, point[1])
 
