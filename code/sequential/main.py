@@ -2,7 +2,7 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-guy = "large_elephant"
+guy = "obama"
 guy = "img/" + guy
 
 img = imread(guy + ".jpg")
@@ -20,21 +20,30 @@ for row in range(height):
 
 
 # Blur with box filter, take average of square around center pixel
-box_size = 10
+box_size = 5
 blurred = np.zeros((height, width))
+gauss_kernel = [
+                   [1, 4, 7, 4, 1],
+                   [4, 16, 26, 16, 4],
+                   [7, 26, 41, 26, 7],
+                   [4, 16, 26, 16, 4],
+                   [1, 4, 7, 4, 1]
+                  ]
 for row in range(height):
     for col in range(width):
-        total = 0
         count = 0
-        for i in range(row - (box_size / 2), row + (box_size / 2)):
-            for j in range(col - (box_size / 2), col + (box_size / 2)):
+        total = 0
+        for i_k in range(box_size):
+            for j_k in range(box_size):
+                weight = gauss_kernel[i_k][j_k]
+                i = row - (box_size / 2) + i_k
+                j = col - (box_size / 2) + j_k
+
                 if (i < 0 or i >= height or j < 0 or j >= width):
                     continue
-                count += 1
-                total += grayscale[i][j]
-        if count == 0:
-            count = 1
-        blurred[row][col] = (total / count)
+                total += weight * grayscale[i][j]
+                count += weight
+        blurred[row][col] = total / count
 
 # Line Energy
 line_energy = blurred
@@ -44,12 +53,19 @@ gradient_kernel = [[0, 1, 0],
                    [1, -4, 1],
                    [0, 1, 0]
                   ]
+gradient_kernel = [
+                   [0, 0, 1, 0, 0],
+                   [0, 0, 2, 0, 0],
+                   [1, 2, -12, 2, 1],
+                   [0, 0, 2, 0, 0],
+                   [0, 0, 1, 0, 0]
+                  ]
 kernel_size = len(gradient_kernel)
 edge_energy = np.zeros((height, width))
 for row in range(height):
     for col in range(width):
         total = 0
-        dirs = [(-1,0), (1,0), (0,1), (0,-1)]
+        dirs = [(-2,0), (-1,0), (2,0), (1,0), (0,1), (0,2), (0,-1), (0,-2)]
         count = 0
         for direction in dirs:
             i = direction[0] + row
@@ -59,12 +75,13 @@ for row in range(height):
             if (i < 0 or i >= height or j < 0 or j >= width):
                 continue
             total += blurred[i][j] * gradient_kernel[i_k][j_k]
-            count += 1
+            count += gradient_kernel[i_k][j_k]
         total += blurred[row][col] * count * -1
         edge_energy[row][col] = abs(total)
 
 # Energy
-total_energy = (-5 * line_energy) + (200 * edge_energy)
+total_energy = (-1 * line_energy) + (200 * edge_energy)
+total_energy = np.clip(total_energy, 0, None)
 threshold = 70
 
 # Type of point in snake [(x, y), hasConverged]
@@ -86,7 +103,7 @@ for i in range(topSnakeEnd):
         currentEnergy = total_energy[point[0][1]][point[0][0]]
         nextEnergy = total_energy[point[0][1] + 1][point[0][0]]
         diff = abs(nextEnergy - currentEnergy)
-        if (diff > point[1] and (abs(point[1] - diff) > threshold)):
+        if (diff > point[1] and (diff > threshold)):
             topSnake[j][1] = diff
             topSnake[j][2] = (point[0][0], point[0][1])
             img[point[0][1]][point[0][0]] =  np.array([0,255,0])
@@ -99,7 +116,7 @@ for i in range(leftSnakeEnd):
         currentEnergy = total_energy[point[0][1]][point[0][0]]
         nextEnergy = total_energy[point[0][1]][point[0][0] + 1]
         diff = abs(nextEnergy - currentEnergy)
-        if (diff > point[1] and (abs(point[1] - diff) > threshold)):
+        if (diff > point[1] and (diff > threshold)):
             leftSnake[j][1] = diff
             leftSnake[j][2] = (point[0][0], point[0][1])
             img[point[0][1]][point[0][0]] =  np.array([255,0,0])
@@ -112,7 +129,7 @@ for i in range(rightSnakeEnd):
         currentEnergy = total_energy[point[0][1]][point[0][0]]
         nextEnergy = total_energy[point[0][1]][point[0][0] - 1]
         diff = abs(nextEnergy - currentEnergy)
-        if (diff > point[1] and (abs(point[1] - diff) > threshold)):
+        if (diff > point[1] and (diff > threshold)):
             rightSnake[j][1] = diff
             rightSnake[j][2] = (point[0][0], point[0][1])
             img[point[0][1]][point[0][0]] =  np.array([0,0,255])
