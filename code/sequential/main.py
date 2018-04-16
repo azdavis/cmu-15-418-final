@@ -6,161 +6,40 @@ guy = "farnam"
 guy = "img/" + guy
 
 img = imread(guy + ".jpg")
-imgcpy = imread(guy + ".jpg")
+imgcpy = np.copy(img, True)
 print np.shape(img)
 (height, width, color) = np.shape(img)
 
-# Convert to grayscale
-grayscale = np.zeros((height, width))
+wall = 6
+leftWall = width / wall
+rightWall = (width * (wall - 1)) / wall
 
-for row in range(height):
-    for col in range(width):
-        grayscale[row][col] = sum(img[row][col]) / 3
-
-# Blur with gaussian filter
-box_size = 5
-blurred = np.zeros((height, width))
-gauss_kernel = [
-                   [1, 4, 7, 4, 1],
-                   [4, 16, 26, 16, 4],
-                   [7, 26, 41, 26, 7],
-                   [4, 16, 26, 16, 4],
-                   [1, 4, 7, 4, 1]
-                  ]
-for row in range(height):
-    for col in range(width):
-        count = 0
-        total = 0
-        for i_k in range(box_size):
-            for j_k in range(box_size):
-                weight = gauss_kernel[i_k][j_k]
-                i = row - (box_size / 2) + i_k
-                j = col - (box_size / 2) + j_k
-
-                if (i < 0 or i >= height or j < 0 or j >= width):
-                    continue
-                total += weight * grayscale[i][j]
-                count += weight
-        blurred[row][col] = total / count
-
-# Line Energy
-line_energy = blurred
-
-# compute gradient
-gradient_kernel = [
-                   [0, 0, 1, 0, 0],
-                   [0, 0, 2, 0, 0],
-                   [1, 2, -12, 2, 1],
-                   [0, 0, 2, 0, 0],
-                   [0, 0, 1, 0, 0]
-                  ]
-kernel_size = len(gradient_kernel)
-edge_energy = np.zeros((height, width))
-for row in range(height):
-    for col in range(width):
-        total = 0
-        dirs = [(-2,0), (-1,0), (2,0), (1,0), (0,1), (0,2), (0,-1), (0,-2)]
-        count = 0
-        for direction in dirs:
-            i = direction[0] + row
-            j = direction[1] + col
-            i_k = direction[0] + (kernel_size / 2)
-            j_k = direction[1] + (kernel_size / 2)
-            if (i < 0 or i >= height or j < 0 or j >= width):
-                continue
-            total += blurred[i][j] * gradient_kernel[i_k][j_k]
-            count += gradient_kernel[i_k][j_k]
-        total += blurred[row][col] * count * -1
-        edge_energy[row][col] = abs(total)
-
-# Energy
-total_energy =(edge_energy)
-total_energy = np.clip(total_energy, 0, None)
-threshold = 60
-
-# Type of point in snake (x, y)
-topSnake = []
-edgeTopSnakePts = [] # Has all the points for top snake for edges
-for i in range(width):
-    topSnake.append((i, 0))
-    edgeTopSnakePts.append([])
-leftSnake = []
-edgeLeftSnakePts = [] # Has all the points for left snake for edges
 for i in range(height):
-    leftSnake.append((0, i))
-    edgeLeftSnakePts.append([])
+    imgcpy[i][leftWall] = np.array([255,0,0])
+    imgcpy[i][rightWall] = np.array([0,255,0])
 
-topSnakePts = edgeTopSnakePts
-leftSnakePts = edgeLeftSnakePts
-topSnakeEnd = height - 1
-leftSnakeEnd = width - 1
-for i in range(topSnakeEnd):
-    for j in range(len(topSnake)):
-        point = topSnake[j]
-        currentEnergy = total_energy[point[1]][point[0]]
-        nextEnergy = total_energy[point[1] + 1][point[0]]
-        diff = abs(nextEnergy - currentEnergy)
-        if (diff > threshold):
-            topSnakePts[j].append((point[0], point[1]))
-            img[point[1]][point[0]] =  np.array([0,255,0])
-        topSnake[j] = (point[0], point[1] + 1)
+imsave(guy + "_walls.jpg", imgcpy) # See walls
 
-for i in range(leftSnakeEnd):
-    for j in range(len(leftSnake)):
-        point = leftSnake[j]
-        currentEnergy = total_energy[point[1]][point[0]]
-        nextEnergy = total_energy[point[1]][point[0] + 1]
-        diff = abs(nextEnergy - currentEnergy)
-        if (diff > threshold):
-            leftSnakePts[j].append((point[0], point[1]))
-            img[point[1]][point[0]] =  np.array([255,0,0])
-        leftSnake[j] = (point[0] + 1, point[1])
-
-imsave(guy + "_segmented.jpg", img) # Edge as Energy
-imsave(guy + "_energy.jpg", total_energy)
-
-threshold = 10
-total_energy = line_energy
-img = imgcpy
-# Type of point in snake (x, y)
-topSnake = []
-pixTopSnakePts = [] # Has all the points for top snake for pixels
-for i in range(width):
-    topSnake.append((i, 0))
-    pixTopSnakePts.append([])
-leftSnake = []
-pixLeftSnakePts = [] # Has all the points for left snake for pixels
+img = img.astype(np.int32) # DEFAULT NUMPY IMAGE IS UINT8
+threshold = 30
+def hasColorDiff(color1, color2):
+    return (abs(color1[0] - color2[0]) +
+            abs(color1[1] - color2[1]) +
+            abs(color1[2] - color2[2])) > threshold
+background = []
+# Get color profile of background
 for i in range(height):
-    leftSnake.append((0, i))
-    pixLeftSnakePts.append([])
+    for j in range(leftWall):
+        color = img[i][j]
+        if len(background) == 0:
+            background.append(color)
+            continue
+        diff = True
+        for bc in background:
+            diff = diff and hasColorDiff(color, bc)
 
-topSnakePts = pixTopSnakePts
-leftSnakePts = pixLeftSnakePts
-topSnakeEnd = height - 1
-leftSnakeEnd = width - 1
-for i in range(topSnakeEnd):
-    for j in range(len(topSnake)):
-        point = topSnake[j]
-        currentEnergy = total_energy[point[1]][point[0]]
-        nextEnergy = total_energy[point[1] + 1][point[0]]
-        diff = abs(nextEnergy - currentEnergy)
-        if (diff > threshold):
-            topSnakePts[j].append((point[0], point[1]))
-            img[point[1]][point[0]] =  np.array([0,255,0])
-        topSnake[j] = (point[0], point[1] + 1)
+        if diff:
+            background.append(color)
 
-for i in range(leftSnakeEnd):
-    for j in range(len(leftSnake)):
-        point = leftSnake[j]
-        currentEnergy = total_energy[point[1]][point[0]]
-        nextEnergy = total_energy[point[1]][point[0] + 1]
-        diff = abs(nextEnergy - currentEnergy)
-        if (diff > threshold):
-            leftSnakePts[j].append((point[0], point[1]))
-            img[point[1]][point[0]] =  np.array([255,0,0])
-        leftSnake[j] = (point[0] + 1, point[1])
-
-imsave(guy + "_segmented_rough.jpg", img) # Raw Pixel as energy
-
-imsave(guy + "_blurred.jpg", blurred)
-imsave(guy + "_edge.jpg", edge_energy)
+print len(background)
+print background
