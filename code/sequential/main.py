@@ -5,6 +5,8 @@ import numpy as np
 guy = "farnam"
 guy = "img/" + guy
 
+print("prelims")
+
 img = imread(guy + ".jpg").astype(np.int32)
 height, width, _ = np.shape(img)
 
@@ -13,6 +15,8 @@ walls = np.copy(img, True)
 wall = 6
 leftWall = width / wall
 rightWall = (width * (wall - 1)) / wall
+
+print("show walls")
 
 for i in range(height):
     walls[i][leftWall] = np.array([255,0,0])
@@ -28,6 +32,8 @@ def hasColorDiff(color1, color2):
         abs(color1[2] - color2[2])
     ) > threshold
 
+print("get background")
+
 background = []
 for i in range(height):
     for j in range(leftWall):
@@ -37,6 +43,8 @@ for i in range(height):
             diff = diff and hasColorDiff(this, bc)
         if diff:
             background.append(this)
+
+print("use background")
 
 dude = np.copy(img, True)
 
