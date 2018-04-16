@@ -37,3 +37,16 @@ for i in range(height):
             diff = diff and hasColorDiff(this, bc)
         if diff:
             background.append(this)
+
+dude = np.copy(img, True)
+
+for i in range(height):
+    for j in range(width):
+        this = dude[i][j]
+        diff = True
+        for bc in background:
+            diff = diff and hasColorDiff(this, bc)
+        if diff:
+            dude[i][j] = np.array([255,0,0])
+
+imsave(guy + "_dude.jpg", dude)
