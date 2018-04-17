@@ -15,12 +15,17 @@ walls = np.copy(img, True)
 ltRtWallDenom = 7
 ltWall = width / ltRtWallDenom
 rtWall = (width * (ltRtWallDenom - 1)) / ltRtWallDenom
+tpWallDenom = 8
+tpWall = height / tpWallDenom
 
 print("show walls")
 
 for i in range(height):
     walls[i][ltWall] = np.array([255,0,0])
     walls[i][rtWall] = np.array([0,255,0])
+
+for j in range(width):
+    walls[tpWall][j] = np.array([0,0,255])
 
 imsave(guy + "_walls.jpg", walls)
 
