@@ -46,7 +46,10 @@ def getBackgroundColors(image, xmin, xmax, ymin, ymax):
                 ret.append(this)
     return ret
 
-background = getBackgroundColors(img, 0, leftWall, 0, height)
+background = (
+    getBackgroundColors(img, 0, leftWall, 0, height) +
+    getBackgroundColors(img, rightWall, width, 0, height)
+)
 
 print("use background")
 
