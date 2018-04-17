@@ -34,15 +34,19 @@ def hasColorDiff(color1, color2):
 
 print("get background")
 
-background = []
-for i in range(height):
-    for j in range(leftWall):
-        this = img[i][j]
-        diff = True
-        for bc in background:
-            diff = diff and hasColorDiff(this, bc)
-        if diff:
-            background.append(this)
+def getBackgroundColors(image, xmin, xmax, ymin, ymax):
+    ret = []
+    for i in range(ymin, ymax):
+        for j in range(xmin, xmax):
+            this = image[i][j]
+            diff = True
+            for x in ret:
+                diff = diff and hasColorDiff(this, x)
+            if diff:
+                ret.append(this)
+    return ret
+
+background = getBackgroundColors(img, 0, leftWall, 0, height)
 
 print("use background")
 
