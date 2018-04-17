@@ -2,7 +2,7 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-guy = "farnam"
+guy = "elephant"
 guy = "img/" + guy
 
 print("prelims")
@@ -46,10 +46,13 @@ def getBackgroundColors(image, ranges):
             for j in range(xmin, xmax):
                 this = image[i][j]
                 diff = True
-                for x in ret:
-                    diff = diff and hasColorDiff(this, x)
+                for ind in range(len(ret)):
+                    x = ret[ind]
+                    diff = diff and hasColorDiff(this, x[0])
+                    if not hasColorDiff(this, x[0]):
+                        x[1] += 1
                 if diff:
-                    ret.append(this)
+                    ret.append([this, 1])
     return ret
 
 background = getBackgroundColors(
@@ -60,8 +63,14 @@ background = getBackgroundColors(
         (0, width, 0, tpWall)
     ]
 )
-
+print background
+totalBCPix = ltWall * height + (width - rtWall) * height + tpWall * width
 print("use background")
+# Filter background colors
+bcThresh = 0.01 * totalBCPix
+background = filter(lambda x: x[1] > bcThresh, background)
+print background
+
 
 dude = np.copy(img, True)
 
@@ -70,8 +79,8 @@ for i in range(height):
         this = dude[i][j]
         diff = True
         for bc in background:
-            diff = diff and hasColorDiff(this, bc)
+            diff = diff and hasColorDiff(this, bc[0])
         if diff:
-            dude[i][j] = np.array([255,0,0])
+            dude[i][j] = np.array([0,255,0])
 
 imsave(guy + "_dude.jpg", dude)
