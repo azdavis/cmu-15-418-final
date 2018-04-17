@@ -63,16 +63,19 @@ background = getBackgroundColors(
         (0, width, 0, tpWall)
     ]
 )
+
+print("filter background")
+# Filter background colors
 print background
 totalBCPix = ltWall * height + (width - rtWall) * height + tpWall * width
-print("use background")
-# Filter background colors
 bcThresh = 0.01 * totalBCPix
 background = filter(lambda x: x[1] > bcThresh, background)
 print background
 
+print("use background")
 
 dude = np.copy(img, True)
+mask = np.zeros((height, width))
 
 for i in range(height):
     for j in range(width):
@@ -82,5 +85,23 @@ for i in range(height):
             diff = diff and hasColorDiff(this, bc[0])
         if diff:
             dude[i][j] = np.array([0,255,0])
+            mask[i][j] = 1
 
+imsave(guy + "_predude.jpg", dude)
+
+newMask = np.copy(mask, True)
+# Cleaning up mask
+for i in range(2, height-2):
+    for j in range(2, width-2):
+        this = mask[i][j]
+        if this == 0:
+            borderSum = (mask[i-1][j] + mask[i][j-1] +
+                         mask[i+1][j] + mask[i][j+1] +
+                         mask[i-2][j] + mask[i][j-2] +
+                         mask[i+2][j] + mask[i][j+2])
+            if borderSum >= 2:
+               dude[i][j] = np.array([0,0,0])
+               newMask[i][j] = 1
+mask = newMask
 imsave(guy + "_dude.jpg", dude)
+
