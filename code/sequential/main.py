@@ -12,15 +12,15 @@ height, width, _ = np.shape(img)
 
 walls = np.copy(img, True)
 
-wall = 6
-leftWall = width / wall
-rightWall = (width * (wall - 1)) / wall
+ltRtWallDenom = 7
+ltWall = width / ltRtWallDenom
+rtWall = (width * (ltRtWallDenom - 1)) / ltRtWallDenom
 
 print("show walls")
 
 for i in range(height):
-    walls[i][leftWall] = np.array([255,0,0])
-    walls[i][rightWall] = np.array([0,255,0])
+    walls[i][ltWall] = np.array([255,0,0])
+    walls[i][rtWall] = np.array([0,255,0])
 
 imsave(guy + "_walls.jpg", walls)
 
@@ -47,8 +47,8 @@ def getBackgroundColors(image, xmin, xmax, ymin, ymax):
     return ret
 
 background = (
-    getBackgroundColors(img, 0, leftWall, 0, height) +
-    getBackgroundColors(img, rightWall, width, 0, height)
+    getBackgroundColors(img, 0, ltWall, 0, height) +
+    getBackgroundColors(img, rtWall, width, 0, height)
 )
 
 print("use background")
