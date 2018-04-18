@@ -67,14 +67,11 @@ background = getBackgroundColors(
 
 print("filter background")
 # Filter background colors
-print background
 totalBCPix = ltWall * height + (width - rtWall) * height + tpWall * width
 bcThresh = 0.01 * totalBCPix
 background = filter(lambda x: x[1] > bcThresh, background)
-print background
 
 print("use background")
-
 dude = np.copy(img, True)
 mask = np.zeros((height, width))
 
@@ -112,8 +109,6 @@ blurKernel = [[1.0/8, 1.0/8, 1.0/8],
               [1.0/8, 1.0/8, 1.0/8]
              ]
 blurred = np.zeros((height, width, 3))
-print np.shape(blurred)
-print np.shape(original)
 
 for kY in range(len(blurKernel)):
     for kX in range(len(blurKernel[0])):
