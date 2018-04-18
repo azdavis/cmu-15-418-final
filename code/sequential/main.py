@@ -2,7 +2,7 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-guy = "elephant"
+guy = "farnam"
 guy = "img/" + guy
 
 print("prelims")
@@ -113,7 +113,7 @@ blurred = np.zeros((height, width, 3))
 for kY in range(len(blurKernel)):
     for kX in range(len(blurKernel[0])):
         blur = blurKernel[kY][kX]
-        if blur = 0:
+        if blur == 0:
             continue
         for i in range(len(original)):
             for j in range(len(original[i])):
