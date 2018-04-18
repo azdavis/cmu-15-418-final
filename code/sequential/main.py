@@ -130,3 +130,11 @@ for kY in range(len(blurKernel)):
 
 imsave(guy + "_blurred.jpg", blurred)
 
+# Put filter on mask
+for i in range(len(blurred)):
+    for j in range(len(blurred[0])):
+        if (i+1 >= height) or (j+1 >= width):
+            continue
+        if mask[i+1][j+1] == 1:
+            blurred[i][j] = original[i+1][j+1]
+imsave(guy + "_portrait.jpg", blurred)
