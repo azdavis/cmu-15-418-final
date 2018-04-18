@@ -2,7 +2,7 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-guy = "farnam"
+guy = "elephant"
 guy = "img/" + guy
 
 print("prelims")
@@ -87,6 +87,7 @@ for i in range(height):
 
 imsave(guy + "_predude.jpg", dude)
 
+print("cleaning up mask")
 newMask = np.copy(mask, True)
 # Clean up mask
 for i in range(2, height-2):
@@ -104,29 +105,41 @@ mask = newMask
 
 imsave(guy + "_dude.jpg", dude)
 # Blur
-blurKernel = [[1.0/8, 1.0/8, 1.0/8],
-              [1.0/8, 0, 1.0/8],
-              [1.0/8, 1.0/8, 1.0/8]
-             ]
 blurred = np.zeros((height, width, 3))
+blurKernel = [
+                   [1, 4, 7, 4, 1],
+                   [4, 16, 26, 16, 4],
+                   [7, 26, 41, 26, 7],
+                   [4, 16, 26, 16, 4],
+                   [1, 4, 7, 4, 1]
+                  ]
+box_size = len(blurKernel)
+for row in range(height):
+    for col in range(width):
+        count = 0
+        for i_k in range(len(blurKernel)):
+            for j_k in range(len(blurKernel[0])):
+                weight = blurKernel[i_k][j_k]
+                i = row - (box_size / 2) + i_k
+                j = col - (box_size / 2) + j_k
 
-for kY in range(len(blurKernel)):
-    for kX in range(len(blurKernel[0])):
-        blur = blurKernel[kY][kX]
-        if blur == 0:
+                if (i < 0 or i >= height or j < 0 or j >= width):
+                    continue
+                elif (mask[i][j] == 1):
+                    continue
+                blurred[row][col][0] += weight * original[i][j][0]
+                blurred[row][col][1] += weight * original[i][j][1]
+                blurred[row][col][2] += weight * original[i][j][2]
+                count += weight
+        if (count == 0):
             continue
-        for i in range(len(original)):
-            for j in range(len(original[i])):
-                if (i + kY >= height) or (j + kX >= width):
-                    continue
-                if (i + 1 >= height) or (j + 1 >= width):
-                    continue
-                blurred[i+1][j+1][0] += blur * original[i+kY][j+kX][0]
-                blurred[i+1][j+1][1] += blur * original[i+kY][j+kX][1]
-                blurred[i+1][j+1][2] += blur * original[i+kY][j+kX][2]
+        blurred[row][col][0] = float(blurred[row][col][0]) / count
+        blurred[row][col][1] = float(blurred[row][col][1]) / count
+        blurred[row][col][2] = float(blurred[row][col][2]) / count
 
 imsave(guy + "_blurred.jpg", blurred)
 
+print("put on filter")
 # Put filter on mask
 for i in range(len(blurred)):
     for j in range(len(blurred[0])):
