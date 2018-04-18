@@ -11,6 +11,7 @@ img = imread(guy + ".jpg").astype(np.int32)
 height, width, _ = np.shape(img)
 
 walls = np.copy(img, True)
+original = np.copy(img, True)
 
 ltRtWallDenom = 7
 ltWall = width / ltRtWallDenom
@@ -90,7 +91,7 @@ for i in range(height):
 imsave(guy + "_predude.jpg", dude)
 
 newMask = np.copy(mask, True)
-# Cleaning up mask
+# Clean up mask
 for i in range(2, height-2):
     for j in range(2, width-2):
         this = mask[i][j]
@@ -103,5 +104,29 @@ for i in range(2, height-2):
                dude[i][j] = np.array([0,0,0])
                newMask[i][j] = 1
 mask = newMask
+
 imsave(guy + "_dude.jpg", dude)
+# Blur
+blurKernel = [[1.0/8, 1.0/8, 1.0/8],
+              [1.0/8, 0, 1.0/8],
+              [1.0/8, 1.0/8, 1.0/8]
+             ]
+blurred = np.zeros((height, width, 3))
+print np.shape(blurred)
+print np.shape(original)
+
+for kY in range(len(blurKernel)):
+    for kX in range(len(blurKernel[0])):
+        blur = blurKernel[kY][kX]
+        for i in range(len(original)):
+            for j in range(len(original[i])):
+                if (i + kY >= height) or (j + kX >= width):
+                    continue
+                if (i + 1 >= height) or (j + 1 >= width):
+                    continue
+                blurred[i+1][j+1][0] += blur * original[i+kY][j+kX][0]
+                blurred[i+1][j+1][1] += blur * original[i+kY][j+kX][1]
+                blurred[i+1][j+1][2] += blur * original[i+kY][j+kX][2]
+
+imsave(guy + "_blurred.jpg", blurred)
 
