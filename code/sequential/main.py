@@ -118,6 +118,8 @@ print np.shape(original)
 for kY in range(len(blurKernel)):
     for kX in range(len(blurKernel[0])):
         blur = blurKernel[kY][kX]
+        if blur = 0:
+            continue
         for i in range(len(original)):
             for j in range(len(original[i])):
                 if (i + kY >= height) or (j + kX >= width):
