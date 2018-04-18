@@ -135,7 +135,33 @@ between sequential python with CUDA and sequential C.
 
 \section*{Issues}
 
-\newpage
+Our current algorithm performs very well on some images, but on others it does
+not do as well. When the colors composing the subject are similar to the ones
+in the background, we have trouble distinguishing the two.
+
+Additionally, we sometimes notice small objects in the background with unusual
+colors being identified as the foreground
+
+We may try to use a hybrid strategy using both our modified grab-cut algorithm
+and snakes to try to better identify the subject, or attempt to implement logic
+to ignore small, isolated ``foreground'' objects. Or, we may decide to limit
+our scope to images that work well with our current algorithm and focus on
+parallelization.
+
+As for the parallelization we have left to do: Due to the structure of the
+problem and the low amount of competition when writing to the final blurred
+image, we think we may see significant speedup on the final blurring step.
+However, in order to blur a single pixel, we have to look at many neighboring
+pixels. This may present a challenge, and we may wish to decrease the number of
+pixels each pixel looks at as it blurs.
+
+The gathering of background color info is also likely to be a challenge. Here,
+we do have a significant amount of sequential-ness and dependency. We will have
+to think of creative ways to identify which colors are background colors in a
+parallelization way. Some preliminary thoughts we have are to set up a lookup
+table mapping ranges of colors to number of times encountered in the image,
+break the image into many small blocks, locally update the counts, and coalesce
+the counts at the end into the final global table.
 
 \section*{Sample Results Gallery}
 
