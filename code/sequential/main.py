@@ -2,7 +2,7 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-guy = "elephant"
+guy = "large_elephant"
 guy = "img/" + guy
 
 print("prelims")
@@ -105,6 +105,7 @@ mask = newMask
 
 imsave(guy + "_dude.jpg", dude)
 # Blur
+print "blur image"
 blurred = np.zeros((height, width, 3))
 blurKernel = [
                    [1, 4, 7, 4, 1],
@@ -113,6 +114,7 @@ blurKernel = [
                    [4, 16, 26, 16, 4],
                    [1, 4, 7, 4, 1]
                   ]
+blurKernel = [[1] * 11] * 11
 box_size = len(blurKernel)
 for row in range(height):
     for col in range(width):
