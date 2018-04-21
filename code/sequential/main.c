@@ -154,15 +154,11 @@ int main(void) {
     strcat(guy, ".ppm");
     img = readPPM(guy);
 
+    // Get Walls
     int ltWall = img->width / LTRTWALLDENOM;
     int rtWall = (img->width * (LTRTWALLDENOM - 1)) / LTRTWALLDENOM;
     int tpWall = img->height / TPWALLDENOM;
 
-    int i, j;
-    for (i = 0; i < img->height; i++) {
-        setPixel(ltWall, i, img, 255, 0, 0);
-        setPixel(rtWall, i, img, 0, 255, 0);
-    }
 
     for (j = 0; j < img->width; j++) {
         setPixel(j, tpWall, img, 0, 0, 255);
