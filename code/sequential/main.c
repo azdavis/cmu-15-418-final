@@ -154,7 +154,7 @@ int main(void) {
         setPixel(rtWall, i, img, 0, 255, 0);
     }
 
-    for (j = 0; j < img->height; j++) {
+    for (j = 0; j < img->width; j++) {
         setPixel(j, tpWall, img, 0, 0, 255);
     }
     strcpy(guy, base);
