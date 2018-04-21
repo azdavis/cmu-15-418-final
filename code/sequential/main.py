@@ -141,8 +141,7 @@ print("put on filter")
 # Put filter on mask
 for i in range(len(blurred)):
     for j in range(len(blurred[0])):
-        if (i+1 >= height) or (j+1 >= width):
-            continue
-        if mask[i+1][j+1] == 1:
-            blurred[i][j] = original[i+1][j+1]
+        if mask[i][j] == 1:
+            blurred[i][j] = original[i][j]
 imsave(guy + "_portrait.ppm", blurred)
+imsave(guy + "_portrait.jpg", blurred)
