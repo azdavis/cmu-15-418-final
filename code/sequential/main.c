@@ -117,10 +117,14 @@ void writePPM(const char *filename, PPMImage *img)
     fclose(fp);
 }
 
+static PPMPixel* getPixel(int x, int y, PPMImage *img)
+{
+    return &(img->data[x + y * img->width]);
+}
+
 int main(void) {
     PPMImage *image;
     image = readPPM("img/elephant.ppm");
     writePPM("img/elephant2.ppm",image);
-    puts("hello");
     return 0;
 }
