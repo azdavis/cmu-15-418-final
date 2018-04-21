@@ -1,8 +1,8 @@
 .SUFFIXES:
 .PHONY: all
 
-all:
-	python main.py
+all: main
+	./main
 
 clean:
 	rm -rf main
