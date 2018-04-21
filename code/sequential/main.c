@@ -1,5 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define RGB_COMPONENT_COLOR 255
+#define LTRTWALLDENOM 7
+#define TPWALLDENOM 8
 
 // PPM reading writing code guided from:
 // https://stackoverflow.com/questions/2693631/read-ppm-file-and-store-it-in-an-array-coded-with-c
@@ -12,8 +17,6 @@ typedef struct {
      int width, height;
      PPMPixel *data;
 } PPMImage;
-
-#define RGB_COMPONENT_COLOR 255
 
 static PPMImage *readPPM(const char *filename)
 {
@@ -130,17 +133,32 @@ static void setPixel(int x, int y, PPMImage *img,
     img->data[x + y * img->width].blue = B;
 }
 int main(void) {
-    PPMImage *image;
-    image = readPPM("img/elephant.ppm");
-    PPMPixel* pt = getPixel(0, 0, image);
-    PPMPixel* pt2 = getPixel(1, 1, image);
-    printf("unsigned char %d\n", sizeof(unsigned char));
-    printf("pixel at 0 0 is %d %d %d\n", pt->red, pt->blue, pt->green);
-    printf("pixel at 1 1 is %d %d %d\n", pt2->red, pt2->blue, pt2->green);
-    setPixel(0, 0, image, pt->red, pt->green, pt->blue);
-    setPixel(1, 1, image, pt2->red, pt2->green, pt2->blue);
-    printf("pixel at 0 0 is %d %d %d\n", pt->red, pt->blue, pt->green);
-    printf("pixel at 1 1 is %d %d %d\n", pt2->red, pt2->blue, pt2->green);
-    writePPM("img/elephant2.ppm", image);
+
+    // Initializion
+    PPMImage *img;
+    char base[100] = "img/";
+    char guy[100];
+    strcat(base, "elephant2");
+
+    strcpy(guy, base);
+    strcat(guy, ".ppm");
+    img = readPPM(guy);
+
+    int ltWall = img->width / LTRTWALLDENOM;
+    int rtWall = (img->width * (LTRTWALLDENOM - 1)) / LTRTWALLDENOM;
+    int tpWall = img->height / TPWALLDENOM;
+
+    int i, j;
+    for (i = 0; i < img->height; i++) {
+        setPixel(ltWall, i, img, 255, 0, 0);
+        setPixel(rtWall, i, img, 0, 255, 0);
+    }
+
+    for (j = 0; j < img->height; j++) {
+        setPixel(j, tpWall, img, 0, 0, 255);
+    }
+    strcpy(guy, base);
+    strcat(guy, "_walls.ppm");
+    writePPM(guy, img);
     return 0;
 }
