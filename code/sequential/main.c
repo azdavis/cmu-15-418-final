@@ -196,8 +196,8 @@ int main(void) {
                       tpWall * img->width);
     int bcThresh = BCTHRESH_DECIMAL * totalBCPix;
 
-    char *mask = calloc(img->width * img->height, sizeof(char));
-    if (color_counts == NULL)
+    char *oldMask = calloc(img->width * img->height, sizeof(char));
+    if (oldMask == NULL)
         exit(1);
 
     for (i = 0; i < img->height; i++) {
@@ -208,13 +208,39 @@ int main(void) {
             unsigned char b = pt->blue / BUCKET_SIZE;
             if (color_counts[getBucketIdx(r, g, b)] < bcThresh) {
                 setPixel(j, i, img, 0, 255, 0);
-                mask[i * img->width + j] = 1;
+                oldMask[i * img->width + j] = 1;
+            }
+        }
+    }
+
+    char *mask = calloc(img->width * img->height, sizeof(char));
+    if (mask == NULL)
+        exit(1);
+    memcpy(mask, oldMask, img->width * img->height * sizeof(char));
+
+    // Clean up mask
+    for (i = 2; i < img->height-2; i++) {
+        for (j = 2; j < img->width-2; j++) {
+            char this = oldMask[i * img->width + j];
+            if (this == 0) {
+                int borderSum = (oldMask[(i-1) * img->width + j] +
+                                 oldMask[i * img->width + j-1] +
+                                 oldMask[(i+1) * img->width + j] +
+                                 oldMask[i * img->width + j+1] +
+                                 oldMask[(i-2) * img->width + j] +
+                                 oldMask[i * img->width + j-2] +
+                                 oldMask[(i+2) * img->width + j] +
+                                 oldMask[i * img->width + j+2]);
+                if (borderSum >= 2) {
+                   setPixel(j, i, img, 0, 0, 0);
+                   mask[i * img->width + j] = 1;
+                }
             }
         }
     }
 
     strcpy(guy, base);
-    strcat(guy, "_predude.ppm");
+    strcat(guy, "_dude.ppm");
     writePPM(guy, img);
     return 0;
 }
