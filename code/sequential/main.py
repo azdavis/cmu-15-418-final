@@ -32,7 +32,7 @@ imsave(guy + "_walls.ppm", walls)
 
 print("get color_counts")
 
-bucket_size = 16
+bucket_size = 32
 colors = 256
 buckets = colors / bucket_size
 color_counts = [
