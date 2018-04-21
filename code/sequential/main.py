@@ -45,7 +45,7 @@ color_counts = [
     for _ in range(buckets)
 ]
 
-ranges =  [
+ranges = [
     (0, ltWall, 0, height),
     (rtWall, width, 0, height),
     (0, width, 0, tpWall)
