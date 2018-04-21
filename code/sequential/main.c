@@ -292,14 +292,26 @@ int main(void) {
             blurData[row*width + col].blue = (unsigned char) (blue / count);
         }
     }
+    // Put filter on mask
+    for (i = 0; i < height; i++) {
+        for (j = 0; j < width; j++) {
+            if (mask[i*width + j] == 1) {
+                PPMPixel *pt = getPixel(j, i, img);
+                blurData[i*width + j].red = pt->red;
+                blurData[i*width + j].green = pt->green;
+                blurData[i*width + j].blue = pt->blue;
+            }
+        }
+    }
+
     PPMPixel *oldData = img->data;
     img->data = blurData;
-    free(oldData);
 
     strcpy(guy, base);
-    strcat(guy, "_blurred.ppm");
+    strcat(guy, "_portrait.ppm");
     writePPM(guy, img);
 
+    free(oldData);
     free(color_counts);
     free(blurKernel);
     free(img);
