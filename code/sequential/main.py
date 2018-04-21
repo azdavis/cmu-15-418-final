@@ -35,7 +35,15 @@ print("get color_counts")
 bucket_size = 16
 colors = 256
 buckets = colors / bucket_size
-color_counts = [[[0] * buckets] * buckets] * buckets
+color_counts = [
+    [
+        [ 0
+            for _ in range(buckets)
+        ]
+        for _ in range(buckets)
+    ]
+    for _ in range(buckets)
+]
 
 ranges =  [
     (0, ltWall, 0, height),
