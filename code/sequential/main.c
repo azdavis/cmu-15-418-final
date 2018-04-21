@@ -8,6 +8,7 @@
 #define BUCKET_SIZE 32
 #define COLORS 256
 #define BCTHRESH_DECIMAL 0.005
+#define FILTER_SIZE 11
 
 typedef struct {
      int xmin, xmax, ymin, ymax;
@@ -207,7 +208,6 @@ int main(void) {
             unsigned char g = pt->green / BUCKET_SIZE;
             unsigned char b = pt->blue / BUCKET_SIZE;
             if (color_counts[getBucketIdx(r, g, b)] < bcThresh) {
-                setPixel(j, i, img, 0, 255, 0);
                 oldMask[i * img->width + j] = 1;
             }
         }
@@ -232,15 +232,75 @@ int main(void) {
                                  oldMask[(i+2) * img->width + j] +
                                  oldMask[i * img->width + j+2]);
                 if (borderSum >= 2) {
-                   setPixel(j, i, img, 0, 0, 0);
                    mask[i * img->width + j] = 1;
                 }
             }
         }
     }
 
+    // Blur
+    printf("finished mask, starting blur\n");
+    float *blurKernel = malloc(FILTER_SIZE * FILTER_SIZE * sizeof(float));
+    if (blurKernel == NULL)
+        exit(1);
+    // Even box blur
+    for (i = 0; i < FILTER_SIZE; i++) {
+        for (j = 0; j < FILTER_SIZE; j++) {
+            mask[i * FILTER_SIZE + j] = 1.0;
+        }
+    }
+
+    PPMPixel *blurData = malloc(img->width * img->height * sizeof(PPMPixel));
+    if (blurData == NULL)
+        exit(1);
+
+    int width = img->width;
+    int height = img->height;
+    int row, col;
+    for (row = 0; row < height; row++) {
+        for (col = 0; col < width; col++) {
+            float count = 0;
+            int i_k, j_k;
+            for (i_k = 0; i_k < FILTER_SIZE; i_k++){
+                for (j_k = 0; j_k < FILTER_SIZE; j_k++){
+                    float weight = blurKernel[i_k*FILTER_SIZE + j_k];
+                    int i = row - (FILTER_SIZE / 2) + i_k;
+                    int j = col - (FILTER_SIZE / 2) + j_k;
+
+                    if (i < 0 || i >= height || j < 0 || j >= width) {
+                        continue;
+                    }
+                    else if (mask[i * width + j] == 1) {
+                        continue;
+                    }
+                    blurData[row*width + col].red += (weight *
+                                                    (getPixel(j, i, img))->red);
+                    blurData[row*width + col].green += (weight *
+                                                  (getPixel(j, i, img))->green);
+                    blurData[row*width + col].blue += (weight *
+                                                   (getPixel(j, i, img))->blue);
+                    count += weight;
+                }
+            }
+            if (count == 0) {
+                continue;
+            }
+            blurData[row*width + col].red /= count;
+            blurData[row*width + col].green /= count;
+            blurData[row*width + col].blue /= count;
+        }
+    }
+    PPMPixel *oldData = img->data;
+    img->data = blurData;
+    free(oldData);
+
     strcpy(guy, base);
-    strcat(guy, "_dude.ppm");
+    strcat(guy, "_blurred.ppm");
     writePPM(guy, img);
+
+    free(color_counts);
+    free(blurKernel);
+    free(img);
+    free(img->data);
     return 0;
 }
