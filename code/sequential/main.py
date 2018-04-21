@@ -74,7 +74,7 @@ for i in range(height):
         r = this[0] / bucket_size
         g = this[1] / bucket_size
         b = this[2] / bucket_size
-        if color_counts[r][g][b] > bcThresh:
+        if color_counts[r][g][b] < bcThresh:
             dude[i][j] = np.array([0,255,0])
             mask[i][j] = 1
 
