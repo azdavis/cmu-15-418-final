@@ -276,9 +276,10 @@ int main(void) {
                     else if (mask[i * width + j] == 1) {
                         continue;
                     }
-                    red += (weight * (getPixel(j, i, img))->red);
-                    green += (weight * (getPixel(j, i, img))->green);
-                    blue += (weight * (getPixel(j, i, img))->blue);
+                    PPMPixel *pt = getPixel(j, i, img);
+                    red += weight * (pt->red);
+                    green += weight * (pt->green);
+                    blue += weight * (pt->blue);
                     count += weight;
                 }
             }
