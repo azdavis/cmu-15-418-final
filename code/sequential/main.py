@@ -30,58 +30,43 @@ for j in range(width):
 
 imsave(guy + "_walls.ppm", walls)
 
-threshold = 30
-def hasColorDiff(color1, color2):
-    return (
-        abs(color1[0] - color2[0]) +
-        abs(color1[1] - color2[1]) +
-        abs(color1[2] - color2[2])
-    ) > threshold
+print("get color_counts")
 
-print("get background")
+bucket_size = 16
+colors = 256
+buckets = colors / bucket_size
+color_counts = [[[0] * buckets] * buckets] * buckets
 
-def getBackgroundColors(image, ranges):
-    ret = []
-    for xmin, xmax, ymin, ymax in ranges:
-        for i in range(ymin, ymax):
-            for j in range(xmin, xmax):
-                this = image[i][j]
-                diff = True
-                for ind in range(len(ret)):
-                    x = ret[ind]
-                    diff = diff and hasColorDiff(this, x[0])
-                    if not hasColorDiff(this, x[0]):
-                        x[1] += 1
-                if diff:
-                    ret.append([this, 1])
-    return ret
+ranges =  [
+    (0, ltWall, 0, height),
+    (rtWall, width, 0, height),
+    (0, width, 0, tpWall)
+]
 
-background = getBackgroundColors(
-    img,
-    [
-        (0, ltWall, 0, height),
-        (rtWall, width, 0, height),
-        (0, width, 0, tpWall)
-    ]
-)
+for xmin, xmax, ymin, ymax in ranges:
+    for i in range(ymin, ymax):
+        for j in range(xmin, xmax):
+            this = img[i][j]
+            r = this[0] / bucket_size
+            g = this[1] / bucket_size
+            b = this[2] / bucket_size
+            color_counts[r][g][b] += 1
 
-print("filter background")
-# Filter background colors
 totalBCPix = ltWall * height + (width - rtWall) * height + tpWall * width
 bcThresh = 0.01 * totalBCPix
-background = filter(lambda x: x[1] > bcThresh, background)
 
-print("use background")
+print("use color_counts")
+
 dude = np.copy(img, True)
 mask = np.zeros((height, width))
 
 for i in range(height):
     for j in range(width):
         this = dude[i][j]
-        diff = True
-        for bc in background:
-            diff = diff and hasColorDiff(this, bc[0])
-        if diff:
+        r = this[0] / bucket_size
+        g = this[1] / bucket_size
+        b = this[2] / bucket_size
+        if color_counts[r][g][b] > bcThresh:
             dude[i][j] = np.array([0,255,0])
             mask[i][j] = 1
 
