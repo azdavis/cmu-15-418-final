@@ -1,5 +1,11 @@
 # thoughts
 
+https://en.wikipedia.org/wiki/Gaussian_blur
+circle blur is bokeh
+use gaussin instead of box
+
+
+
 1. Foreground / Background detection
 https://sites.google.com/site/backgroundsubtraction/Home
 
