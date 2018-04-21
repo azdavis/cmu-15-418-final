@@ -2,7 +2,7 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 
-guy = "large_elephant"
+guy = "elephant"
 guy = "img/" + guy
 
 print("prelims")
