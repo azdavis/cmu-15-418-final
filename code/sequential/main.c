@@ -133,12 +133,14 @@ int main(void) {
     PPMImage *image;
     image = readPPM("img/elephant.ppm");
     PPMPixel* pt = getPixel(0, 0, image);
-    PPMPixel* pt2 = getPixel(0, 1, image);
+    PPMPixel* pt2 = getPixel(1, 1, image);
+    printf("unsigned char %d\n", sizeof(unsigned char));
     printf("pixel at 0 0 is %d %d %d\n", pt->red, pt->blue, pt->green);
-    printf("pixel at 0 1 is %d %d %d\n", pt2->red, pt2->blue, pt2->green);
-    setPixel(0, 0, image, 255, 0, 0);
+    printf("pixel at 1 1 is %d %d %d\n", pt2->red, pt2->blue, pt2->green);
+    setPixel(0, 0, image, pt->red, pt->green, pt->blue);
+    setPixel(1, 1, image, pt2->red, pt2->green, pt2->blue);
     printf("pixel at 0 0 is %d %d %d\n", pt->red, pt->blue, pt->green);
-    printf("pixel at 0 1 is %d %d %d\n", pt2->red, pt2->blue, pt2->green);
+    printf("pixel at 1 1 is %d %d %d\n", pt2->red, pt2->blue, pt2->green);
     writePPM("img/elephant2.ppm", image);
     return 0;
 }
