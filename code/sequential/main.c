@@ -163,18 +163,58 @@ int main(void) {
     int rtWall = (img->width * (LTRTWALLDENOM - 1)) / LTRTWALLDENOM;
     int tpWall = img->height / TPWALLDENOM;
 
-
-    for (j = 0; j < img->width; j++) {
-        setPixel(j, tpWall, img, 0, 0, 255);
-    }
-    strcpy(guy, base);
-    strcat(guy, "_walls.ppm");
-    writePPM(guy, img);
-
-    int buckets = COLORS / BUCKETSIZE;
+    // Get color distribution
+    int buckets = COLORS / BUCKET_SIZE;
     int *color_counts = malloc(buckets * buckets * buckets * sizeof(int));
     if (color_counts == NULL)
         exit(1);
 
+    range rs[3];
+    rs[0].xmin = 0; rs[0].xmax = ltWall;
+    rs[0].ymin = 0; rs[0].ymax = img->height;
+    rs[1].xmin = rtWall; rs[1].xmax = img->width;
+    rs[1].ymin = 0; rs[1].ymax = img->height;
+    rs[2].xmin = 0; rs[2].xmax = img->width;
+    rs[2].ymin = 0; rs[2].ymax = tpWall;
+
+    int i, j, ri;
+    for (ri = 0; ri < 3; ri++) {
+        range r = rs[ri];
+        for (i = r.ymin; i < r.ymax; i++) {
+            for (j = r.xmin; j < r.xmax; j++) {
+                PPMPixel *pt = getPixel(j, i, img);
+                color_counts[getBucketIdx(pt->red / BUCKET_SIZE,
+                                          pt->green / BUCKET_SIZE,
+                                          pt->blue / BUCKET_SIZE)] += 1;
+
+            }
+        }
+    }
+
+    int totalBCPix = (ltWall * img->height +
+                     (img->width - rtWall) * img->height +
+                      tpWall * img->width);
+    int bcThresh = BCTHRESH_DECIMAL * totalBCPix;
+
+    char *mask = calloc(img->width * img->height, sizeof(char));
+    if (color_counts == NULL)
+        exit(1);
+
+    for (i = 0; i < img->height; i++) {
+        for (j = 0; j < img->width; j++) {
+            PPMPixel *pt = getPixel(j, i, img);
+            unsigned char r = pt->red / BUCKET_SIZE;
+            unsigned char g = pt->green / BUCKET_SIZE;
+            unsigned char b = pt->blue / BUCKET_SIZE;
+            if (color_counts[getBucketIdx(r, g, b)] < bcThresh) {
+                setPixel(j, i, img, 0, 255, 0);
+                mask[i * img->width + j] = 1;
+            }
+        }
+    }
+
+    strcpy(guy, base);
+    strcat(guy, "_predude.ppm");
+    writePPM(guy, img);
     return 0;
 }
