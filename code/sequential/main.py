@@ -7,7 +7,7 @@ guy = "img/" + guy
 
 print("prelims")
 
-img = imread(guy + ".jpg").astype(np.int32)
+img = imread(guy + ".ppm").astype(np.int32)
 height, width, _ = np.shape(img)
 
 walls = np.copy(img, True)
@@ -28,7 +28,7 @@ for i in range(height):
 for j in range(width):
     walls[tpWall][j] = np.array([0,0,255])
 
-imsave(guy + "_walls.jpg", walls)
+imsave(guy + "_walls.ppm", walls)
 
 threshold = 30
 def hasColorDiff(color1, color2):
@@ -85,7 +85,7 @@ for i in range(height):
             dude[i][j] = np.array([0,255,0])
             mask[i][j] = 1
 
-imsave(guy + "_predude.jpg", dude)
+imsave(guy + "_predude.ppm", dude)
 
 print("cleaning up mask")
 newMask = np.copy(mask, True)
@@ -103,7 +103,7 @@ for i in range(2, height-2):
                newMask[i][j] = 1
 mask = newMask
 
-imsave(guy + "_dude.jpg", dude)
+imsave(guy + "_dude.ppm", dude)
 # Blur
 print "blur image"
 blurred = np.zeros((height, width, 3))
@@ -139,7 +139,7 @@ for row in range(height):
         blurred[row][col][1] = float(blurred[row][col][1]) / count
         blurred[row][col][2] = float(blurred[row][col][2]) / count
 
-imsave(guy + "_blurred.jpg", blurred)
+imsave(guy + "_blurred.ppm", blurred)
 
 print("put on filter")
 # Put filter on mask
@@ -149,4 +149,4 @@ for i in range(len(blurred)):
             continue
         if mask[i+1][j+1] == 1:
             blurred[i][j] = original[i+1][j+1]
-imsave(guy + "_portrait.jpg", blurred)
+imsave(guy + "_portrait.ppm", blurred)
