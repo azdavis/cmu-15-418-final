@@ -5,7 +5,7 @@
 // https://stackoverflow.com/questions/2693631/read-ppm-file-and-store-it-in-an-array-coded-with-c
 
 typedef struct {
-     unsigned short red,green,blue;
+     unsigned char red,green,blue;
 } PPMPixel;
 
 typedef struct {
@@ -122,9 +122,23 @@ static PPMPixel* getPixel(int x, int y, PPMImage *img)
     return &(img->data[x + y * img->width]);
 }
 
+static void setPixel(int x, int y, PPMImage *img,
+                     unsigned char R, unsigned char G, unsigned char B)
+{
+    img->data[x + y * img->width].red = R;
+    img->data[x + y * img->width].green = G;
+    img->data[x + y * img->width].blue = B;
+}
 int main(void) {
     PPMImage *image;
     image = readPPM("img/elephant.ppm");
-    writePPM("img/elephant2.ppm",image);
+    PPMPixel* pt = getPixel(0, 0, image);
+    PPMPixel* pt2 = getPixel(0, 1, image);
+    printf("pixel at 0 0 is %d %d %d\n", pt->red, pt->blue, pt->green);
+    printf("pixel at 0 1 is %d %d %d\n", pt2->red, pt2->blue, pt2->green);
+    setPixel(0, 0, image, 255, 0, 0);
+    printf("pixel at 0 0 is %d %d %d\n", pt->red, pt->blue, pt->green);
+    printf("pixel at 0 1 is %d %d %d\n", pt2->red, pt2->blue, pt2->green);
+    writePPM("img/elephant2.ppm", image);
     return 0;
 }
