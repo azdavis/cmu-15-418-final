@@ -250,7 +250,7 @@ int main(void) {
         }
     }
 
-    PPMPixel *blurData = malloc(img->width * img->height * sizeof(PPMPixel));
+    PPMPixel *blurData = calloc(img->width * img->height, sizeof(PPMPixel));
     if (blurData == NULL)
         exit(1);
 
