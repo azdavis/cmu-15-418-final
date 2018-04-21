@@ -246,7 +246,7 @@ int main(void) {
     // Even box blur
     for (i = 0; i < FILTER_SIZE; i++) {
         for (j = 0; j < FILTER_SIZE; j++) {
-            mask[i * FILTER_SIZE + j] = 1.0;
+            blurKernel[i * FILTER_SIZE + j] = 1.0;
         }
     }
 
@@ -261,6 +261,9 @@ int main(void) {
         for (col = 0; col < width; col++) {
             float count = 0;
             int i_k, j_k;
+            float red = 0;
+            float green = 0;
+            float blue = 0;
             for (i_k = 0; i_k < FILTER_SIZE; i_k++){
                 for (j_k = 0; j_k < FILTER_SIZE; j_k++){
                     float weight = blurKernel[i_k*FILTER_SIZE + j_k];
@@ -273,21 +276,19 @@ int main(void) {
                     else if (mask[i * width + j] == 1) {
                         continue;
                     }
-                    blurData[row*width + col].red += (weight *
-                                                    (getPixel(j, i, img))->red);
-                    blurData[row*width + col].green += (weight *
-                                                  (getPixel(j, i, img))->green);
-                    blurData[row*width + col].blue += (weight *
-                                                   (getPixel(j, i, img))->blue);
+                    red += (weight * (getPixel(j, i, img))->red);
+                    green += (weight * (getPixel(j, i, img))->green);
+                    blue += (weight * (getPixel(j, i, img))->blue);
                     count += weight;
                 }
             }
             if (count == 0) {
                 continue;
             }
-            blurData[row*width + col].red /= count;
-            blurData[row*width + col].green /= count;
-            blurData[row*width + col].blue /= count;
+
+            blurData[row*width + col].red = (unsigned char) (red / count);
+            blurData[row*width + col].green = (unsigned char) (green / count);
+            blurData[row*width + col].blue = (unsigned char) (blue / count);
         }
     }
     PPMPixel *oldData = img->data;
