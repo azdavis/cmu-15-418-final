@@ -5,8 +5,13 @@
 #define RGB_COMPONENT_COLOR 255
 #define LTRTWALLDENOM 7
 #define TPWALLDENOM 8
-#define BUCKETSIZE 32
+#define BUCKET_SIZE 32
 #define COLORS 256
+#define BCTHRESH_DECIMAL 0.005
+
+typedef struct {
+     int xmin, xmax, ymin, ymax;
+} range;
 
 // PPM reading writing code guided from:
 // https://stackoverflow.com/questions/2693631/read-ppm-file-and-store-it-in-an-array-coded-with-c
@@ -137,14 +142,13 @@ static void setPixel(int x, int y, PPMImage *img,
 
 static int getBucketIdx(int r, int g, int b)
 {
-    int buckets = COLORS / BUCKETSIZE;
+    int buckets = COLORS / BUCKET_SIZE;
     return r * buckets * buckets + g * buckets + b;
 }
 
-
 int main(void) {
 
-    // Initializion
+    // Initializtion
     PPMImage *img;
     char base[100] = "img/";
     char guy[100];
