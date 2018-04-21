@@ -61,7 +61,7 @@ for xmin, xmax, ymin, ymax in ranges:
             color_counts[r][g][b] += 1
 
 totalBCPix = ltWall * height + (width - rtWall) * height + tpWall * width
-bcThresh = 0.01 * totalBCPix
+bcThresh = 0.005 * totalBCPix
 
 print("use color_counts")
 
