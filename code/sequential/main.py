@@ -99,7 +99,7 @@ mask = newMask
 imsave(guy + "_dude.ppm", dude)
 # Blur
 print "blur image"
-blurred = np.zeros((height, width, 3))
+blurred = np.zeros((height, width, 3), dtype=np.uint8)
 blurKernel = [
                    [1, 4, 7, 4, 1],
                    [4, 16, 26, 16, 4],
@@ -111,7 +111,10 @@ blurKernel = [[1] * 11] * 11
 box_size = len(blurKernel)
 for row in range(height):
     for col in range(width):
-        count = 0
+        count = 0.0
+        red = 0.0
+        green = 0.0
+        blue = 0.0
         for i_k in range(len(blurKernel)):
             for j_k in range(len(blurKernel[0])):
                 weight = blurKernel[i_k][j_k]
@@ -122,15 +125,15 @@ for row in range(height):
                     continue
                 elif (mask[i][j] == 1):
                     continue
-                blurred[row][col][0] += weight * original[i][j][0]
-                blurred[row][col][1] += weight * original[i][j][1]
-                blurred[row][col][2] += weight * original[i][j][2]
+                red += weight * original[i][j][0]
+                green += weight * original[i][j][1]
+                blue += weight * original[i][j][2]
                 count += weight
         if (count == 0):
             continue
-        blurred[row][col][0] = float(blurred[row][col][0]) / count
-        blurred[row][col][1] = float(blurred[row][col][1]) / count
-        blurred[row][col][2] = float(blurred[row][col][2]) / count
+        blurred[row][col][0] = red / count
+        blurred[row][col][1] = green / count
+        blurred[row][col][2] = blue / count
 
 imsave(guy + "_blurred.ppm", blurred)
 
