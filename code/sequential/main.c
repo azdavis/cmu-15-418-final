@@ -5,6 +5,8 @@
 #define RGB_COMPONENT_COLOR 255
 #define LTRTWALLDENOM 7
 #define TPWALLDENOM 8
+#define BUCKETSIZE 32
+#define COLORS 256
 
 // PPM reading writing code guided from:
 // https://stackoverflow.com/questions/2693631/read-ppm-file-and-store-it-in-an-array-coded-with-c
@@ -132,6 +134,14 @@ static void setPixel(int x, int y, PPMImage *img,
     img->data[x + y * img->width].green = G;
     img->data[x + y * img->width].blue = B;
 }
+
+static int getBucketIdx(int r, int g, int b)
+{
+    int buckets = COLORS / BUCKETSIZE
+    return r * buckets * buckets + g * buckets + b;
+}
+
+
 int main(void) {
 
     // Initializion
