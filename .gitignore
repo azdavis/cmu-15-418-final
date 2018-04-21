@@ -7,3 +7,4 @@
 .__afs*
 .DS_Store
 build
+code/sequential/main
