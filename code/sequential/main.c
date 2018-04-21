@@ -137,7 +137,7 @@ static void setPixel(int x, int y, PPMImage *img,
 
 static int getBucketIdx(int r, int g, int b)
 {
-    int buckets = COLORS / BUCKETSIZE
+    int buckets = COLORS / BUCKETSIZE;
     return r * buckets * buckets + g * buckets + b;
 }
 
@@ -170,5 +170,11 @@ int main(void) {
     strcpy(guy, base);
     strcat(guy, "_walls.ppm");
     writePPM(guy, img);
+
+    int buckets = COLORS / BUCKETSIZE;
+    int *color_counts = malloc(buckets * buckets * buckets * sizeof(int));
+    if (color_counts == NULL)
+        exit(1);
+
     return 0;
 }
