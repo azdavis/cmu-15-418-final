@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
+#include <string>
 
 #define RGB_COMPONENT_COLOR 255
 #define LTRTWALLDENOM 7
@@ -10,6 +12,20 @@
 #define BCTHRESH_DECIMAL 0.005
 #define FILTER_SIZE 50
 #define BUCKETS (COLORS / BUCKET_SIZE)
+
+#if 1
+#define CUDA_CHECK cudaCheck(cudaPeekAtLastError(), __FILE__, __LINE__)
+static inline void cudaCheck(cudaError_t code, const char *file, int line) {
+    if (code == cudaSuccess) {
+        return;
+    }
+    fprintf(stderr, "%s:%d: %s\n", file, line, cudaGetErrorString(code));
+    exit(EXIT_FAILURE);
+}
+#else
+#define CUDA_CHECK ((void) 0)
+#endif
+
 
 typedef struct {
      int xmin, xmax, ymin, ymax;
@@ -147,13 +163,40 @@ static int getBucketIdx(int r, int g, int b)
     return r * BUCKETS * BUCKETS + g * BUCKETS + b;
 }
 
-int main(int argc, char **argv) {
+__host__ int main(int argc, char **argv) {
     if (argc != 3) {
         printf("usage: %s <infile> <outfile>\n", argv[0]);
         return 0;
     }
     char *infile = argv[1];
     char *outfile = argv[2];
+
+    int deviceCount = 0;
+    bool isFastGPU = false;
+    std::string name;
+    cudaError_t err = cudaGetDeviceCount(&deviceCount);
+
+    printf("---------------------------------------------------------\n");
+    printf("Initializing CUDA for CudaRenderer\n");
+    printf("Found %d CUDA devices\n", deviceCount);
+
+    for (int i=0; i<deviceCount; i++) {
+        cudaDeviceProp deviceProps;
+        cudaGetDeviceProperties(&deviceProps, i);
+        name = deviceProps.name;
+        if (name.compare("GeForce GTX 1040") == 0) {
+            isFastGPU = true;
+        }
+
+        printf("Device %d: %s\n", i, deviceProps.name);
+        printf("   SMs:        %d\n", deviceProps.multiProcessorCount);
+        printf(
+            "   Global mem: %.0f MB\n",
+            static_cast<float>(deviceProps.totalGlobalMem) / (1024 * 1024)
+        );
+        printf("   CUDA Cap:   %d.%d\n", deviceProps.major, deviceProps.minor);
+    }
+
     PPMImage *img = readPPM(infile);
 
     int *color_counts = (int*) malloc(BUCKETS * BUCKETS * BUCKETS * sizeof(int));
@@ -171,6 +214,15 @@ int main(int argc, char **argv) {
     PPMPixel *blurData = (PPMPixel*) calloc(img->width * img->height, sizeof(PPMPixel));
     if (blurData == NULL)
         exit(1);
+
+    int* cudaImgData;
+    cudaMalloc(&cudaImgData, img->width * img->height * sizeof(PPMPixel));
+    cudaMemcpy(cudaImgData,
+               img->data,
+               img->width * img->height * sizeof(PPMPixel),
+               cudaMemcpyHostToDevice
+    );
+    cudaFree(cudaImgData);
 
     // Get Walls
     int ltWall = img->width / LTRTWALLDENOM;
