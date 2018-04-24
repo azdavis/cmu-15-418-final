@@ -169,6 +169,21 @@ __global__ void blur(int width, int height, PPMPixel *imgData,
 
     int col = blockIdx.x * blockDim.x + threadIdx.x;
     int row = blockIdx.y * blockDim.y + threadIdx.y;
+    int sqIdx = threadIdx.y * SQ_DIM + threadIdx.x;
+
+    // Load Kernel into shared mem
+    __shared__ float sharedBlurKernel[FILTER_SIZE * FILTER_SIZE];
+    int blurKernelCopyLen = div_ceil(FILTER_SIZE * FILTER_SIZE,
+                                    SQ_DIM * SQ_DIM);
+    for (int ind = 0; ind < blurKernelCopyLen; ind++) {
+        int index = ind + sqIdx * blurKernelCopyLen;
+        if (index >= FILTER_SIZE * FILTER_SIZE) {
+            continue;
+        }
+        sharedBlurKernel[index] = blurKernel[index];
+    }
+
+    __syncthreads();
 
     if (row < 0 || row >= height || col < 0 || col >= width) {
         return;
@@ -179,9 +194,9 @@ __global__ void blur(int width, int height, PPMPixel *imgData,
     float red = 0;
     float green = 0;
     float blue = 0;
-    for (i_k = 0; i_k < FILTER_SIZE; i_k++) {
-        for (j_k = 0; j_k < FILTER_SIZE; j_k++) {
-            float weight = blurKernel[i_k * FILTER_SIZE + j_k];
+    for (i_k = 0; i_k < FILTER_SIZE; i_k++){
+        for (j_k = 0; j_k < FILTER_SIZE; j_k++){
+            float weight = sharedBlurKernel[i_k*FILTER_SIZE + j_k];
             int i = row - (FILTER_SIZE / 2) + i_k;
             int j = col - (FILTER_SIZE / 2) + j_k;
 
