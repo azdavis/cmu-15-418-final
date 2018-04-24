@@ -4,11 +4,16 @@ from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
 import math
+import sys
 
-guy = "elephant"
-guy = "img/" + guy
+if len(sys.argv) != 3:
+    print("usage: " + sys.argv[0] + " <infile> <outfile>")
+    sys.exit()
 
-img = imread(guy + ".ppm").astype(np.int32)
+infile = sys.argv[1]
+outfile = sys.argv[2]
+
+img = imread(infile).astype(np.int32)
 height, width, _ = np.shape(img)
 
 walls = np.copy(img, True)
@@ -71,8 +76,6 @@ for i in range(height):
             dude[i][j] = np.array([0,255,0])
             mask[i][j] = 1
 
-imsave(guy + "_predude.ppm", dude)
-
 newMask = np.copy(mask, True)
 # Clean up mask
 for i in range(2, height-2):
@@ -125,5 +128,4 @@ for i in range(len(blurred)):
         if mask[i][j] == 1:
             blurred[i][j] = original[i][j]
 
-imsave(guy + "_portrait.ppm", blurred)
-imsave(guy + "_portrait.jpg", blurred)
+imsave(outfile, blurred)
