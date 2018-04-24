@@ -90,7 +90,7 @@ mask = newMask
 
 # Blur
 blurred = np.zeros((height, width, 3), dtype=np.uint8)
-blurDim = 11;
+blurDim = 11
 blurKernel = np.ones((blurDim, blurDim), dtype=np.float32)
 
 box_size = len(blurKernel)
