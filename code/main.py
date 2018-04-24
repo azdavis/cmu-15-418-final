@@ -29,15 +29,9 @@ tpWall = height / tpWallDenom
 bucket_size = 32
 colors = 256
 buckets = colors / bucket_size
-color_counts = [
-    [
-        [ 0
-            for _ in range(buckets)
-        ]
-        for _ in range(buckets)
-    ]
-    for _ in range(buckets)
-]
+color_counts = [ [ [ 0 for _ in range(buckets) ]
+                       for _ in range(buckets) ]
+                       for _ in range(buckets) ]
 
 ranges = [
     (0, ltWall, 0, height),
