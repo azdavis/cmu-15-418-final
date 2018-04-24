@@ -18,6 +18,8 @@ height, width, _ = np.shape(img)
 
 original = np.copy(img, True)
 
+# get color counts
+
 ltRtWallDenom = 7
 ltWall = width / ltRtWallDenom
 rtWall = (width * (ltRtWallDenom - 1)) / ltRtWallDenom
@@ -52,6 +54,8 @@ for xmin, xmax, ymin, ymax in ranges:
             b = this[2] / bucket_size
             color_counts[r][g][b] += 1
 
+# get initial mask
+
 totalBCPix = ltWall * height + (width - rtWall) * height + tpWall * width
 bcThresh = 0.005 * totalBCPix
 
@@ -69,7 +73,9 @@ for i in range(height):
             mask[i][j] = 1
 
 newMask = np.copy(mask, True)
+
 # Clean up mask
+
 for i in range(2, height-2):
     for j in range(2, width-2):
         this = mask[i][j]
@@ -84,6 +90,7 @@ for i in range(2, height-2):
 mask = newMask
 
 # Blur
+
 blurred = np.zeros((height, width, 3), dtype=np.uint8)
 blurDim = 11
 blurKernel = np.ones((blurDim, blurDim), dtype=np.float32)
@@ -117,6 +124,7 @@ for row in range(height):
         blurred[row][col][2] = blue / count
 
 # Put filter on mask
+
 for i in range(len(blurred)):
     for j in range(len(blurred[0])):
         if mask[i][j] == 1:
