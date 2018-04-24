@@ -1,6 +1,7 @@
 from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
+import math
 
 import time
 
@@ -103,16 +104,28 @@ i#msave(guy + "_dude.ppm", dude)
 # Blur
 print "blur image"
 blurred = np.zeros((height, width, 3), dtype=np.uint8)
-blurKernel = [
-                   [1, 4, 7, 4, 1],
-                   [4, 16, 26, 16, 4],
-                   [7, 26, 41, 26, 7],
-                   [4, 16, 26, 16, 4],
-                   [1, 4, 7, 4, 1]
-                  ]
-blurKernel = [[1] * 11] * 11
+blurDim = 11;
+blurKernel = np.ones((blurDim, blurDim), dtype=np.float32)
+"""
+sigma = width / 4;
+
+def gauss(x, y):
+    x = float(x)
+    y = float(y)
+    return ((1 / (2 * math.pi * sigma * sigma)) *
+           (math.exp(-1 * (x ** 2 + y ** 2) / (2 * sigma * sigma))))
+
+centerX = blurDim/2
+centerY = blurDim/2
+for i in range(blurDim):
+    for j in range(blurDim):
+        x = abs(j - centerX)
+        y = abs(i - centerY)
+        blurKernel[i][j] = gauss(x, y)
+"""
 box_size = len(blurKernel)
 for row in range(height):
+
     for col in range(width):
         count = 0.0
         red = 0.0
@@ -147,6 +160,6 @@ for i in range(len(blurred)):
         if mask[i][j] == 1:
             blurred[i][j] = original[i][j]
 imsave(guy + "_portrait.ppm", blurred)
-#imsave(guy + "_portrait.jpg", blurred)
+imsave(guy + "_portrait.jpg", blurred)
 t1 = time.time()
 print "Python total time", t1 - t0

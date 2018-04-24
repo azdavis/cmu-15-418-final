@@ -8,7 +8,7 @@
 #define BUCKET_SIZE 32
 #define COLORS 256
 #define BCTHRESH_DECIMAL 0.005
-#define FILTER_SIZE 11
+#define FILTER_SIZE 100
 
 typedef struct {
      int xmin, xmax, ymin, ymax;
@@ -153,7 +153,7 @@ int main(void) {
     PPMImage *img;
     char base[100] = "img/";
     char guy[100];
-    strcat(base, "elephant2");
+    strcat(base, "large_elephant");
 
     strcpy(guy, base);
     strcat(guy, ".ppm");

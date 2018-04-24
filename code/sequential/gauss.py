@@ -3,9 +3,11 @@ import numpy as np
 
 width = 100;
 height = 100;
+width = 11
+height = 11
 a = np.zeros((width, height), dtype=np.float32)
 
-sigma = width / 4;
+sigma = width / 2;
 def gauss(x, y):
     x = float(x)
     y = float(y)
@@ -18,7 +20,6 @@ for i in range(height):
     for j in range(width):
         x = abs(j - centerX)
         y = abs(i - centerY)
-        print x, y
         a[i][j] = gauss(x, y)
 
-np.savetxt("g", a),
+print a
