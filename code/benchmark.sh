@@ -1,3 +1,5 @@
+#!/bin/sh
+
 set -efu
 
 make main-c main-cu
