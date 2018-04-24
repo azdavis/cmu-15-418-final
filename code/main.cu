@@ -177,6 +177,10 @@ __global__ void blur(int width, int height,
     int col =  blockIdx.x * blockDim.x + threadIdx.x;
     int row = blockIdx.y * blockDim.y + threadIdx.y;
 
+    if (row < 0 || row >= height || col < 0 || col >= width) {
+        return;
+    }
+
     float count = 0;
     int i_k, j_k;
     float red = 0;
@@ -199,16 +203,10 @@ __global__ void blur(int width, int height,
             green += weight * (pt.green);
             blue += weight * (pt.blue);
             count += weight;
-            if (row == 33 && col == 0) {
-                printf("adding to row %d col %d \n", i, j);
-            }
         }
     }
 
     if (count != 0) {
-        if (row == 33 && col == 0) {
-            printf("setting row %d col %d to %d red from %d, count %f \n", row, col, (unsigned char) (red/count), (imgData[width*row+col]).red, count);
-        }
         blurData[row*width + col].red = (unsigned char) (red / count);
         blurData[row*width + col].green = (unsigned char) (green / count);
         blurData[row*width + col].blue = (unsigned char) (blue / count);
@@ -362,7 +360,6 @@ __host__ int main(int argc, char **argv) {
 
     // Blur
     printf("finished mask, starting blur\n");
-
     char *cudaMask;
     cudaMalloc(&cudaMask, img->width * img->height * sizeof(char));
     cudaMemcpy(cudaMask,
@@ -390,7 +387,6 @@ __host__ int main(int argc, char **argv) {
                img->width * img->height * sizeof(PPMPixel),
                cudaMemcpyDeviceToHost
     );
-
     // Put filter on mask
     int height = img->height;
     int width = img->width;
