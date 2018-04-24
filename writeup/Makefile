@@ -5,10 +5,7 @@ TEXFLAGS = -halt-on-error -output-directory=build
 .PHONY: all clean
 .PRECIOUS: build/%.pdf
 
-all: \
-	build/proposal-checkpoint.pdf \
-	build/proposal.pdf \
-	build/checkpoint-01.pdf
+all: $(patsubst %.tex,build/%.pdf,$(wildcard *.tex))
 
 clean:
 	rm -rf build
