@@ -211,14 +211,21 @@ __host__ int main(int argc, char **argv) {
     if (blurData == NULL)
         exit(1);
 
-    int* cudaImgData;
+    PPMPixel *cudaImgData;
     cudaMalloc(&cudaImgData, img->width * img->height * sizeof(PPMPixel));
     cudaMemcpy(cudaImgData,
                img->data,
                img->width * img->height * sizeof(PPMPixel),
                cudaMemcpyHostToDevice
     );
-    cudaFree(cudaImgData);
+
+    float *cudaBlurKernel;
+    cudaMalloc(&cudaBlurKernel, FILTER_SIZE * FILTER_SIZE * sizeof(float));
+    cudaMemcpy(cudaBlurKernel,
+               blurKernel,
+               FILTER_SIZE * FILTER_SIZE * sizeof(float),
+               cudaMemcpyHostToDevice
+    );
 
     // Get Walls
     int ltWall = img->width / LTRTWALLDENOM;
@@ -359,5 +366,7 @@ __host__ int main(int argc, char **argv) {
     free(blurKernel);
     free(img);
     free(img->data);
+    cudaFree(cudaImgData);
+    cudaFree(cudaBlurKernel);
     return 0;
 }
