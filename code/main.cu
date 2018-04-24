@@ -12,6 +12,7 @@
 #define BCTHRESH_DECIMAL 0.005
 #define FILTER_SIZE 50
 #define BUCKETS (COLORS / BUCKET_SIZE)
+#define SQ_DIM 32
 
 #if 1
 #define CUDA_CHECK cudaCheck(cudaPeekAtLastError(), __FILE__, __LINE__)
@@ -42,6 +43,10 @@ typedef struct {
      int width, height;
      PPMPixel *data;
 } PPMImage;
+
+static inline __host__ __device__ int div_ceil(int n, int d) {
+    return (n + (d - 1)) / d;
+}
 
 static PPMImage *readPPM(const char *filename)
 {
@@ -163,6 +168,53 @@ static int getBucketIdx(int r, int g, int b)
     return r * BUCKETS * BUCKETS + g * BUCKETS + b;
 }
 
+__global__ void blur(int width, int height,
+                     PPMPixel *imgData,
+                     float *blurKernel,
+                     PPMPixel *blurData,
+                     char *mask) {
+
+    int col =  blockIdx.x * blockDim.x + threadIdx.x;
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+
+    float count = 0;
+    int i_k, j_k;
+    float red = 0;
+    float green = 0;
+    float blue = 0;
+    for (i_k = 0; i_k < FILTER_SIZE; i_k++){
+        for (j_k = 0; j_k < FILTER_SIZE; j_k++){
+            float weight = blurKernel[i_k*FILTER_SIZE + j_k];
+            int i = row - (FILTER_SIZE / 2) + i_k;
+            int j = col - (FILTER_SIZE / 2) + j_k;
+
+            if (i < 0 || i >= height || j < 0 || j >= width) {
+                continue;
+            }
+            else if (mask[i * width + j] == 1) {
+                continue;
+            }
+            PPMPixel pt = imgData[width * i + j];
+            red += weight * (pt.red);
+            green += weight * (pt.green);
+            blue += weight * (pt.blue);
+            count += weight;
+            if (row == 33 && col == 0) {
+                printf("adding to row %d col %d \n", i, j);
+            }
+        }
+    }
+
+    if (count != 0) {
+        if (row == 33 && col == 0) {
+            printf("setting row %d col %d to %d red from %d, count %f \n", row, col, (unsigned char) (red/count), (imgData[width*row+col]).red, count);
+        }
+        blurData[row*width + col].red = (unsigned char) (red / count);
+        blurData[row*width + col].green = (unsigned char) (green / count);
+        blurData[row*width + col].blue = (unsigned char) (blue / count);
+    }
+}
+
 __host__ int main(int argc, char **argv) {
     if (argc != 3) {
         printf("usage: %s <infile> <outfile>\n", argv[0]);
@@ -219,6 +271,20 @@ __host__ int main(int argc, char **argv) {
                cudaMemcpyHostToDevice
     );
 
+    PPMPixel *cudaBlurData;
+    cudaMalloc(&cudaBlurData, img->width * img->height * sizeof(PPMPixel));
+    cudaMemcpy(cudaBlurData,
+               img->data,
+               img->width * img->height * sizeof(PPMPixel),
+               cudaMemcpyHostToDevice
+    );
+
+    // Even box blur
+    for (int i = 0; i < FILTER_SIZE; i++) {
+        for (int j = 0; j < FILTER_SIZE; j++) {
+            blurKernel[i * FILTER_SIZE + j] = 1.0;
+        }
+    }
     float *cudaBlurKernel;
     cudaMalloc(&cudaBlurKernel, FILTER_SIZE * FILTER_SIZE * sizeof(float));
     cudaMemcpy(cudaBlurKernel,
@@ -296,55 +362,38 @@ __host__ int main(int argc, char **argv) {
 
     // Blur
     printf("finished mask, starting blur\n");
-    // Even box blur
-    for (i = 0; i < FILTER_SIZE; i++) {
-        for (j = 0; j < FILTER_SIZE; j++) {
-            blurKernel[i * FILTER_SIZE + j] = 1.0;
-        }
-    }
 
-    int width = img->width;
-    int height = img->height;
-    int row, col;
-    for (row = 0; row < height; row++) {
-        if (row % 100 == 0) {
-            printf("finished row %d\n", row);
-        }
-        for (col = 0; col < width; col++) {
-            float count = 0;
-            int i_k, j_k;
-            float red = 0;
-            float green = 0;
-            float blue = 0;
-            for (i_k = 0; i_k < FILTER_SIZE; i_k++){
-                for (j_k = 0; j_k < FILTER_SIZE; j_k++){
-                    float weight = blurKernel[i_k*FILTER_SIZE + j_k];
-                    int i = row - (FILTER_SIZE / 2) + i_k;
-                    int j = col - (FILTER_SIZE / 2) + j_k;
+    char *cudaMask;
+    cudaMalloc(&cudaMask, img->width * img->height * sizeof(char));
+    cudaMemcpy(cudaMask,
+               mask,
+               img->width * img->height * sizeof(char),
+               cudaMemcpyHostToDevice
+    );
 
-                    if (i < 0 || i >= height || j < 0 || j >= width) {
-                        continue;
-                    }
-                    else if (mask[i * width + j] == 1) {
-                        continue;
-                    }
-                    PPMPixel *pt = getPixel(j, i, img);
-                    red += weight * (pt->red);
-                    green += weight * (pt->green);
-                    blue += weight * (pt->blue);
-                    count += weight;
-                }
-            }
-            if (count == 0) {
-                continue;
-            }
+    dim3 threadsPerBlock(SQ_DIM, SQ_DIM);
+    dim3 blocks(
+        div_ceil(img->width, SQ_DIM),
+        div_ceil(img->height, SQ_DIM)
+    );
 
-            blurData[row*width + col].red = (unsigned char) (red / count);
-            blurData[row*width + col].green = (unsigned char) (green / count);
-            blurData[row*width + col].blue = (unsigned char) (blue / count);
-        }
-    }
+    CUDA_CHECK;
+    blur<<<blocks, threadsPerBlock>>>(img->width,
+                                      img->height,
+                                      cudaImgData,
+                                      cudaBlurKernel,
+                                      cudaBlurData,
+                                      cudaMask);
+    cudaDeviceSynchronize();
+    cudaMemcpy(blurData,
+               cudaBlurData,
+               img->width * img->height * sizeof(PPMPixel),
+               cudaMemcpyDeviceToHost
+    );
+
     // Put filter on mask
+    int height = img->height;
+    int width = img->width;
     for (i = 0; i < height; i++) {
         for (j = 0; j < width; j++) {
             if (mask[i*width + j] == 1) {
@@ -370,3 +419,4 @@ __host__ int main(int argc, char **argv) {
     cudaFree(cudaBlurKernel);
     return 0;
 }
+

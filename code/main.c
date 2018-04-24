@@ -288,7 +288,9 @@ int main(int argc, char **argv) {
             if (count == 0) {
                 continue;
             }
-
+            if (row == 33 && col == 0) {
+                printf("red %f\n", red / count);
+            }
             blurData[row * width + col].red = (unsigned char)(red / count);
             blurData[row * width + col].green = (unsigned char)(green / count);
             blurData[row * width + col].blue = (unsigned char)(blue / count);

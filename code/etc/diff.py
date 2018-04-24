@@ -18,4 +18,4 @@ for i in range(height):
         if (img[i][j][0] != img2[i][j][0] or
            img[i][j][1] != img2[i][j][1] or
            img[i][j][2] != img2[i][j][2]):
-            print "diff ", img[i][j], img2[i][j]
+            print "diff ", img[i][j], img2[i][j], i, j
