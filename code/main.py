@@ -89,7 +89,6 @@ for i in range(2, height-2):
 mask = newMask
 
 # Blur
-print "blur image"
 blurred = np.zeros((height, width, 3), dtype=np.uint8)
 blurDim = 11;
 blurKernel = np.ones((blurDim, blurDim), dtype=np.float32)
