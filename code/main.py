@@ -11,7 +11,6 @@ t0 = time.time()
 guy = "elephant"
 guy = "img/" + guy
 
-#print("prelims")
 
 img = imread(guy + ".ppm").astype(np.int32)
 height, width, _ = np.shape(img)
@@ -25,7 +24,6 @@ rtWall = (width * (ltRtWallDenom - 1)) / ltRtWallDenom
 tpWallDenom = 8
 tpWall = height / tpWallDenom
 
-#print("show walls")
 
 for i in range(height):
     walls[i][ltWall] = np.array([255,0,0])
@@ -33,10 +31,6 @@ for i in range(height):
 
 for j in range(width):
     walls[tpWall][j] = np.array([0,0,255])
-
-# imsave(guy + "_walls.ppm", walls)
-
-#print("get color_counts")
 
 bucket_size = 32
 colors = 256
@@ -69,8 +63,6 @@ for xmin, xmax, ymin, ymax in ranges:
 totalBCPix = ltWall * height + (width - rtWall) * height + tpWall * width
 bcThresh = 0.005 * totalBCPix
 
-#print("use color_counts")
-
 dude = np.copy(img, True)
 mask = np.zeros((height, width))
 
@@ -86,7 +78,6 @@ for i in range(height):
 
 imsave(guy + "_predude.ppm", dude)
 
-#print("cleaning up mask")
 newMask = np.copy(mask, True)
 # Clean up mask
 for i in range(2, height-2):
@@ -102,29 +93,12 @@ for i in range(2, height-2):
                newMask[i][j] = 1
 mask = newMask
 
-i#msave(guy + "_dude.ppm", dude)
 # Blur
 print "blur image"
 blurred = np.zeros((height, width, 3), dtype=np.uint8)
 blurDim = 11;
 blurKernel = np.ones((blurDim, blurDim), dtype=np.float32)
-"""
-sigma = width / 4;
 
-def gauss(x, y):
-    x = float(x)
-    y = float(y)
-    return ((1 / (2 * math.pi * sigma * sigma)) *
-           (math.exp(-1 * (x ** 2 + y ** 2) / (2 * sigma * sigma))))
-
-centerX = blurDim/2
-centerY = blurDim/2
-for i in range(blurDim):
-    for j in range(blurDim):
-        x = abs(j - centerX)
-        y = abs(i - centerY)
-        blurKernel[i][j] = gauss(x, y)
-"""
 box_size = len(blurKernel)
 for row in range(height):
 
@@ -153,9 +127,6 @@ for row in range(height):
         blurred[row][col][1] = green / count
         blurred[row][col][2] = blue / count
 
-#imsave(guy + "_blurred.ppm", blurred)
-
-#print("put on filter")
 # Put filter on mask
 for i in range(len(blurred)):
     for j in range(len(blurred[0])):
