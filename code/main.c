@@ -152,6 +152,7 @@ int main(int argc, char **argv) {
     char *infile = argv[1];
     char *outfile = argv[2];
 
+    // Initializtion
     PPMImage *img = readPPM(infile);
 
     // Get Walls

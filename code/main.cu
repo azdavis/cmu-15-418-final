@@ -9,6 +9,7 @@
 #define COLORS 256
 #define BCTHRESH_DECIMAL 0.005
 #define FILTER_SIZE 50
+#define BUCKETS (COLORS / BUCKET_SIZE)
 
 typedef struct {
      int xmin, xmax, ymin, ymax;
@@ -143,8 +144,7 @@ static void setPixel(int x, int y, PPMImage *img,
 
 static int getBucketIdx(int r, int g, int b)
 {
-    int buckets = COLORS / BUCKET_SIZE;
-    return r * buckets * buckets + g * buckets + b;
+    return r * BUCKETS * BUCKETS + g * BUCKETS + b;
 }
 
 int main(void) {
@@ -153,7 +153,7 @@ int main(void) {
     PPMImage *img;
     char base[100] = "img/";
     char guy[100];
-    strcat(base, "large_elephant");
+    strcat(base, "elephant");
 
     strcpy(guy, base);
     strcat(guy, ".ppm");
@@ -165,8 +165,8 @@ int main(void) {
     int tpWall = img->height / TPWALLDENOM;
 
     // Get color distribution
-    int buckets = COLORS / BUCKET_SIZE;
-    int *color_counts = (int*) malloc(buckets * buckets * buckets * sizeof(int));
+    //int buckets = COLORS / BUCKET_SIZE;
+    int *color_counts = (int*) malloc(BUCKETS * BUCKETS * BUCKETS * sizeof(int));
     if (color_counts == NULL)
         exit(1);
 
