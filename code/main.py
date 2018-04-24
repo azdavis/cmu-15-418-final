@@ -108,15 +108,17 @@ for row in range(height):
                 weight = blurKernel[i_k][j_k]
                 i = row - (box_size / 2) + i_k
                 j = col - (box_size / 2) + j_k
-                if (i < 0 or i >= height or j < 0 or j >= width):
-                    continue
-                elif (mask[i][j] == 1):
+                if (
+                    i < 0 or i >= height or
+                    j < 0 or j >= width or
+                    mask[i][j] == 1
+                ):
                     continue
                 red += weight * original[i][j][0]
                 green += weight * original[i][j][1]
                 blue += weight * original[i][j][2]
                 count += weight
-        if (count == 0):
+        if count == 0:
             continue
         blurred[row][col][0] = red / count
         blurred[row][col][1] = green / count
