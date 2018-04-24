@@ -8,7 +8,7 @@
 #define BUCKET_SIZE 32
 #define COLORS 256
 #define BCTHRESH_DECIMAL 0.005
-#define FILTER_SIZE 100
+#define FILTER_SIZE 50
 
 typedef struct {
     int xmin, xmax, ymin, ymax;
@@ -259,6 +259,9 @@ int main(void) {
     int height = img->height;
     int row, col;
     for (row = 0; row < height; row++) {
+        if (row % 10 == 0) {
+            printf("finished row %d\n", row);
+        }
         for (col = 0; col < width; col++) {
             float count = 0;
             int i_k, j_k;
