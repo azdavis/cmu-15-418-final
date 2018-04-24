@@ -8,7 +8,6 @@ import math
 guy = "elephant"
 guy = "img/" + guy
 
-
 img = imread(guy + ".ppm").astype(np.int32)
 height, width, _ = np.shape(img)
 
@@ -20,7 +19,6 @@ ltWall = width / ltRtWallDenom
 rtWall = (width * (ltRtWallDenom - 1)) / ltRtWallDenom
 tpWallDenom = 8
 tpWall = height / tpWallDenom
-
 
 for i in range(height):
     walls[i][ltWall] = np.array([255,0,0])
@@ -98,7 +96,6 @@ blurKernel = np.ones((blurDim, blurDim), dtype=np.float32)
 
 box_size = len(blurKernel)
 for row in range(height):
-
     for col in range(width):
         count = 0.0
         red = 0.0
@@ -109,7 +106,6 @@ for row in range(height):
                 weight = blurKernel[i_k][j_k]
                 i = row - (box_size / 2) + i_k
                 j = col - (box_size / 2) + j_k
-
                 if (i < 0 or i >= height or j < 0 or j >= width):
                     continue
                 elif (mask[i][j] == 1):
