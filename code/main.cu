@@ -172,7 +172,6 @@ __host__ int main(int argc, char **argv) {
     char *outfile = argv[2];
 
     int deviceCount = 0;
-    bool isFastGPU = false;
     std::string name;
     cudaError_t err = cudaGetDeviceCount(&deviceCount);
 
@@ -184,9 +183,6 @@ __host__ int main(int argc, char **argv) {
         cudaDeviceProp deviceProps;
         cudaGetDeviceProperties(&deviceProps, i);
         name = deviceProps.name;
-        if (name.compare("GeForce GTX 1040") == 0) {
-            isFastGPU = true;
-        }
 
         printf("Device %d: %s\n", i, deviceProps.name);
         printf("   SMs:        %d\n", deviceProps.multiProcessorCount);
