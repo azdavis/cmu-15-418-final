@@ -5,9 +5,6 @@ from scipy.ndimage import imread
 import numpy as np
 import math
 
-import time
-
-t0 = time.time()
 guy = "elephant"
 guy = "img/" + guy
 
@@ -132,7 +129,6 @@ for i in range(len(blurred)):
     for j in range(len(blurred[0])):
         if mask[i][j] == 1:
             blurred[i][j] = original[i][j]
+
 imsave(guy + "_portrait.ppm", blurred)
 imsave(guy + "_portrait.jpg", blurred)
-t1 = time.time()
-print "Python total time", t1 - t0
