@@ -16,7 +16,6 @@ outfile = sys.argv[2]
 img = imread(infile).astype(np.int32)
 height, width, _ = np.shape(img)
 
-walls = np.copy(img, True)
 original = np.copy(img, True)
 
 ltRtWallDenom = 7
@@ -24,13 +23,6 @@ ltWall = width / ltRtWallDenom
 rtWall = (width * (ltRtWallDenom - 1)) / ltRtWallDenom
 tpWallDenom = 8
 tpWall = height / tpWallDenom
-
-for i in range(height):
-    walls[i][ltWall] = np.array([255,0,0])
-    walls[i][rtWall] = np.array([0,255,0])
-
-for j in range(width):
-    walls[tpWall][j] = np.array([0,0,255])
 
 bucket_size = 32
 colors = 256
