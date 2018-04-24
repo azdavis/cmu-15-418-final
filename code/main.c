@@ -144,17 +144,15 @@ static int getBucketIdx(int r, int g, int b) {
     return r * buckets * buckets + g * buckets + b;
 }
 
-int main(void) {
+int main(int argc, char **argv) {
+    if (argc != 3) {
+        printf("usage: %s <infile> <outfile>\n", argv[0]);
+        return 0;
+    }
+    char *infile = argv[1];
+    char *outfile = argv[2];
 
-    // Initializtion
-    PPMImage *img;
-    char base[100] = "img/";
-    char guy[100];
-    strcat(base, "large_elephant");
-
-    strcpy(guy, base);
-    strcat(guy, ".ppm");
-    img = readPPM(guy);
+    PPMImage *img = readPPM(infile);
 
     // Get Walls
     int ltWall = img->width / LTRTWALLDENOM;
@@ -310,9 +308,7 @@ int main(void) {
     PPMPixel *oldData = img->data;
     img->data = blurData;
 
-    strcpy(guy, base);
-    strcat(guy, "_portrait.ppm");
-    writePPM(guy, img);
+    writePPM(outfile, img);
 
     free(oldData);
     free(color_counts);
