@@ -11,138 +11,135 @@
 #define FILTER_SIZE 100
 
 typedef struct {
-     int xmin, xmax, ymin, ymax;
+    int xmin, xmax, ymin, ymax;
 } range;
 
 // PPM reading writing code guided from:
 // https://stackoverflow.com/questions/2693631/read-ppm-file-and-store-it-in-an-array-coded-with-c
 
 typedef struct {
-     unsigned char red,green,blue;
+    unsigned char red, green, blue;
 } PPMPixel;
 
 typedef struct {
-     int width, height;
-     PPMPixel *data;
+    int width, height;
+    PPMPixel *data;
 } PPMImage;
 
-static PPMImage *readPPM(const char *filename)
-{
+static PPMImage *readPPM(const char *filename) {
     char buff[16];
     PPMImage *img;
     FILE *fp;
     int c, rgb_comp_color;
-    //open PPM file for reading
+    // open PPM file for reading
     fp = fopen(filename, "rb");
     if (!fp) {
         fprintf(stderr, "Unable to open file '%s'\n", filename);
         exit(1);
     }
 
-    //read image format
+    // read image format
     if (!fgets(buff, sizeof(buff), fp)) {
-      perror(filename);
-      exit(1);
+        perror(filename);
+        exit(1);
     }
 
-    //check the image format
+    // check the image format
     if (buff[0] != 'P' || buff[1] != '6') {
         fprintf(stderr, "Invalid image format (must be 'P6')\n");
         exit(1);
     }
 
-    //alloc memory form image
+    // alloc memory form image
     img = (PPMImage *)malloc(sizeof(PPMImage));
     if (!img) {
-         fprintf(stderr, "Unable to allocate memory\n");
-         exit(1);
+        fprintf(stderr, "Unable to allocate memory\n");
+        exit(1);
     }
 
-    //check for comments
+    // check for comments
     c = getc(fp);
     while (c == '#') {
-    while (getc(fp) != '\n') ;
-         c = getc(fp);
+        while (getc(fp) != '\n')
+            ;
+        c = getc(fp);
     }
 
     ungetc(c, fp);
-    //read image size information
+    // read image size information
     if (fscanf(fp, "%d %d", &img->width, &img->height) != 2) {
-         fprintf(stderr, "Invalid image size (error loading '%s')\n", filename);
-         exit(1);
+        fprintf(stderr, "Invalid image size (error loading '%s')\n", filename);
+        exit(1);
     }
 
-    //read rgb component
+    // read rgb component
     if (fscanf(fp, "%d", &rgb_comp_color) != 1) {
-         fprintf(stderr, "Invalid rgb component (error loading '%s')\n", filename);
-         exit(1);
+        fprintf(stderr, "Invalid rgb component (error loading '%s')\n", filename);
+        exit(1);
     }
 
-    //check rgb component depth
-    if (rgb_comp_color!= RGB_COMPONENT_COLOR) {
-         fprintf(stderr, "'%s' does not have 8-bits components\n", filename);
-         exit(1);
+    // check rgb component depth
+    if (rgb_comp_color != RGB_COMPONENT_COLOR) {
+        fprintf(stderr, "'%s' does not have 8-bits components\n", filename);
+        exit(1);
     }
 
-    while (fgetc(fp) != '\n') ;
-    //memory allocation for pixel data
-    img->data = (PPMPixel*)malloc(img->width * img->height * sizeof(PPMPixel));
+    while (fgetc(fp) != '\n')
+        ;
+    // memory allocation for pixel data
+    img->data = (PPMPixel *)malloc(img->width * img->height * sizeof(PPMPixel));
 
     if (!img) {
-         fprintf(stderr, "Unable to allocate memory\n");
-         exit(1);
+        fprintf(stderr, "Unable to allocate memory\n");
+        exit(1);
     }
 
-    //read pixel data from file
+    // read pixel data from file
     if (fread(img->data, 3 * img->width, img->height, fp) != img->height) {
-         fprintf(stderr, "Error loading image '%s'\n", filename);
-         exit(1);
+        fprintf(stderr, "Error loading image '%s'\n", filename);
+        exit(1);
     }
 
     fclose(fp);
     return img;
 }
 
-void writePPM(const char *filename, PPMImage *img)
-{
+void writePPM(const char *filename, PPMImage *img) {
     FILE *fp;
-    //open file for output
+    // open file for output
     fp = fopen(filename, "wb");
     if (!fp) {
-         fprintf(stderr, "Unable to open file '%s'\n", filename);
-         exit(1);
+        fprintf(stderr, "Unable to open file '%s'\n", filename);
+        exit(1);
     }
 
-    //write the header file
-    //image format
+    // write the header file
+    // image format
     fprintf(fp, "P6\n");
 
-    //image size
-    fprintf(fp, "%d %d\n",img->width,img->height);
+    // image size
+    fprintf(fp, "%d %d\n", img->width, img->height);
 
     // rgb component depth
-    fprintf(fp, "%d\n",RGB_COMPONENT_COLOR);
+    fprintf(fp, "%d\n", RGB_COMPONENT_COLOR);
 
     // pixel data
     fwrite(img->data, 3 * img->width, img->height, fp);
     fclose(fp);
 }
 
-static PPMPixel* getPixel(int x, int y, PPMImage *img)
-{
+static PPMPixel *getPixel(int x, int y, PPMImage *img) {
     return &(img->data[x + y * img->width]);
 }
 
-static void setPixel(int x, int y, PPMImage *img,
-                     unsigned char R, unsigned char G, unsigned char B)
-{
+static void setPixel(int x, int y, PPMImage *img, unsigned char R,
+                                         unsigned char G, unsigned char B) {
     img->data[x + y * img->width].red = R;
     img->data[x + y * img->width].green = G;
     img->data[x + y * img->width].blue = B;
 }
 
-static int getBucketIdx(int r, int g, int b)
-{
+static int getBucketIdx(int r, int g, int b) {
     int buckets = COLORS / BUCKET_SIZE;
     return r * buckets * buckets + g * buckets + b;
 }
@@ -171,12 +168,18 @@ int main(void) {
         exit(1);
 
     range rs[3];
-    rs[0].xmin = 0; rs[0].xmax = ltWall;
-    rs[0].ymin = 0; rs[0].ymax = img->height;
-    rs[1].xmin = rtWall; rs[1].xmax = img->width;
-    rs[1].ymin = 0; rs[1].ymax = img->height;
-    rs[2].xmin = 0; rs[2].xmax = img->width;
-    rs[2].ymin = 0; rs[2].ymax = tpWall;
+    rs[0].xmin = 0;
+    rs[0].xmax = ltWall;
+    rs[0].ymin = 0;
+    rs[0].ymax = img->height;
+    rs[1].xmin = rtWall;
+    rs[1].xmax = img->width;
+    rs[1].ymin = 0;
+    rs[1].ymax = img->height;
+    rs[2].xmin = 0;
+    rs[2].xmax = img->width;
+    rs[2].ymin = 0;
+    rs[2].ymax = tpWall;
 
     int i, j, ri;
     for (ri = 0; ri < 3; ri++) {
@@ -185,16 +188,14 @@ int main(void) {
             for (j = r.xmin; j < r.xmax; j++) {
                 PPMPixel *pt = getPixel(j, i, img);
                 color_counts[getBucketIdx(pt->red / BUCKET_SIZE,
-                                          pt->green / BUCKET_SIZE,
-                                          pt->blue / BUCKET_SIZE)] += 1;
-
+                                                                    pt->green / BUCKET_SIZE,
+                                                                    pt->blue / BUCKET_SIZE)] += 1;
             }
         }
     }
 
-    int totalBCPix = (ltWall * img->height +
-                     (img->width - rtWall) * img->height +
-                      tpWall * img->width);
+    int totalBCPix = (ltWall * img->height + (img->width - rtWall) * img->height +
+                                        tpWall * img->width);
     int bcThresh = BCTHRESH_DECIMAL * totalBCPix;
 
     char *oldMask = calloc(img->width * img->height, sizeof(char));
@@ -219,20 +220,20 @@ int main(void) {
     memcpy(mask, oldMask, img->width * img->height * sizeof(char));
 
     // Clean up mask
-    for (i = 2; i < img->height-2; i++) {
-        for (j = 2; j < img->width-2; j++) {
+    for (i = 2; i < img->height - 2; i++) {
+        for (j = 2; j < img->width - 2; j++) {
             char this = oldMask[i * img->width + j];
             if (this == 0) {
-                int borderSum = (oldMask[(i-1) * img->width + j] +
-                                 oldMask[i * img->width + j-1] +
-                                 oldMask[(i+1) * img->width + j] +
-                                 oldMask[i * img->width + j+1] +
-                                 oldMask[(i-2) * img->width + j] +
-                                 oldMask[i * img->width + j-2] +
-                                 oldMask[(i+2) * img->width + j] +
-                                 oldMask[i * img->width + j+2]);
+                int borderSum = (oldMask[(i - 1) * img->width + j] +
+                                                 oldMask[i * img->width + j - 1] +
+                                                 oldMask[(i + 1) * img->width + j] +
+                                                 oldMask[i * img->width + j + 1] +
+                                                 oldMask[(i - 2) * img->width + j] +
+                                                 oldMask[i * img->width + j - 2] +
+                                                 oldMask[(i + 2) * img->width + j] +
+                                                 oldMask[i * img->width + j + 2]);
                 if (borderSum >= 2) {
-                   mask[i * img->width + j] = 1;
+                    mask[i * img->width + j] = 1;
                 }
             }
         }
@@ -264,16 +265,15 @@ int main(void) {
             float red = 0;
             float green = 0;
             float blue = 0;
-            for (i_k = 0; i_k < FILTER_SIZE; i_k++){
-                for (j_k = 0; j_k < FILTER_SIZE; j_k++){
-                    float weight = blurKernel[i_k*FILTER_SIZE + j_k];
+            for (i_k = 0; i_k < FILTER_SIZE; i_k++) {
+                for (j_k = 0; j_k < FILTER_SIZE; j_k++) {
+                    float weight = blurKernel[i_k * FILTER_SIZE + j_k];
                     int i = row - (FILTER_SIZE / 2) + i_k;
                     int j = col - (FILTER_SIZE / 2) + j_k;
 
                     if (i < 0 || i >= height || j < 0 || j >= width) {
                         continue;
-                    }
-                    else if (mask[i * width + j] == 1) {
+                    } else if (mask[i * width + j] == 1) {
                         continue;
                     }
                     PPMPixel *pt = getPixel(j, i, img);
@@ -287,19 +287,19 @@ int main(void) {
                 continue;
             }
 
-            blurData[row*width + col].red = (unsigned char) (red / count);
-            blurData[row*width + col].green = (unsigned char) (green / count);
-            blurData[row*width + col].blue = (unsigned char) (blue / count);
+            blurData[row * width + col].red = (unsigned char)(red / count);
+            blurData[row * width + col].green = (unsigned char)(green / count);
+            blurData[row * width + col].blue = (unsigned char)(blue / count);
         }
     }
     // Put filter on mask
     for (i = 0; i < height; i++) {
         for (j = 0; j < width; j++) {
-            if (mask[i*width + j] == 1) {
+            if (mask[i * width + j] == 1) {
                 PPMPixel *pt = getPixel(j, i, img);
-                blurData[i*width + j].red = pt->red;
-                blurData[i*width + j].green = pt->green;
-                blurData[i*width + j].blue = pt->blue;
+                blurData[i * width + j].red = pt->red;
+                blurData[i * width + j].green = pt->green;
+                blurData[i * width + j].blue = pt->blue;
             }
         }
     }
