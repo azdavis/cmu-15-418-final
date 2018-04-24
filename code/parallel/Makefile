@@ -1,7 +1,13 @@
+CUDAC = nvcc
+CUDACFLAGS = -O3 -m64 --gpu-architecture compute_61
+OBJDIR = objs
+
 .PHONY: all clean
 
-all:
-	@echo "TODO"
+all: main
 
 clean:
-	@echo "TODO"
+	rm -rf main
+
+main: main.cu
+	$(CUDAC) $(CUDACFLAGS) -o $@ $<
