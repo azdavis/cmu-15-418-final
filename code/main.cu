@@ -156,17 +156,28 @@ int main(int argc, char **argv) {
     char *outfile = argv[2];
     PPMImage *img = readPPM(infile);
 
+    int *color_counts = (int*) malloc(BUCKETS * BUCKETS * BUCKETS * sizeof(int));
+    if (color_counts == NULL)
+        exit(1);
+    char *oldMask = (char*) calloc(img->width * img->height, sizeof(char));
+    if (oldMask == NULL)
+        exit(1);
+    char *mask = (char*) calloc(img->width * img->height, sizeof(char));
+    if (mask == NULL)
+        exit(1);
+    float *blurKernel = (float*) malloc(FILTER_SIZE * FILTER_SIZE * sizeof(float));
+    if (blurKernel == NULL)
+        exit(1);
+    PPMPixel *blurData = (PPMPixel*) calloc(img->width * img->height, sizeof(PPMPixel));
+    if (blurData == NULL)
+        exit(1);
+
     // Get Walls
     int ltWall = img->width / LTRTWALLDENOM;
     int rtWall = (img->width * (LTRTWALLDENOM - 1)) / LTRTWALLDENOM;
     int tpWall = img->height / TPWALLDENOM;
 
     // Get color distribution
-    //int buckets = COLORS / BUCKET_SIZE;
-    int *color_counts = (int*) malloc(BUCKETS * BUCKETS * BUCKETS * sizeof(int));
-    if (color_counts == NULL)
-        exit(1);
-
     range rs[3];
     rs[0].xmin = 0; rs[0].xmax = ltWall;
     rs[0].ymin = 0; rs[0].ymax = img->height;
@@ -194,10 +205,6 @@ int main(int argc, char **argv) {
                       tpWall * img->width);
     int bcThresh = BCTHRESH_DECIMAL * totalBCPix;
 
-    char *oldMask = (char*) calloc(img->width * img->height, sizeof(char));
-    if (oldMask == NULL)
-        exit(1);
-
     for (i = 0; i < img->height; i++) {
         for (j = 0; j < img->width; j++) {
             PPMPixel *pt = getPixel(j, i, img);
@@ -210,9 +217,6 @@ int main(int argc, char **argv) {
         }
     }
 
-    char *mask = (char*) calloc(img->width * img->height, sizeof(char));
-    if (mask == NULL)
-        exit(1);
     memcpy(mask, oldMask, img->width * img->height * sizeof(char));
 
     // Clean up mask
@@ -237,9 +241,6 @@ int main(int argc, char **argv) {
 
     // Blur
     printf("finished mask, starting blur\n");
-    float *blurKernel = (float*) malloc(FILTER_SIZE * FILTER_SIZE * sizeof(float));
-    if (blurKernel == NULL)
-        exit(1);
     // Even box blur
     for (i = 0; i < FILTER_SIZE; i++) {
         for (j = 0; j < FILTER_SIZE; j++) {
@@ -247,15 +248,11 @@ int main(int argc, char **argv) {
         }
     }
 
-    PPMPixel *blurData = (PPMPixel*) calloc(img->width * img->height, sizeof(PPMPixel));
-    if (blurData == NULL)
-        exit(1);
-
     int width = img->width;
     int height = img->height;
     int row, col;
     for (row = 0; row < height; row++) {
-        if (row % 10 == 0) {
+        if (row % 100 == 0) {
             printf("finished row %d\n", row);
         }
         for (col = 0; col < width; col++) {
