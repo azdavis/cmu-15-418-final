@@ -6,7 +6,6 @@
 #include <string>
 #include "ppm.h"
 
-#define RGB_COMPONENT_COLOR 255
 #define LTRTWALLDENOM 7
 #define TPWALLDENOM 8
 #define BUCKET_SIZE 32
