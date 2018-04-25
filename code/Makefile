@@ -12,10 +12,10 @@ clean:
 	rm -rf main-cu main-c lib/*.o
 
 main-c: main.c $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $@ $<
+	$(CC) $(CFLAGS) -o $@ $^
 
 main-cu: main.cu $(OBJS)
-	$(CUDAC) $(CUDACFLAGS) $(OBJS) -o $@ $<
+	$(CUDAC) $(CUDACFLAGS) -o $@ $^
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c -o $@ $<
