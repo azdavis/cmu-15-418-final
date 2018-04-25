@@ -302,7 +302,6 @@ int main(int argc, char **argv) {
     dim3 threadsPerBlock(SQ_DIM, SQ_DIM);
     dim3 blocks(div_ceil(img->width, SQ_DIM), div_ceil(img->height, SQ_DIM));
 
-    CUDA_CHECK;
     blur<<<blocks, threadsPerBlock>>>(
         img->width,
         img->height,
@@ -312,7 +311,6 @@ int main(int argc, char **argv) {
         cudaMask
     );
 
-    CUDA_CHECK;
     cudaDeviceSynchronize();
     cudaMemcpy(
         blurData,
