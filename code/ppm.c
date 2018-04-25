@@ -4,19 +4,19 @@
 
 // https://stackoverflow.com/questions/2693631
 
-PPMImage *readPPM(const char *filename) {
+PPMImage *readPPM(const char *fname) {
     char buff[16];
     PPMImage *img;
     FILE *fp;
     int c, rgb_comp_color;
-    fp = fopen(filename, "rb");
+    fp = fopen(fname, "rb");
     if (!fp) {
-        fprintf(stderr, "Unable to open file '%s'\n", filename);
+        fprintf(stderr, "Unable to open file '%s'\n", fname);
         return NULL;
     }
 
     if (!fgets(buff, sizeof(buff), fp)) {
-        perror(filename);
+        perror(fname);
         return NULL;
     }
 
@@ -40,17 +40,17 @@ PPMImage *readPPM(const char *filename) {
 
     ungetc(c, fp);
     if (fscanf(fp, "%d %d", &img->width, &img->height) != 2) {
-        fprintf(stderr, "Invalid image size (error loading '%s')\n", filename);
+        fprintf(stderr, "Invalid image size (error loading '%s')\n", fname);
         return NULL;
     }
 
     if (fscanf(fp, "%d", &rgb_comp_color) != 1) {
-        fprintf(stderr, "Invalid rgb component (error loading '%s')\n", filename);
+        fprintf(stderr, "Invalid rgb component (error loading '%s')\n", fname);
         return NULL;
     }
 
     if (rgb_comp_color != RGB_COMPONENT_COLOR) {
-        fprintf(stderr, "'%s' does not have 8-bits components\n", filename);
+        fprintf(stderr, "'%s' does not have 8-bits components\n", fname);
         return NULL;
     }
 
@@ -64,7 +64,7 @@ PPMImage *readPPM(const char *filename) {
     }
 
     if (fread(img->data, 3 * img->width, img->height, fp) != img->height) {
-        fprintf(stderr, "Error loading image '%s'\n", filename);
+        fprintf(stderr, "Error loading image '%s'\n", fname);
         return NULL;
     }
 
@@ -72,11 +72,11 @@ PPMImage *readPPM(const char *filename) {
     return img;
 }
 
-void writePPM(const char *filename, PPMImage *img) {
+void writePPM(const char *fname, PPMImage *img) {
     FILE *fp;
-    fp = fopen(filename, "wb");
+    fp = fopen(fname, "wb");
     if (!fp) {
-        fprintf(stderr, "Unable to open file '%s'\n", filename);
+        fprintf(stderr, "Unable to open file '%s'\n", fname);
         return;
     }
     fprintf(fp, "P6\n");
