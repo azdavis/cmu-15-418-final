@@ -56,19 +56,11 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    range rs[3];
-    rs[0].xmin = 0;
-    rs[0].xmax = ltWall;
-    rs[0].ymin = 0;
-    rs[0].ymax = img->height;
-    rs[1].xmin = rtWall;
-    rs[1].xmax = img->width;
-    rs[1].ymin = 0;
-    rs[1].ymax = img->height;
-    rs[2].xmin = 0;
-    rs[2].xmax = img->width;
-    rs[2].ymin = 0;
-    rs[2].ymax = tpWall;
+    range rs[] = {
+        {0, ltWall, 0, img->height},
+        {rtWall, img->width, 0, img->height},
+        {0, img->width, 0, tpWall},
+    };
 
     int i, j, ri;
     for (ri = 0; ri < 3; ri++) {
