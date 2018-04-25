@@ -1,7 +1,6 @@
 #if defined(__APPLE__)
 #include <mach/mach.h>
 #include <mach/mach_time.h>
-#endif
 #elif _WIN32
 #include <time.h>
 #include <windows.h>
