@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
     char *infile = argv[1];
     char *outfile = argv[2];
 
-    uint64_t start;
+    double start;
 
     printf("begin\n");
     start = currentTicks();
