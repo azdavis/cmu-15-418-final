@@ -1,4 +1,5 @@
 *.jpg
+*.o
 *.ppm
 *.pyc
 *.swp
@@ -6,8 +7,8 @@
 *~
 .__afs*
 .DS_Store
-build
-code/main-cu
-code/main-c
 1
 2
+build
+code/main-c
+code/main-cu
