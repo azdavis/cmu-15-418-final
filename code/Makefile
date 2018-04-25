@@ -8,7 +8,7 @@ CUDACFLAGS = -O3 -m64 --gpu-architecture compute_61
 all: main-c main-cu
 
 clean:
-	rm -rf main-cu main-c
+	rm -rf main-cu main-c *.o
 
 main-c: main.c
 	$(CC) $(CFLAGS) -o $@ $<
