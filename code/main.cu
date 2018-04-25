@@ -14,6 +14,7 @@
 #define FILTER_SIZE 50
 #define BUCKETS (COLORS / BUCKET_SIZE)
 #define SQ_DIM 32
+#define SHARED_IMG_DATA_DIM (FILTER_SIZE + SQ_DIM)
 
 #define CUDA_CHECK cudaCheck(cudaPeekAtLastError(), __FILE__, __LINE__)
 static inline void cudaCheck(cudaError_t code, const char *file, int line) {
@@ -49,16 +50,59 @@ __global__ void blur(
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int sqIdx = threadIdx.y * SQ_DIM + threadIdx.x;
 
+
     // Load Kernel into shared mem
     __shared__ float sharedBlurKernel[FILTER_SIZE * FILTER_SIZE];
     int blurKernelCopyLen = div_ceil(FILTER_SIZE * FILTER_SIZE,
                                     SQ_DIM * SQ_DIM);
+    int index;
     for (int ind = 0; ind < blurKernelCopyLen; ind++) {
-        int index = ind + sqIdx * blurKernelCopyLen;
+        index = ind + sqIdx * blurKernelCopyLen;
         if (index >= FILTER_SIZE * FILTER_SIZE) {
             continue;
         }
         sharedBlurKernel[index] = blurKernel[index];
+    }
+
+    // Load image into shared memory
+    __shared__ PPMPixel sharedImgData[SHARED_IMG_DATA_DIM*SHARED_IMG_DATA_DIM];
+    int imgDataCopyLen = div_ceil(SHARED_IMG_DATA_DIM * SHARED_IMG_DATA_DIM,
+                                  SQ_DIM * SQ_DIM);
+
+    int imgIndex;
+    int rowOffset = blockIdx.x * SQ_DIM - (FILTER_SIZE / 2);
+    int colOffset = blockIdx.y * SQ_DIM - (FILTER_SIZE / 2);
+
+    int blockX = blockIdx.x;
+    int blockY = blockIdx.y;
+
+
+    if ((sqIdx == 0) && (blockX == 0) && (blockY == 0)) {
+        printf("sqIdx %d blockX %d blockY %d rowOffset %d colOffset %d\n", sqIdx, blockIdx.x, blockIdx.y, rowOffset, colOffset);
+        //printf("copy len %d , shared_img_dat_dim %d\n", imgDataCopyLen, SHARED_IMG_DATA_DIM);
+    }
+    for (int ind = 0; ind < imgDataCopyLen; ind++) {
+
+        index = ind + sqIdx * imgDataCopyLen;
+        int imgRow = rowOffset + (index / SHARED_IMG_DATA_DIM);
+        int imgCol = colOffset + (index % SHARED_IMG_DATA_DIM);
+
+        imgIndex = imgRow * width + imgCol;
+        if (index < 0 || index >= SHARED_IMG_DATA_DIM * SHARED_IMG_DATA_DIM) {
+            if (sqIdx == 0 && blockIdx.x == 2 && blockIdx.y == 2) {
+                printf("ind %d writing from imgIndex %d to shared index %d\n", ind, imgIndex, index);
+            }
+            continue;
+        }
+        if (imgIndex < 0 || imgIndex >= width * height) {
+            if (sqIdx == 0 && blockIdx.x == 2 && blockIdx.y == 2) {
+                printf("ind %d writing from imgIndex %d to shared index %d\n", ind, imgIndex, index);
+            }
+            continue;
+        }
+        sharedImgData[index] = imgData[imgIndex];
+
+        printf("ind %d writing from imgIndex %d to shared index %d blockX %d blockY %d innerRow %d innerCol %d imgRow %d imgCol %d\n", ind, imgIndex, index, blockIdx.x, blockIdx.y, index / SHARED_IMG_DATA_DIM, index % SHARED_IMG_DATA_DIM, imgRow, imgCol);
     }
 
     __syncthreads();
@@ -83,7 +127,8 @@ __global__ void blur(
             } else if (mask[i * width + j] == 1) {
                 continue;
             }
-            PPMPixel pt = imgData[width * i + j];
+            PPMPixel pt = sharedImgData[SHARED_IMG_DATA_DIM * (i - rowOffset) + j - colOffset];
+            //PPMPixel pt = imgData[width * (i) + j];
             red += weight * (pt.red);
             green += weight * (pt.green);
             blue += weight * (pt.blue);
