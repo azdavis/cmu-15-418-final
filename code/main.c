@@ -168,9 +168,6 @@ int main(int argc, char **argv) {
     int height = img->height;
     int row, col;
     for (row = 0; row < height; row++) {
-        if (row % 100 == 0) {
-            printf("finished row %d\n", row);
-        }
         for (col = 0; col < width; col++) {
             float count = 0;
             int i_k, j_k;
