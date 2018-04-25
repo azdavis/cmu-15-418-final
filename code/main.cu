@@ -261,11 +261,12 @@ int main(int argc, char **argv) {
 
     CUDA_CHECK;
     blur<<<blocks, threadsPerBlock>>>(
-        img->width
-        img->height
+        img->width,
+        img->height,
         cudaImgData,
-        cudaBlurKernel
-        cudaBlurData, cudaMask
+        cudaBlurKernel,
+        cudaBlurData,
+        cudaMask
     );
 
     cudaDeviceSynchronize();
