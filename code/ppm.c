@@ -33,8 +33,7 @@ PPMImage *readPPM(const char *fname) {
 
     c = getc(fp);
     while (c == '#') {
-        while (getc(fp) != '\n')
-            ;
+        while (getc(fp) != '\n') {}
         c = getc(fp);
     }
 
@@ -54,8 +53,7 @@ PPMImage *readPPM(const char *fname) {
         return NULL;
     }
 
-    while (fgetc(fp) != '\n')
-        ;
+    while (fgetc(fp) != '\n') {}
     img->data = (PPMPixel *)malloc(img->width * img->height * sizeof(PPMPixel));
 
     if (!img) {
