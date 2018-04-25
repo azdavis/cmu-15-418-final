@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -efu
+set -efux
 
 make main-c main-cu
 
