@@ -12,4 +12,5 @@ for image in elephant.ppm; do
     else
         echo "Results differ: $image"
     fi
+    rm 1 2
 done
