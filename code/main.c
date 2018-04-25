@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <inttypes.h>
 #include "ppm.h"
+#include "cycletimer.h"
 
 #define LTRTWALLDENOM 7
 #define TPWALLDENOM 8
@@ -28,11 +30,19 @@ int main(int argc, char **argv) {
     char *infile = argv[1];
     char *outfile = argv[2];
 
+    uint64_t ticks;
+
+    printf("begin\n");
+    ticks = currentTicks();
+
     // Initializtion
     PPMImage *img = readPPM(infile);
     if (img == NULL) {
         exit(EXIT_FAILURE);
     }
+
+    printf("load image: %" PRIu64 "\n", currentTicks() - ticks);
+    ticks = currentTicks();
 
     // Get Walls
     int ltWall = img->width / LTRTWALLDENOM;
@@ -76,6 +86,9 @@ int main(int argc, char **argv) {
         }
     }
 
+    printf("get color_counts: %" PRIu64 "\n", currentTicks() - ticks);
+    ticks = currentTicks();
+
     int totalBCPix =
         ltWall * img->height +
         (img->width - rtWall) * img->height +
@@ -99,6 +112,9 @@ int main(int argc, char **argv) {
             }
         }
     }
+
+    printf("get oldMask: %" PRIu64 "\n", currentTicks() - ticks);
+    ticks = currentTicks();
 
     char *mask = calloc(img->width * img->height, sizeof(char));
     if (mask == NULL) {
@@ -126,6 +142,9 @@ int main(int argc, char **argv) {
             }
         }
     }
+
+    printf("get mask: %" PRIu64 "\n", currentTicks() - ticks);
+    ticks = currentTicks();
 
     // Blur
     printf("finished mask, starting blur\n");
@@ -187,6 +206,10 @@ int main(int argc, char **argv) {
             blurData[row * width + col].blue = (unsigned char)(blue / count);
         }
     }
+
+    printf("get blurData: %" PRIu64 "\n", currentTicks() - ticks);
+    ticks = currentTicks();
+
     // Put filter on mask
     for (i = 0; i < height; i++) {
         for (j = 0; j < width; j++) {
@@ -199,14 +222,20 @@ int main(int argc, char **argv) {
         }
     }
 
+
     PPMPixel *oldData = img->data;
     img->data = blurData;
+
+    printf("use blurData: %" PRIu64 "\n", currentTicks() - ticks);
+    ticks = currentTicks();
 
     errno = 0;
     writePPM(outfile, img);
     if (errno != 0) {
         exit(EXIT_FAILURE);
     }
+
+    printf("write image: %" PRIu64 "\n", currentTicks() - ticks);
 
     free(oldData);
     free(color_counts);
