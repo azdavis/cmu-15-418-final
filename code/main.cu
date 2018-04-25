@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <string>
 #include "lib/ppm.h"
+#include "lib/cycletimer.h"
 
 #define LTRTWALLDENOM 7
 #define TPWALLDENOM 8
@@ -151,6 +152,8 @@ int main(int argc, char **argv) {
     char *infile = argv[1];
     char *outfile = argv[2];
 
+    double start;
+
     int deviceCount = 0;
     std::string name;
     cudaError_t err = cudaGetDeviceCount(&deviceCount);
@@ -171,7 +174,11 @@ int main(int argc, char **argv) {
         printf("   CUDA Cap:   %d.%d\n", deviceProps.major, deviceProps.minor);
     }
 
+    printf("begin\n");
+    start = currentSeconds();
     PPMImage *img = readPPM(infile);
+    printf("load image: %lf\n", currentSeconds() - start);
+    start = currentSeconds();
 
     int *color_counts = (int *)malloc(BUCKETS * BUCKETS * BUCKETS * sizeof(int));
     char *oldMask = (char *)calloc(img->width * img->height, sizeof(char));
@@ -215,6 +222,8 @@ int main(int argc, char **argv) {
         FILTER_SIZE * FILTER_SIZE * sizeof(float),
         cudaMemcpyHostToDevice);
 
+    printf("malloc and cudamalloc and memcpy: %lf\n", currentSeconds() - start);
+    start = currentSeconds();
     // Get Walls
     int ltWall = img->width / LTRTWALLDENOM;
     int rtWall = (img->width * (LTRTWALLDENOM - 1)) / LTRTWALLDENOM;
@@ -250,6 +259,8 @@ int main(int argc, char **argv) {
             }
         }
     }
+    printf("get color_counts: %lf\n", currentSeconds() - start);
+    start = currentSeconds();
 
     int totalBCPix =
         ltWall * img->height +
@@ -270,6 +281,8 @@ int main(int argc, char **argv) {
         }
     }
 
+    printf("get oldMask: %lf\n", currentSeconds() - start);
+    start = currentSeconds();
     memcpy(mask, oldMask, img->width * img->height * sizeof(char));
 
     // Clean up mask
@@ -292,6 +305,8 @@ int main(int argc, char **argv) {
             }
         }
     }
+    printf("get mask: %lf\n", currentSeconds() - start);
+    start = currentSeconds();
 
     // Blur
     printf("finished mask, starting blur\n");
@@ -335,6 +350,8 @@ int main(int argc, char **argv) {
             }
         }
     }
+    printf("get blurData: %lf\n", currentSeconds() - start);
+    start = currentSeconds();
 
     PPMPixel *oldData = img->data;
     img->data = blurData;
@@ -344,6 +361,7 @@ int main(int argc, char **argv) {
     if (errno != 0) {
         exit(EXIT_FAILURE);
     }
+    printf("write image: %lf\n", currentSeconds() - start);
 
     free(oldData);
     free(color_counts);
