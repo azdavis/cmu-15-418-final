@@ -85,5 +85,5 @@ void writePPM(const char *fname, PPMImage *img) {
 }
 
 PPMPixel *getPixel(int x, int y, PPMImage *img) {
-    return &(img->data[x + y * img->width]);
+    return &img->data[x + y * img->width];
 }
