@@ -4,7 +4,7 @@
 #include <string.h>
 #include <errno.h>
 #include <string>
-#include "ppm.h"
+#include "lib/ppm.h"
 
 #define LTRTWALLDENOM 7
 #define TPWALLDENOM 8

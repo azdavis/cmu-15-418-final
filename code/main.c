@@ -3,8 +3,8 @@
 #include <string.h>
 #include <errno.h>
 #include <inttypes.h>
-#include "ppm.h"
-#include "cycletimer.h"
+#include "lib/ppm.h"
+#include "lib/cycletimer.h"
 
 #define LTRTWALLDENOM 7
 #define TPWALLDENOM 8

@@ -2,14 +2,14 @@ CC = cc
 CFLAGS = -Wall -O3
 CUDAC = nvcc
 CUDACFLAGS = -O3 -m64 --gpu-architecture compute_61
-OBJS = cycletimer.o ppm.o
+OBJS = lib/cycletimer.o lib/ppm.o
 
 .PHONY: all clean
 
 all: main-c main-cu
 
 clean:
-	rm -rf main-cu main-c *.o
+	rm -rf main-cu main-c lib/*.o
 
 main-c: main.c $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $<
