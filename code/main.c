@@ -65,15 +65,21 @@ int main(int argc, char **argv) {
         for (i = r.ymin; i < r.ymax; i++) {
             for (j = r.xmin; j < r.xmax; j++) {
                 PPMPixel *pt = getPixel(j, i, img);
-                color_counts[getBucketIdx(pt->red / BUCKET_SIZE,
-                                                                    pt->green / BUCKET_SIZE,
-                                                                    pt->blue / BUCKET_SIZE)] += 1;
+                color_counts[
+                    getBucketIdx(
+                        pt->red / BUCKET_SIZE,
+                        pt->green / BUCKET_SIZE,
+                        pt->blue / BUCKET_SIZE)
+                ] += 1;
             }
         }
     }
 
-    int totalBCPix = (ltWall * img->height + (img->width - rtWall) * img->height +
-                                        tpWall * img->width);
+    int totalBCPix =
+        ltWall * img->height +
+        (img->width - rtWall) * img->height +
+        tpWall * img->width;
+
     int bcThresh = BCTHRESH_DECIMAL * totalBCPix;
 
     char *oldMask = calloc(img->width * img->height, sizeof(char));
@@ -102,14 +108,15 @@ int main(int argc, char **argv) {
         for (j = 2; j < img->width - 2; j++) {
             char this = oldMask[i * img->width + j];
             if (this == 0) {
-                int borderSum = (oldMask[(i - 1) * img->width + j] +
-                                                 oldMask[i * img->width + j - 1] +
-                                                 oldMask[(i + 1) * img->width + j] +
-                                                 oldMask[i * img->width + j + 1] +
-                                                 oldMask[(i - 2) * img->width + j] +
-                                                 oldMask[i * img->width + j - 2] +
-                                                 oldMask[(i + 2) * img->width + j] +
-                                                 oldMask[i * img->width + j + 2]);
+                int borderSum =
+                    oldMask[(i - 1) * img->width + j] +
+                    oldMask[i * img->width + j - 1] +
+                    oldMask[(i + 1) * img->width + j] +
+                    oldMask[i * img->width + j + 1] +
+                    oldMask[(i - 2) * img->width + j] +
+                    oldMask[i * img->width + j - 2] +
+                    oldMask[(i + 2) * img->width + j] +
+                    oldMask[i * img->width + j + 2];
                 if (borderSum >= 2) {
                     mask[i * img->width + j] = 1;
                 }
