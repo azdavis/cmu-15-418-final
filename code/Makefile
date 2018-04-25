@@ -2,7 +2,7 @@ CC = cc
 CFLAGS = -Wall -O3
 CUDAC = nvcc
 CUDACFLAGS = -O3 -m64 --gpu-architecture compute_61
-OBJS = cycletimer.o
+OBJS = cycletimer.o ppm.o
 
 .PHONY: all clean
 
