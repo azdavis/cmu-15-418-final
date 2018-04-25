@@ -23,7 +23,7 @@ static int getBucketIdx(int r, int g, int b) {
 int main(int argc, char **argv) {
     if (argc != 3) {
         printf("usage: %s <infile> <outfile>\n", argv[0]);
-        return 0;
+        exit(EXIT_FAILURE);
     }
     char *infile = argv[1];
     char *outfile = argv[2];
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     // Initializtion
     PPMImage *img = readPPM(infile);
     if (img == NULL) {
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     // Get Walls
@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
     int buckets = COLORS / BUCKET_SIZE;
     int *color_counts = malloc(buckets * buckets * buckets * sizeof(int));
     if (color_counts == NULL) {
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     range rs[3];
@@ -84,8 +84,9 @@ int main(int argc, char **argv) {
     int bcThresh = BCTHRESH_DECIMAL * totalBCPix;
 
     char *oldMask = calloc(img->width * img->height, sizeof(char));
-    if (oldMask == NULL)
-        exit(1);
+    if (oldMask == NULL) {
+        exit(EXIT_FAILURE);
+    }
 
     for (i = 0; i < img->height; i++) {
         for (j = 0; j < img->width; j++) {
@@ -100,8 +101,9 @@ int main(int argc, char **argv) {
     }
 
     char *mask = calloc(img->width * img->height, sizeof(char));
-    if (mask == NULL)
-        exit(1);
+    if (mask == NULL) {
+        exit(EXIT_FAILURE);
+    }
     memcpy(mask, oldMask, img->width * img->height * sizeof(char));
 
     // Clean up mask
@@ -128,8 +130,9 @@ int main(int argc, char **argv) {
     // Blur
     printf("finished mask, starting blur\n");
     float *blurKernel = malloc(FILTER_SIZE * FILTER_SIZE * sizeof(float));
-    if (blurKernel == NULL)
-        exit(1);
+    if (blurKernel == NULL) {
+        exit(EXIT_FAILURE);
+    }
     // Even box blur
     for (i = 0; i < FILTER_SIZE; i++) {
         for (j = 0; j < FILTER_SIZE; j++) {
@@ -138,8 +141,9 @@ int main(int argc, char **argv) {
     }
 
     PPMPixel *blurData = calloc(img->width * img->height, sizeof(PPMPixel));
-    if (blurData == NULL)
-        exit(1);
+    if (blurData == NULL) {
+        exit(EXIT_FAILURE);
+    }
 
     int width = img->width;
     int height = img->height;
@@ -201,7 +205,7 @@ int main(int argc, char **argv) {
     errno = 0;
     writePPM(outfile, img);
     if (errno != 0) {
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     free(oldData);

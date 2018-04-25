@@ -101,7 +101,7 @@ __global__ void blur(
 int main(int argc, char **argv) {
     if (argc != 3) {
         printf("usage: %s <infile> <outfile>\n", argv[0]);
-        return 0;
+        exit(EXIT_FAILURE);
     }
     char *infile = argv[1];
     char *outfile = argv[2];
@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
         blurKernel == NULL ||
         blurData == NULL
     ) {
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     PPMPixel *cudaImgData;
@@ -296,7 +296,7 @@ int main(int argc, char **argv) {
     errno = 0;
     writePPM(outfile, img);
     if (errno != 0) {
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     free(oldData);
