@@ -89,6 +89,9 @@ __global__ void blur(
         int imgCol = colOffset + (index % SHARED_IMG_DATA_DIM);
 
         imgIndex = imgRow * width + imgCol;
+        if (imgRow < 0 || imgCol < 0) {
+            continue;
+        }
         if (index < 0 || index >= SHARED_IMG_DATA_DIM * SHARED_IMG_DATA_DIM) {
             if (sqIdx == 0 && blockIdx.x == 2 && blockIdx.y == 2) {
                 printf("ind %d writing from imgIndex %d to shared index %d\n", ind, imgIndex, index);
