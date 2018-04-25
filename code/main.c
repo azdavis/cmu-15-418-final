@@ -42,8 +42,9 @@ int main(int argc, char **argv) {
     // Get color distribution
     int buckets = COLORS / BUCKET_SIZE;
     int *color_counts = malloc(buckets * buckets * buckets * sizeof(int));
-    if (color_counts == NULL)
+    if (color_counts == NULL) {
         exit(1);
+    }
 
     range rs[3];
     rs[0].xmin = 0;
