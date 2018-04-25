@@ -12,23 +12,23 @@ PPMImage *readPPM(const char *filename) {
     fp = fopen(filename, "rb");
     if (!fp) {
         fprintf(stderr, "Unable to open file '%s'\n", filename);
-        exit(1);
+        return NULL;
     }
 
     if (!fgets(buff, sizeof(buff), fp)) {
         perror(filename);
-        exit(1);
+        return NULL;
     }
 
     if (buff[0] != 'P' || buff[1] != '6') {
         fprintf(stderr, "Invalid image format (must be 'P6')\n");
-        exit(1);
+        return NULL;
     }
 
     img = (PPMImage *)malloc(sizeof(PPMImage));
     if (!img) {
         fprintf(stderr, "Unable to allocate memory\n");
-        exit(1);
+        return NULL;
     }
 
     c = getc(fp);
@@ -41,17 +41,17 @@ PPMImage *readPPM(const char *filename) {
     ungetc(c, fp);
     if (fscanf(fp, "%d %d", &img->width, &img->height) != 2) {
         fprintf(stderr, "Invalid image size (error loading '%s')\n", filename);
-        exit(1);
+        return NULL;
     }
 
     if (fscanf(fp, "%d", &rgb_comp_color) != 1) {
         fprintf(stderr, "Invalid rgb component (error loading '%s')\n", filename);
-        exit(1);
+        return NULL;
     }
 
     if (rgb_comp_color != RGB_COMPONENT_COLOR) {
         fprintf(stderr, "'%s' does not have 8-bits components\n", filename);
-        exit(1);
+        return NULL;
     }
 
     while (fgetc(fp) != '\n')
@@ -60,12 +60,12 @@ PPMImage *readPPM(const char *filename) {
 
     if (!img) {
         fprintf(stderr, "Unable to allocate memory\n");
-        exit(1);
+        return NULL;
     }
 
     if (fread(img->data, 3 * img->width, img->height, fp) != img->height) {
         fprintf(stderr, "Error loading image '%s'\n", filename);
-        exit(1);
+        return NULL;
     }
 
     fclose(fp);
@@ -77,7 +77,7 @@ void writePPM(const char *filename, PPMImage *img) {
     fp = fopen(filename, "wb");
     if (!fp) {
         fprintf(stderr, "Unable to open file '%s'\n", filename);
-        exit(1);
+        return;
     }
     fprintf(fp, "P6\n");
     fprintf(fp, "%d %d\n", img->width, img->height);

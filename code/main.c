@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "ppm.h"
 
 #define LTRTWALLDENOM 7
@@ -29,6 +30,9 @@ int main(int argc, char **argv) {
 
     // Initializtion
     PPMImage *img = readPPM(infile);
+    if (img == NULL) {
+        exit(1);
+    }
 
     // Get Walls
     int ltWall = img->width / LTRTWALLDENOM;
@@ -186,7 +190,11 @@ int main(int argc, char **argv) {
     PPMPixel *oldData = img->data;
     img->data = blurData;
 
+    errno = 0;
     writePPM(outfile, img);
+    if (errno != 0) {
+        exit(1);
+    }
 
     free(oldData);
     free(color_counts);

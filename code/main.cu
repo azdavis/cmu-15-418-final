@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <string>
 #include "ppm.h"
 
@@ -125,6 +126,9 @@ __host__ int main(int argc, char **argv) {
     }
 
     PPMImage *img = readPPM(infile);
+    if (img == NULL) {
+        exit(1);
+    }
 
     int *color_counts = (int *)malloc(BUCKETS * BUCKETS * BUCKETS * sizeof(int));
     if (color_counts == NULL)
@@ -272,7 +276,11 @@ __host__ int main(int argc, char **argv) {
     PPMPixel *oldData = img->data;
     img->data = blurData;
 
+    errno = 0;
     writePPM(outfile, img);
+    if (errno != 0) {
+        exit(1);
+    }
 
     free(oldData);
     free(color_counts);
