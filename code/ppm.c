@@ -89,10 +89,3 @@ void writePPM(const char *fname, PPMImage *img) {
 PPMPixel *getPixel(int x, int y, PPMImage *img) {
     return &(img->data[x + y * img->width]);
 }
-
-void setPixel(int x, int y, PPMImage *img, unsigned char R,
-                                         unsigned char G, unsigned char B) {
-    img->data[x + y * img->width].red = R;
-    img->data[x + y * img->width].green = G;
-    img->data[x + y * img->width].blue = B;
-}
