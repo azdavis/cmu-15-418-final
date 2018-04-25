@@ -71,17 +71,9 @@ __global__ void blur(
                                   SQ_DIM * SQ_DIM);
 
     int imgIndex;
-    int rowOffset = blockIdx.x * SQ_DIM - (FILTER_SIZE / 2);
-    int colOffset = blockIdx.y * SQ_DIM - (FILTER_SIZE / 2);
+    int rowOffset = blockIdx.y * SQ_DIM - (FILTER_SIZE / 2);
+    int colOffset = blockIdx.x * SQ_DIM - (FILTER_SIZE / 2);
 
-    int blockX = blockIdx.x;
-    int blockY = blockIdx.y;
-
-
-    if ((sqIdx == 0) && (blockX == 0) && (blockY == 0)) {
-        printf("sqIdx %d blockX %d blockY %d rowOffset %d colOffset %d\n", sqIdx, blockIdx.x, blockIdx.y, rowOffset, colOffset);
-        //printf("copy len %d , shared_img_dat_dim %d\n", imgDataCopyLen, SHARED_IMG_DATA_DIM);
-    }
     for (int ind = 0; ind < imgDataCopyLen; ind++) {
 
         index = ind + sqIdx * imgDataCopyLen;
@@ -92,21 +84,13 @@ __global__ void blur(
         if (imgRow < 0 || imgCol < 0) {
             continue;
         }
-        if (index < 0 || index >= SHARED_IMG_DATA_DIM * SHARED_IMG_DATA_DIM) {
-            if (sqIdx == 0 && blockIdx.x == 2 && blockIdx.y == 2) {
-                printf("ind %d writing from imgIndex %d to shared index %d\n", ind, imgIndex, index);
-            }
+        else if (index < 0 || index >= SHARED_IMG_DATA_DIM * SHARED_IMG_DATA_DIM) {
             continue;
         }
-        if (imgIndex < 0 || imgIndex >= width * height) {
-            if (sqIdx == 0 && blockIdx.x == 2 && blockIdx.y == 2) {
-                printf("ind %d writing from imgIndex %d to shared index %d\n", ind, imgIndex, index);
-            }
+        else if (imgIndex < 0 || imgIndex >= width * height) {
             continue;
         }
         sharedImgData[index] = imgData[imgIndex];
-
-        printf("ind %d writing from imgIndex %d to shared index %d blockX %d blockY %d innerRow %d innerCol %d imgRow %d imgCol %d\n", ind, imgIndex, index, blockIdx.x, blockIdx.y, index / SHARED_IMG_DATA_DIM, index % SHARED_IMG_DATA_DIM, imgRow, imgCol);
     }
 
     __syncthreads();
@@ -129,6 +113,10 @@ __global__ void blur(
             if (i < 0 || i >= height || j < 0 || j >= width) {
                 continue;
             } else if (mask[i * width + j] == 1) {
+                continue;
+            } else if (i - rowOffset < 0 || i - rowOffset >= SHARED_IMG_DATA_DIM
+                       || j - colOffset < 0
+                       || j - colOffset >= SHARED_IMG_DATA_DIM) {
                 continue;
             }
             PPMPixel pt = sharedImgData[SHARED_IMG_DATA_DIM * (i - rowOffset) + j - colOffset];
@@ -324,6 +312,7 @@ int main(int argc, char **argv) {
         cudaMask
     );
 
+    CUDA_CHECK;
     cudaDeviceSynchronize();
     cudaMemcpy(
         blurData,
@@ -335,6 +324,7 @@ int main(int argc, char **argv) {
     // Put filter on mask
     int height = img->height;
     int width = img->width;
+
     for (i = 0; i < height; i++) {
         for (j = 0; j < width; j++) {
             if (mask[i * width + j] == 1) {
