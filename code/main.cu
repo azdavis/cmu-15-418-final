@@ -36,8 +36,14 @@ static int getBucketIdx(int r, int g, int b) {
     return r * BUCKETS * BUCKETS + g * BUCKETS + b;
 }
 
-__global__ void blur(int width, int height, PPMPixel *imgData,
-                                         float *blurKernel, PPMPixel *blurData, char *mask) {
+__global__ void blur(
+    int width,
+    int height,
+    PPMPixel *imgData,
+    float *blurKernel,
+    PPMPixel *blurData,
+    char *mask
+) {
 
     int col = blockIdx.x * blockDim.x + threadIdx.x;
     int row = blockIdx.y * blockDim.y + threadIdx.y;
@@ -146,14 +152,14 @@ __host__ int main(int argc, char **argv) {
     PPMPixel *cudaImgData;
     cudaMalloc(&cudaImgData, img->width * img->height * sizeof(PPMPixel));
     cudaMemcpy(cudaImgData, img->data,
-                         img->width * img->height * sizeof(PPMPixel),
-                         cudaMemcpyHostToDevice);
+        img->width * img->height * sizeof(PPMPixel),
+        cudaMemcpyHostToDevice);
 
     PPMPixel *cudaBlurData;
     cudaMalloc(&cudaBlurData, img->width * img->height * sizeof(PPMPixel));
     cudaMemcpy(cudaBlurData, img->data,
-                         img->width * img->height * sizeof(PPMPixel),
-                         cudaMemcpyHostToDevice);
+        img->width * img->height * sizeof(PPMPixel),
+        cudaMemcpyHostToDevice);
 
     // Even box blur
     for (int i = 0; i < FILTER_SIZE; i++) {
@@ -164,7 +170,8 @@ __host__ int main(int argc, char **argv) {
     float *cudaBlurKernel;
     cudaMalloc(&cudaBlurKernel, FILTER_SIZE * FILTER_SIZE * sizeof(float));
     cudaMemcpy(cudaBlurKernel, blurKernel,
-                         FILTER_SIZE * FILTER_SIZE * sizeof(float), cudaMemcpyHostToDevice);
+        FILTER_SIZE * FILTER_SIZE * sizeof(float),
+        cudaMemcpyHostToDevice);
 
     // Get Walls
     int ltWall = img->width / LTRTWALLDENOM;
@@ -248,19 +255,30 @@ __host__ int main(int argc, char **argv) {
     printf("finished mask, starting blur\n");
     char *cudaMask;
     cudaMalloc(&cudaMask, img->width * img->height * sizeof(char));
-    cudaMemcpy(cudaMask, mask, img->width * img->height * sizeof(char),
-                         cudaMemcpyHostToDevice);
+    cudaMemcpy(cudaMask, mask,
+        img->width * img->height * sizeof(char),
+        cudaMemcpyHostToDevice);
 
     dim3 threadsPerBlock(SQ_DIM, SQ_DIM);
     dim3 blocks(div_ceil(img->width, SQ_DIM), div_ceil(img->height, SQ_DIM));
 
     CUDA_CHECK;
-    blur<<<blocks, threadsPerBlock>>>(img->width, img->height, cudaImgData,
-                                                                        cudaBlurKernel, cudaBlurData, cudaMask);
+    blur<<<blocks, threadsPerBlock>>>(
+        img->width
+        img->height
+        cudaImgData,
+        cudaBlurKernel
+        cudaBlurData, cudaMask
+    );
+
     cudaDeviceSynchronize();
-    cudaMemcpy(blurData, cudaBlurData,
-                         img->width * img->height * sizeof(PPMPixel),
-                         cudaMemcpyDeviceToHost);
+    cudaMemcpy(
+        blurData,
+        cudaBlurData,
+        img->width * img->height * sizeof(PPMPixel),
+        cudaMemcpyDeviceToHost
+    );
+
     // Put filter on mask
     int height = img->height;
     int width = img->width;
