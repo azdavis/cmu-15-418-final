@@ -127,27 +127,24 @@ int main(int argc, char **argv) {
     }
 
     PPMImage *img = readPPM(infile);
-    if (img == NULL) {
-        exit(1);
-    }
 
     int *color_counts = (int *)malloc(BUCKETS * BUCKETS * BUCKETS * sizeof(int));
-    if (color_counts == NULL)
-        exit(1);
     char *oldMask = (char *)calloc(img->width * img->height, sizeof(char));
-    if (oldMask == NULL)
-        exit(1);
     char *mask = (char *)calloc(img->width * img->height, sizeof(char));
-    if (mask == NULL)
-        exit(1);
     float *blurKernel =
             (float *)malloc(FILTER_SIZE * FILTER_SIZE * sizeof(float));
-    if (blurKernel == NULL)
-        exit(1);
     PPMPixel *blurData =
             (PPMPixel *)calloc(img->width * img->height, sizeof(PPMPixel));
-    if (blurData == NULL)
+    if (
+        img == NULL ||
+        color_counts == NULL ||
+        oldMask == NULL ||
+        mask == NULL ||
+        blurKernel == NULL ||
+        blurData == NULL
+    ) {
         exit(1);
+    }
 
     PPMPixel *cudaImgData;
     cudaMalloc(&cudaImgData, img->width * img->height * sizeof(PPMPixel));
