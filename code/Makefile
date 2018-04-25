@@ -17,5 +17,5 @@ main-c: main.c $(OBJS)
 main-cu: main.cu $(OBJS)
 	$(CUDAC) $(CUDACFLAGS) $(OBJS) -o $@ $<
 
-%.o: %.c
+%.o: %.c %.h
 	$(CC) $(CFLAGS) -c -o $@ $<
