@@ -15,7 +15,6 @@
 #define BUCKETS (COLORS / BUCKET_SIZE)
 #define SQ_DIM 32
 
-#if 1
 #define CUDA_CHECK cudaCheck(cudaPeekAtLastError(), __FILE__, __LINE__)
 static inline void cudaCheck(cudaError_t code, const char *file, int line) {
     if (code == cudaSuccess) {
@@ -24,9 +23,6 @@ static inline void cudaCheck(cudaError_t code, const char *file, int line) {
     fprintf(stderr, "%s:%d: %s\n", file, line, cudaGetErrorString(code));
     exit(EXIT_FAILURE);
 }
-#else
-#define CUDA_CHECK ((void)0)
-#endif
 
 typedef struct {
     int xmin, xmax, ymin, ymax;
