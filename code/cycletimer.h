@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-uint64_t currentSeconds(void);
+uint64_t currentTicks(void);
 
 #ifdef __cplusplus
 }

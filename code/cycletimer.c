@@ -12,7 +12,7 @@
 
 #include "cycletimer.h"
 
-uint64_t currentTicks() {
+uint64_t currentTicks(void) {
 #if defined(__APPLE__)
     return mach_absolute_time();
 #elif defined(_WIN32)
