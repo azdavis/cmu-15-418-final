@@ -26,19 +26,35 @@ the algorithm to work with PPM, which is an image format we used in Assignment
 
 We saw a significant amount of speedup between the sequential Python and
 sequential C implementations. Then, after completing the CUDA implementation,
-we saw more impressive speedups.
+we saw more impressive speedups. In the CUDA implementation, we took advantage
+of shared memory for our blur convolutions and synchronized threads between
+the load and blur steps.
+
+\section{Preliminary Results}
 
 Below, we have summarized some results. Although the speedup from Python to C
 is also impressive, we do not explictly include it in the table below because
 the focus of the project is to consider the speedup gained specifically by
-utilizing parallelism, not by choosing a ``fast'' language.
+utilizing parallelism, not by choosing a ``fast'' language. We have also emited
+some python results because they take too long to run.
 
 \begin{tabular}{l|l|l|l|l}
-    Image & Python & C & Cuda & Speedup \\
+    Image (size in px) & Python & C & Cuda & Speedup \\
     \hline
-    TODO & TODO & TODO & TODO & TODO \\
-    TODO & TODO & TODO & TODO & TODO \\
-    TODO & TODO & TODO & TODO & TODO
+    Elephant 389x584 & 2m39s & 2.84s & 0.345s & 8.23x \\
+    Tiger 1400x845 & - & 18.1s & 0.328s & 55.19x \\
+    Large Elephant 2594x3888 & - & 2m14.37s & 1.040s & 129.17x \\
+\end{tabular}
+
+Time Breakdown in seconds for Large Elephant \\
+\begin{tabular}{l|l|l|l}
+    Task & C & Cuda & Speedup From Parallelism\\
+    \hline
+    Load Image & 0.5091 & 0.0132 & - \\
+    Cuda Move Memory & - & 0.1734 & - \\
+    Generate Mask & 0.1376 & 0.0963 & - \\
+    Blur & 136.9151 & 0.2244 & 601.139x \\
+    Write Image & 0.3073 & 0.4284 & -
 \end{tabular}
 
 \section{Goals}
