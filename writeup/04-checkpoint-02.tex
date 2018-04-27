@@ -45,17 +45,22 @@ some python results because they take too long to run.
     Tiger 1400x845 & - & 18.1s & 0.328s & 55.19x \\
     Large Elephant 2594x3888 & - & 134.37s & 1.040s & 129.17x \\
 \end{tabular}
-
+\\
 Time Breakdown in seconds for Large Elephant \\
 \begin{tabular}{l|l|l|l}
     Task & C & Cuda & Speedup From Parallelism\\
     \hline
     Load Image & 0.5091 & 0.0132 & - \\
-    Cuda Move Memory & - & 0.1734 & - \\
+    CUDA Move Memory & - & 0.1734 & - \\
     Generate Mask & 0.1376 & 0.0963 & - \\
     Blur & 136.9151 & 0.2244 & 601.139x \\
     Write Image & 0.3073 & 0.4284 & -
 \end{tabular}
+
+Because of our time breakdown, we are spending the most time in writing the
+image result, which cannot be parallelized. Also, we believe the overhead of
+moving the memory into the GPU for generating the mask will take more time than
+sequential, due to the CUDA Move Memory time. We will validate this soon.
 
 \section{Goals}
 
@@ -72,6 +77,15 @@ OpenMP-enabled C. We expect there to be fairly significant speedups, but not on
 the order of what we saw with CUDA, because our algorithm is basically various
 image manipulations operations, and GPUs were originally designed to be able to
 quickly execute such image manipulations.
+
+We believe with the OpenMP approach of having less threads and less overhead of
+moving data to a GPU, we can achieve more parallelism with the segmentation
+part of our algorithm. However, most of the time is spent on blur, so this the
+resulting speedup will not be as high.
+
+Additionally, we are looking to implement the algorithm in ISPC if we have time.
+If we have extra time, we can apply the algorithm to a video to show that is
+able to run in live-time.
 
 \section{Revised Schedule}
 
