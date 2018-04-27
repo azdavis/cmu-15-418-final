@@ -60,7 +60,8 @@ Time Breakdown in seconds for Large Elephant \\
 Because of our time breakdown, we are spending the most time in writing the
 image result, which cannot be parallelized. Also, we believe the overhead of
 moving the memory into the GPU for generating the mask will take more time than
-sequential, due to the CUDA Move Memory time. We will validate this soon.
+sequential, due to the CUDA Move Memory time. We will verify if this is the
+case.
 
 \section{Goals}
 
