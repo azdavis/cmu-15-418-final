@@ -12,6 +12,73 @@
 \begin{document}
 \maketitle
 
+\section{Progress Review}
+
+We have finished both the sequential C implementation and parallel CUDA
+implementation of our algorithm.
+
+We have verified that all three implementations produce the same, bit-for-bit
+results on a given input image.
+
+In order to avoid any encode/decode steps when working with JPEG, we modified
+the algorithm to work with PPM, which is an image format we used in Assignment
+1 and is much easier to work with.
+
+We saw a significant amount of speedup between the sequential Python and
+sequential C implementations. Then, after completing the CUDA implementation,
+we saw more impressive speedups.
+
+Below, we have summarized some results. Although the speedup from Python to C
+is also impressive, we do not explictly include it in the table below because
+the focus of the project is to consider the speedup gained specifically by
+utilizing parallelism, not by choosing a ``fast'' language.
+
+\begin{tabular}
+    Image & Python & C & Cuda & Speedup \\
+    \hline
+    TODO & TODO & TODO & TODO & TODO \\
+    TODO & TODO & TODO & TODO & TODO \\
+    TODO & TODO & TODO & TODO & TODO
+\end{tabular}
+
+\section{Goals}
+
+We have essentially completed all the goals we set out to accomplish in our
+proposal. However, we still have time left to work on the project.
+
+We would like to try using OpenMP as a source of parallelism to achive speedup
+in running our algorithm. We will revise the sequential C program to add OpenMP
+pragmas, and compile sequential C and OpenMP-enabled C versions of the program
+separately, as in Assignment 3.
+
+We are interested as to what kinds of speedups we will see from sequential C to
+OpenMP-enabled C. We expect there to be fairly significant speedups, but not on
+the order of what we saw with CUDA, because our algorithm is basically various
+image manipulations operations, and GPUs were originally designed to be able to
+quickly execute such image manipulations.
+
+\section{Revised Schedule}
+
+\begin{tabular}{l|l}
+    Date & Item \\
+    \hline
+    TODO & TODO \\
+    TODO & TODO \\
+    TODO & TODO \\
+    TODO & TODO \\
+    TODO & TODO
+\end{tabular}
+
+\section{Deliverables}
+
+TODO
+
+\section{Issues}
+
+TODO
+
+\section{Sample Results Gallery}
+
 TODO
 
 \end{document}
