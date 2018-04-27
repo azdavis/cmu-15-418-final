@@ -83,9 +83,9 @@ moving data to a GPU, we can achieve more parallelism with the segmentation
 part of our algorithm. However, most of the time is spent on blur, so this the
 resulting speedup will not be as high.
 
-Additionally, we are looking to implement the algorithm in ISPC if we have time.
-If we have extra time, we can apply the algorithm to a video to show that is
-able to run in live-time.
+Additionally, we are looking to implement the algorithm in ISPC if we have
+time. If we have extra time, we can apply the algorithm to a video to show that
+is able to run in live-time.
 
 \section{Revised Schedule}
 
@@ -112,9 +112,9 @@ We have met our goal of implementing portrait mode in CUDA. We will likely be
 able to implement the OMP and ISCP versions of the algorithm and compare the
 results. It will be interesting to discuss how each framework's approach to
 parallelism causes different speedup in different parts of the code. We have
-been able to show 130x speedup with CUDA, but we anticipate OMP and ISPC to only
-be able to achieve around 30x speedup due to GPUS having more computational
-threads.
+been able to show 130x speedup with CUDA, but we anticipate OMP and ISPC to
+only be able to achieve around 30x speedup due to GPUS having more
+computational threads.
 
 We plan to show a gallery of before an examples for input image and output
 portrait mode images.
