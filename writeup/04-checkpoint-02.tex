@@ -122,9 +122,23 @@ portrait mode images.
 
 \section{Issues}
 
-TODO
-An issue with video is the speed of the parsing the frame may take longer than
-the algorithm, but we will try to see if the computation can occur in live time.
+One issue may be if we feel a need to have our regular C program and OpenMP-
+enabled C program diverge significantly. We may wish to use \texttt{#if OMP}
+pragmas to separate OpenMP-only logic from regular sequential logic. We hope,
+however, to keep the algorithms as similar as possible. Ideally, the only
+change would be to add the OpenMP pragmas.
+
+If we wish to run our algorithm on videos, a possible problem may be that even
+the fastest version of the algorithm may not be able to run in real-time. Even
+for relatively small images such as Elephant and Tiger, the program runs in
+more than $\tfrac{1}{30}$ of a second, meaning we may not be able to process 30
+frames per second, a common standard for video. 60 or 120 frames per second
+would be even better, but also even less likely.
+
+We also foresee that it will be non-trivial to decode a video into frames for
+our algorithm to process. Even if we were to scale back our ambitions and only
+run our algorithm on existing video files, rather than with a real-time camera,
+the way in which we handle various video formats will require research.
 
 \section{Sample Results Gallery}
 Large Tiger Result (0.328s)
