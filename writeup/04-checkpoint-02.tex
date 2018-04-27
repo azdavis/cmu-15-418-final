@@ -97,8 +97,7 @@ able to run in live-time.
     2018-04-20 & Sequential C: background detection and manipulation \\
     2018-04-23 & Parallel CUDA: background blur\\
     2018-04-25 & Parallel CUDA: optimizing with shared memory\\
-    2018-04-27 & Parallel CUDA: final optimizations / measuring performance
-                 for Ariel and Jerry\\
+    2018-04-27 & Parallel CUDA: final optimizations for Ariel and Jerry\\
     2018-04-29 & Parallel OMP: background detection and manipulation
                  for Ariel and Jerry\\
     2018-05-04 & Parallel ISPC: background detection and manipulation
@@ -109,11 +108,22 @@ able to run in live-time.
 
 \section{Deliverables}
 
-TODO
+We have met our goal of implementing portrait mode in CUDA. We will likely be
+able to implement the OMP and ISCP versions of the algorithm and compare the
+results. It will be interesting to discuss how each framework's approach to
+parallelism causes different speedup in different parts of the code. We have
+been able to show 130x speedup with CUDA, but we anticipate OMP and ISPC to only
+be able to achieve around 30x speedup due to GPUS having more computational
+threads.
+
+We plan to show a gallery of before an examples for input image and output
+portrait mode images.
 
 \section{Issues}
 
 TODO
+An issue with video is the speed of the parsing the frame may take longer than
+the algorithm, but we will try to see if the computation can occur in live time.
 
 \section{Sample Results Gallery}
 
