@@ -12,12 +12,12 @@
 \begin{document}
 \maketitle
 
-\section*{Progress Review}
+\section{Progress Review}
+
 We have finished the sequential implementation of our algorithm in Python.
-(NumPy)
-This includes both the segmentation and the blur.
-We are currently working on the C implementation and brainstorming ways to use
-CUDA for parallelism.
+(NumPy) This includes both the segmentation and the blur. We are currently
+working on the C implementation and brainstorming ways to use CUDA for
+parallelism.
 
 \begin{figure}[!htb]
     \begin{minipage}{0.48\textwidth}
@@ -34,9 +34,9 @@ CUDA for parallelism.
 
 Through implementing the algorithm, we have found that we had to make several
 changes to our original design. For segmentation, we realized that using edges
-and gradients with snakes was not giving us the results we wanted.
-Much of the foreground was not captured by the snake and each point was
-too far apart form a continuous mask for the foreground.
+and gradients with snakes was not giving us the results we wanted. Much of the
+foreground was not captured by the snake and each point was too far apart form
+a continuous mask for the foreground.
 
 \begin{figure}[!htb]
     \begin{minipage}{0.30\textwidth}
@@ -58,6 +58,7 @@ too far apart form a continuous mask for the foreground.
 
 So, we decided to revise our algorithm. We chose to implement a simplified
 grab-cut algorithm.
+
 \begin{enumerate}
     \item
         Designiate the borders of the image as the background.
@@ -94,21 +95,21 @@ grab-cut algorithm.
     \end{minipage}\hfill
 \end{figure}
 
-Most of the time in the last week was spent ironing out
-the computer vision algorithm and trying to balance accuracy with
-how generalizable the algorithm was. We tried many other methods like using
-a background only image with a background / foreground image, but we finalized
-what we have now moving foward.
+Most of the time in the last week was spent ironing out the computer vision
+algorithm and trying to balance accuracy with how generalizable the algorithm
+was. We tried many other methods like using a background only image with a
+background / foreground image, but we finalized what we have now moving foward.
 
-\section*{Goals}
+\section{Goals}
+
 We took an additional 2 days to complete our goal of implementing the python
 version, but we have completed it. We are confident we can finish the C
 implementation by the end of the week. Once we optimize array patterns and
-convolutions in C, we will start CUDA implementation. We are not sure of
-the "nice to have" portrait mode on gifs or videos, but we will decide by the
-next checkpoint.
+convolutions in C, we will start CUDA implementation. We are not sure of the
+"nice to have" portrait mode on gifs or videos, but we will decide by the next
+checkpoint.
 
-\section*{Revised Schedule}
+\section{Revised Schedule}
 
 \begin{tabular}{l|l}
     Date & Item \\
@@ -124,16 +125,17 @@ next checkpoint.
     2018-05-08 & Presentation
 \end{tabular}
 
-\section*{Deliverables}
-We will be able to implement the CUDA implemnetation of portrait mode.
-We plan to show a gallery of before an examples for input image and output
-portrait mode images. We are not sure of the exact speedup between the
-CUDA implementation with the sequential C, but believe it will be significant
-with the high number of iterations across every pixel with background
-distribution and blur. We also plan on comparing the performance differences
-between sequential python with CUDA and sequential C.
+\section{Deliverables}
 
-\section*{Issues}
+We will be able to implement the CUDA implemnetation of portrait mode. We plan
+to show a gallery of before an examples for input image and output portrait
+mode images. We are not sure of the exact speedup between the CUDA
+implementation with the sequential C, but believe it will be significant with
+the high number of iterations across every pixel with background distribution
+and blur. We also plan on comparing the performance differences between
+sequential python with CUDA and sequential C.
+
+\section{Issues}
 
 Our current algorithm performs very well on some images, but on others it does
 not do as well. When the colors composing the subject are similar to the ones
@@ -163,7 +165,7 @@ table mapping ranges of colors to number of times encountered in the image,
 break the image into many small blocks, locally update the counts, and coalesce
 the counts at the end into the final global table.
 
-\section*{Sample Results Gallery}
+\section{Sample Results Gallery}
 
 \begin{figure}[!htb]
     \begin{minipage}{0.48\textwidth}

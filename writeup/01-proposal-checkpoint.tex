@@ -12,7 +12,7 @@
 \begin{document}
 \maketitle
 
-\subsection*{Overview}
+\subsection{Overview}
 
 We have decided to build bokeh portrait mode in parallel.
 
@@ -44,7 +44,7 @@ little dependencies after the blur process. Depending on which segmentation
 algorithm we utilize (options explained in next section), we will also
 implement it in parallel to achieve speedup.
 
-\subsection*{Part 1: Segmentation}
+\subsection{Part 1: Segmentation}
 
 There are several different implementations of foreground/background removal
 and extraction algorithms. In order to maximize parallelism and due to our lack
@@ -99,19 +99,19 @@ cuts. \cite{cv-graphcut} \cite{grabcut-paper}
 By the proposal, we will have solidified the algorithm we will use for
 segmentation.
 
-\subsection*{Part 2: Bokeh Blur}
+\subsection{Part 2: Bokeh Blur}
 
 The Bokeh effect is implemented by applying a filter in the shape of a polygon
 across an image. Values are accumulated by shifting the image in a shape and
 computing a weighted sum. This can be heavily parallelized across CUDA.
 \cite{bokeh}
 
-\subsection*{Hardware}
+\subsection{Hardware}
 
 We will use the gates machines, as they have GPUS if we use CUDA and a high
 number of hyperthreads for OMP processing.
 
-\subsection*{Overall}
+\subsection{Overall}
 
 Overall, we are looking to use CUDAs on GPUs because we are often able to
 parallelize across all the pixels of an image to apply all our filters and
