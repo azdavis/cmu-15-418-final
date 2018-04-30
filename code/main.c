@@ -19,7 +19,6 @@ int main(int argc, char **argv) {
     printf("begin\n");
     start = currentSeconds();
 
-    // Initializtion
     PPMImage *img = readPPM(infile);
     if (img == NULL) {
         exit(EXIT_FAILURE);
@@ -34,7 +33,6 @@ int main(int argc, char **argv) {
     int tpWall = img->height / TPWALLDENOM;
 
     // Get color distribution
-    int buckets = COLORS / BUCKET_SIZE;
     int *color_counts = malloc(buckets * buckets * buckets * sizeof(int));
     if (color_counts == NULL) {
         exit(EXIT_FAILURE);

@@ -128,19 +128,27 @@ int main(int argc, char **argv) {
 
     printf("begin\n");
     start = currentSeconds();
+
     PPMImage *img = readPPM(infile);
+    if (img == NULL) {
+        exit(EXIT_FAILURE);
+    }
+
     printf("load image: %lf\n", currentSeconds() - start);
     start = currentSeconds();
 
-    int *color_counts = (int *)malloc(BUCKETS * BUCKETS * BUCKETS * sizeof(int));
-    char *oldMask = (char *)calloc(img->width * img->height, sizeof(char));
-    char *mask = (char *)calloc(img->width * img->height, sizeof(char));
+    int *color_counts =
+        (int *)calloc(BUCKETS * BUCKETS * BUCKETS, sizeof(int));
+    char *oldMask =
+        (char *)calloc(img->width * img->height, sizeof(char));
+    char *mask =
+        (char *)calloc(img->width * img->height, sizeof(char));
     float *blurKernel =
-            (float *)malloc(FILTER_SIZE * FILTER_SIZE * sizeof(float));
+        (float *)calloc(FILTER_SIZE * FILTER_SIZE, sizeof(float));
     PPMPixel *blurData =
-            (PPMPixel *)calloc(img->width * img->height, sizeof(PPMPixel));
+        (PPMPixel *)calloc(img->width * img->height, sizeof(PPMPixel));
+
     if (
-        img == NULL ||
         color_counts == NULL ||
         oldMask == NULL ||
         mask == NULL ||
