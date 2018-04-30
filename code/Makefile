@@ -3,7 +3,7 @@ CFLAGS = -Wall -O3
 OMPFLAGS = -fopenmp -DOMP
 CUDAC = nvcc
 CUDAFLAGS = -O3 -m64 --gpu-architecture compute_61
-OBJS = lib/cycletimer.o lib/ppm.o
+OBJS = lib/cycletimer.o lib/ppm.o lib/etc.o
 
 .PHONY: all clean
 

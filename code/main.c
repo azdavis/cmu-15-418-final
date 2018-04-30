@@ -3,24 +3,9 @@
 #include <string.h>
 #include <errno.h>
 #include <inttypes.h>
-#include "lib/ppm.h"
 #include "lib/cycletimer.h"
-
-#define LTRTWALLDENOM 7
-#define TPWALLDENOM 8
-#define BUCKET_SIZE 32
-#define COLORS 256
-#define BCTHRESH_DECIMAL 0.005
-#define FILTER_SIZE 50
-
-typedef struct {
-    int xmin, xmax, ymin, ymax;
-} range;
-
-static int getBucketIdx(int r, int g, int b) {
-    int buckets = COLORS / BUCKET_SIZE;
-    return r * buckets * buckets + g * buckets + b;
-}
+#include "lib/etc.h"
+#include "lib/ppm.h"
 
 int main(int argc, char **argv) {
     if (argc != 3) {

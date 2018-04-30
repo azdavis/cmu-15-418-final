@@ -4,18 +4,9 @@
 #include <string.h>
 #include <errno.h>
 #include <string>
-#include "lib/ppm.h"
 #include "lib/cycletimer.h"
-
-#define LTRTWALLDENOM 7
-#define TPWALLDENOM 8
-#define BUCKET_SIZE 32
-#define COLORS 256
-#define BCTHRESH_DECIMAL 0.005
-#define FILTER_SIZE 50
-#define BUCKETS (COLORS / BUCKET_SIZE)
-#define SQ_DIM 32
-#define SHARED_IMG_DATA_DIM (FILTER_SIZE + SQ_DIM)
+#include "lib/etc.h"
+#include "lib/ppm.h"
 
 #define CUDA_CHECK cudaCheck(cudaPeekAtLastError(), __FILE__, __LINE__)
 static inline void cudaCheck(cudaError_t code, const char *file, int line) {
@@ -26,16 +17,8 @@ static inline void cudaCheck(cudaError_t code, const char *file, int line) {
     exit(EXIT_FAILURE);
 }
 
-typedef struct {
-    int xmin, xmax, ymin, ymax;
-} range;
-
 static inline __host__ __device__ int div_ceil(int n, int d) {
     return (n + (d - 1)) / d;
-}
-
-static int getBucketIdx(int r, int g, int b) {
-    return r * BUCKETS * BUCKETS + g * BUCKETS + b;
 }
 
 __global__ void blur(
