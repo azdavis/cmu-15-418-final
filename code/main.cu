@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <string>
 #include "lib/cycletimer.h"
 #include "lib/etc.h"
 #include "lib/ppm.h"
@@ -127,26 +126,6 @@ int main(int argc, char **argv) {
     char *outfile = argv[2];
 
     double start;
-
-    int deviceCount = 0;
-    std::string name;
-    cudaError_t err = cudaGetDeviceCount(&deviceCount);
-
-    printf("---------------------------------------------------------\n");
-    printf("Initializing CUDA for Portrait Mode\n");
-    printf("Found %d CUDA devices\n", deviceCount);
-
-    for (int i = 0; i < deviceCount; i++) {
-        cudaDeviceProp deviceProps;
-        cudaGetDeviceProperties(&deviceProps, i);
-        name = deviceProps.name;
-
-        printf("Device %d: %s\n", i, deviceProps.name);
-        printf("   SMs:        %d\n", deviceProps.multiProcessorCount);
-        printf("   Global mem: %.0f MB\n",
-                     static_cast<float>(deviceProps.totalGlobalMem) / (1024 * 1024));
-        printf("   CUDA Cap:   %d.%d\n", deviceProps.major, deviceProps.minor);
-    }
 
     printf("begin\n");
     start = currentSeconds();
