@@ -10,3 +10,4 @@
 build
 code/main-c
 code/main-cu
+code/main-omp
