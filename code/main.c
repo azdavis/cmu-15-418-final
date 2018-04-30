@@ -144,10 +144,14 @@ int main(int argc, char **argv) {
     if (blurKernel == NULL) {
         exit(EXIT_FAILURE);
     }
-    // Even box blur
+    // Bokeh Circle Blur
     for (i = 0; i < FILTER_SIZE; i++) {
         for (j = 0; j < FILTER_SIZE; j++) {
-            blurKernel[i * FILTER_SIZE + j] = 1.0;
+            int x = (FILTER_SIZE/2) - j;
+            int y = (FILTER_SIZE/2) - i;
+            if (x * x + y * y < (FILTER_SIZE/2) * (FILTER_SIZE/2)) {
+                blurKernel[i * FILTER_SIZE + j] = 1.0;
+            }
         }
     }
 
