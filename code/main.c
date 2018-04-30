@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <inttypes.h>
 #include "lib/cycletimer.h"
 #include "lib/etc.h"
 #include "lib/ppm.h"
