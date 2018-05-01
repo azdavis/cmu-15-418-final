@@ -19,6 +19,39 @@ static inline __host__ __device__ int div_ceil(int n, int d) {
     return (n + (d - 1)) / d;
 }
 
+
+__global__ void buildMask(
+    int width,
+    int height,
+    char *oldMask,
+    char *mask
+) {
+
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (i < 2 || j < 2 || i >= height - 2 || j >= width - 2) {
+        return;
+    }
+
+    // Clean up mask
+    char thisPx = oldMask[i * width + j];
+    if (thisPx == 0) {
+        int borderSum =
+            oldMask[(i - 1) * width + j] +
+            oldMask[i * width + j - 1] +
+            oldMask[(i + 1) * width + j] +
+            oldMask[i * width + j + 1] +
+            oldMask[(i - 2) * width + j] +
+            oldMask[i * width + j - 2] +
+            oldMask[(i + 2) * width + j] +
+            oldMask[i * width + j + 2];
+        if (borderSum >= 2) {
+            mask[i * width + j] = 1;
+        }
+    }
+}
+
 __global__ void blur(
     int width,
     int height,
