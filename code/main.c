@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
     int tpWall = img->height / TPWALLDENOM;
 
     // Get color distribution
-    int *color_counts = malloc(BUCKETS * BUCKETS * BUCKETS * sizeof(int));
+    int *color_counts = calloc(BUCKETS * BUCKETS * BUCKETS, sizeof(int));
     if (color_counts == NULL) {
         exit(EXIT_FAILURE);
     }
@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
 
     // Blur
     printf("finished mask, starting blur\n");
-    float *blurKernel = malloc(FILTER_SIZE * FILTER_SIZE * sizeof(float));
+    float *blurKernel = calloc(FILTER_SIZE * FILTER_SIZE, sizeof(float));
     if (blurKernel == NULL) {
         exit(EXIT_FAILURE);
     }
