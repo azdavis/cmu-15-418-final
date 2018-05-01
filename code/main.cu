@@ -23,6 +23,64 @@ static inline __host__ __device__ int div_ceil(int n, int d) {
     return (n + (d - 1)) / d;
 }
 
+
+static inline __device__ int cudaGetBucketIdx(int r, int g, int b) {
+    return r * BUCKETS * BUCKETS + g * BUCKETS + b;
+}
+
+__global__ void initMask(
+    int width,
+    int height,
+    char *oldMask,
+    int *color_counts,
+    PPMPixel *imgData,
+    int bcThresh
+) {
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
+
+    PPMPixel pt = imgData[i * width + j];
+    unsigned char r = pt.red / BUCKET_SIZE;
+    unsigned char g = pt.green / BUCKET_SIZE;
+    unsigned char b = pt.blue / BUCKET_SIZE;
+    if (color_counts[cudaGetBucketIdx(r, g, b)] < bcThresh) {
+        oldMask[i * width + j] = 1;
+    }
+}
+
+__global__ void buildMask(
+    int width,
+    int height,
+    char *oldMask,
+    char *mask
+) {
+
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
+    if (i < 2 || j < 2 || i >= height - 2 || j >= width - 2) {
+        return;
+    }
+
+    __syncthreads();
+
+    // Clean up mask
+    char thisPx = oldMask[i * width + j];
+    if (thisPx == 0) {
+        int borderSum =
+            oldMask[(i - 1) * width + j] +
+            oldMask[i * width + j - 1] +
+            oldMask[(i + 1) * width + j] +
+            oldMask[i * width + j + 1] +
+            oldMask[(i - 2) * width + j] +
+            oldMask[i * width + j - 2] +
+            oldMask[(i + 2) * width + j] +
+            oldMask[i * width + j + 2];
+        if (borderSum >= 2) {
+            mask[i * width + j] = 1;
+        }
+    }
+}
+
 __global__ void blur(
     int width,
     int height,
@@ -35,7 +93,6 @@ __global__ void blur(
     int col = blockIdx.x * blockDim.x + threadIdx.x;
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int sqIdx = threadIdx.y * SQ_DIM + threadIdx.x;
-
 
     // Load Kernel into shared mem
     __shared__ float sharedBlurKernel[FILTER_SIZE * FILTER_SIZE];
@@ -193,6 +250,12 @@ int main(int argc, char **argv) {
         FILTER_SIZE * FILTER_SIZE * sizeof(float),
         cudaMemcpyHostToDevice);
 
+    int *cudaColorCounts;
+    cudaMalloc(&cudaColorCounts, BUCKETS * BUCKETS * BUCKETS * sizeof(int));
+
+    char *cudaOldMask;
+    cudaMalloc(&cudaOldMask, img->width * img->height * sizeof(char));
+
     char *cudaMask;
     cudaMalloc(&cudaMask, img->width * img->height * sizeof(char));
 
@@ -235,54 +298,46 @@ int main(int argc, char **argv) {
 
     int bcThresh = BCTHRESH_DECIMAL * totalBCPix;
 
-    for (i = 0; i < img->height; i++) {
-        for (j = 0; j < img->width; j++) {
-            PPMPixel *pt = getPixel(j, i, img);
-            unsigned char r = pt->red / BUCKET_SIZE;
-            unsigned char g = pt->green / BUCKET_SIZE;
-            unsigned char b = pt->blue / BUCKET_SIZE;
-            if (color_counts[getBucketIdx(r, g, b)] < bcThresh) {
-                oldMask[i * img->width + j] = 1;
-            }
-        }
-    }
+    cudaMemcpy(cudaColorCounts, color_counts,
+        BUCKETS * BUCKETS * BUCKETS * sizeof(int),
+        cudaMemcpyHostToDevice);
+
+    cudaMemcpy(cudaOldMask, oldMask,
+        img->width * img->height * sizeof(char),
+        cudaMemcpyHostToDevice);
+
+    // Dims for every pixel
+    dim3 threadsPerBlock(SQ_DIM, SQ_DIM);
+    dim3 blocks(div_ceil(img->width, SQ_DIM), div_ceil(img->height, SQ_DIM));
+
+    initMask<<<blocks, threadsPerBlock>>>(
+        img->width,
+        img->height,
+        cudaOldMask,
+        cudaColorCounts,
+        cudaImgData,
+        bcThresh
+    );
 
     printf("get oldMask: %lf\n", currentSeconds() - start);
     start = currentSeconds();
-    memcpy(mask, oldMask, img->width * img->height * sizeof(char));
 
-    // Clean up mask
+    cudaMemcpy(cudaMask, cudaOldMask,
+        img->width * img->height * sizeof(char),
+        cudaMemcpyDeviceToDevice);
 
-    for (i = 2; i < img->height - 2; i++) {
-        for (j = 2; j < img->width - 2; j++) {
-            char thisPx = oldMask[i * img->width + j];
-            if (thisPx == 0) {
-                int borderSum =
-                    oldMask[(i - 1) * img->width + j] +
-                    oldMask[i * img->width + j - 1] +
-                    oldMask[(i + 1) * img->width + j] +
-                    oldMask[i * img->width + j + 1] +
-                    oldMask[(i - 2) * img->width + j] +
-                    oldMask[i * img->width + j - 2] +
-                    oldMask[(i + 2) * img->width + j] +
-                    oldMask[i * img->width + j + 2];
-                if (borderSum >= 2) {
-                    mask[i * img->width + j] = 1;
-                }
-            }
-        }
-    }
+    buildMask<<<blocks, threadsPerBlock>>>(
+        img->width,
+        img->height,
+        cudaOldMask,
+        cudaMask
+    );
+
     printf("get mask: %lf\n", currentSeconds() - start);
     start = currentSeconds();
 
     // Blur
     printf("finished mask, starting blur\n");
-    cudaMemcpy(cudaMask, mask,
-        img->width * img->height * sizeof(char),
-        cudaMemcpyHostToDevice);
-
-    dim3 threadsPerBlock(SQ_DIM, SQ_DIM);
-    dim3 blocks(div_ceil(img->width, SQ_DIM), div_ceil(img->height, SQ_DIM));
 
     blur<<<blocks, threadsPerBlock>>>(
         img->width,
@@ -322,5 +377,6 @@ int main(int argc, char **argv) {
     cudaFree(cudaImgData);
     cudaFree(cudaBlurKernel);
     cudaFree(cudaMask);
+    cudaFree(cudaOldMask);
     return 0;
 }
