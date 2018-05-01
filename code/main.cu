@@ -193,6 +193,9 @@ int main(int argc, char **argv) {
         FILTER_SIZE * FILTER_SIZE * sizeof(float),
         cudaMemcpyHostToDevice);
 
+    char *cudaMask;
+    cudaMalloc(&cudaMask, img->width * img->height * sizeof(char));
+
     printf("malloc and cudamalloc and memcpy: %lf\n", currentSeconds() - start);
     start = currentSeconds();
     // Get Walls
@@ -274,8 +277,6 @@ int main(int argc, char **argv) {
 
     // Blur
     printf("finished mask, starting blur\n");
-    char *cudaMask;
-    cudaMalloc(&cudaMask, img->width * img->height * sizeof(char));
     cudaMemcpy(cudaMask, mask,
         img->width * img->height * sizeof(char),
         cudaMemcpyHostToDevice);
