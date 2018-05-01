@@ -39,6 +39,10 @@ __global__ void initMask(
     int j = blockIdx.x * blockDim.x + threadIdx.x;
     int i = blockIdx.y * blockDim.y + threadIdx.y;
 
+    if (i >= height || j >= width) {
+        return;
+    }
+
     PPMPixel pt = imgData[i * width + j];
     unsigned char r = pt.red / BUCKET_SIZE;
     unsigned char g = pt.green / BUCKET_SIZE;
