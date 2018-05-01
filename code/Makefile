@@ -1,5 +1,5 @@
 CC = cc
-CFLAGS = -Wall -O3
+CFLAGS = -Wall -O3 -Wno-unknown-pragmas
 OMPFLAGS = -fopenmp -DOMP
 CUDAC = nvcc
 CUDAFLAGS = -O3 -DCUDA -m64 --gpu-architecture compute_61
