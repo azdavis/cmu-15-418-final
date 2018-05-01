@@ -75,6 +75,7 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
+    #pragma omp parallel for shared(i) private(j)
     for (i = 0; i < img->height; i++) {
         for (j = 0; j < img->width; j++) {
             PPMPixel *pt = getPixel(j, i, img);
@@ -97,6 +98,7 @@ int main(int argc, char **argv) {
     memcpy(mask, oldMask, img->width * img->height * sizeof(char));
 
     // Clean up mask
+    #pragma omp parallel for shared(i) private(j)
     for (i = 2; i < img->height - 2; i++) {
         for (j = 2; j < img->width - 2; j++) {
             char this = oldMask[i * img->width + j];
@@ -127,6 +129,7 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
     // Bokeh Circle Blur
+    #pragma omp parallel for shared(i) private(j)
     for (i = 0; i < FILTER_SIZE; i++) {
         for (j = 0; j < FILTER_SIZE; j++) {
             int x = (FILTER_SIZE/2) - j;
@@ -145,6 +148,7 @@ int main(int argc, char **argv) {
     int width = img->width;
     int height = img->height;
     int row, col;
+    #pragma omp parallel for shared(row) private(col)
     for (row = 0; row < height; row++) {
         for (col = 0; col < width; col++) {
             float count = 0;
@@ -183,6 +187,7 @@ int main(int argc, char **argv) {
     start = currentSeconds();
 
     // Put filter on mask
+    #pragma omp parallel for shared(i) private(j)
     for (i = 0; i < height; i++) {
         for (j = 0; j < width; j++) {
             if (mask[i * width + j] == 1) {
