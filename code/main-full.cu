@@ -24,6 +24,30 @@ static inline __host__ __device__ int div_ceil(int n, int d) {
 }
 
 
+static inline __device__ int cudaGetBucketIdx(int r, int g, int b) {
+    return r * BUCKETS * BUCKETS + g * BUCKETS + b;
+}
+
+__global__ void initMask(
+    int width,
+    int height,
+    char *oldMask,
+    int *color_counts,
+    PPMPixel *imgData,
+    int bcThresh
+) {
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
+
+    PPMPixel pt = imgData[i * width + j];
+    unsigned char r = pt.red / BUCKET_SIZE;
+    unsigned char g = pt.green / BUCKET_SIZE;
+    unsigned char b = pt.blue / BUCKET_SIZE;
+    if (color_counts[cudaGetBucketIdx(r, g, b)] < bcThresh) {
+        oldMask[i * width + j] = 1;
+    }
+}
+
 __global__ void buildMask(
     int width,
     int height,
@@ -33,10 +57,11 @@ __global__ void buildMask(
 
     int j = blockIdx.x * blockDim.x + threadIdx.x;
     int i = blockIdx.y * blockDim.y + threadIdx.y;
-
     if (i < 2 || j < 2 || i >= height - 2 || j >= width - 2) {
         return;
     }
+
+    __syncthreads();
 
     // Clean up mask
     char thisPx = oldMask[i * width + j];
@@ -225,6 +250,15 @@ int main(int argc, char **argv) {
         FILTER_SIZE * FILTER_SIZE * sizeof(float),
         cudaMemcpyHostToDevice);
 
+    int *cudaColorCounts;
+    cudaMalloc(&cudaColorCounts, BUCKETS * BUCKETS * BUCKETS * sizeof(int));
+
+    char *cudaOldMask;
+    cudaMalloc(&cudaOldMask, img->width * img->height * sizeof(char));
+
+    char *cudaMask;
+    cudaMalloc(&cudaMask, img->width * img->height * sizeof(char));
+
     printf("malloc and cudamalloc and memcpy: %lf\n", currentSeconds() - start);
     start = currentSeconds();
     // Get Walls
@@ -264,35 +298,33 @@ int main(int argc, char **argv) {
 
     int bcThresh = BCTHRESH_DECIMAL * totalBCPix;
 
-    for (i = 0; i < img->height; i++) {
-        for (j = 0; j < img->width; j++) {
-            PPMPixel *pt = getPixel(j, i, img);
-            unsigned char r = pt->red / BUCKET_SIZE;
-            unsigned char g = pt->green / BUCKET_SIZE;
-            unsigned char b = pt->blue / BUCKET_SIZE;
-            if (color_counts[getBucketIdx(r, g, b)] < bcThresh) {
-                oldMask[i * img->width + j] = 1;
-            }
-        }
-    }
-
-    printf("get oldMask: %lf\n", currentSeconds() - start);
-    start = currentSeconds();
-
-    char *cudaOldMask;
-    cudaMalloc(&cudaOldMask, img->width * img->height * sizeof(char));
-    cudaMemcpy(cudaOldMask, oldMask,
-        img->width * img->height * sizeof(char),
+    cudaMemcpy(cudaColorCounts, color_counts,
+        BUCKETS * BUCKETS * BUCKETS * sizeof(int),
         cudaMemcpyHostToDevice);
-    char *cudaMask;
-    cudaMalloc(&cudaMask, img->width * img->height * sizeof(char));
-    cudaMemcpy(cudaMask, oldMask,
+
+    cudaMemcpy(cudaOldMask, oldMask,
         img->width * img->height * sizeof(char),
         cudaMemcpyHostToDevice);
 
     // Dims for every pixel
     dim3 threadsPerBlock(SQ_DIM, SQ_DIM);
     dim3 blocks(div_ceil(img->width, SQ_DIM), div_ceil(img->height, SQ_DIM));
+
+    initMask<<<blocks, threadsPerBlock>>>(
+        img->width,
+        img->height,
+        cudaOldMask,
+        cudaColorCounts,
+        cudaImgData,
+        bcThresh
+    );
+
+    printf("get oldMask: %lf\n", currentSeconds() - start);
+    start = currentSeconds();
+
+    cudaMemcpy(cudaMask, cudaOldMask,
+        img->width * img->height * sizeof(char),
+        cudaMemcpyDeviceToDevice);
 
     buildMask<<<blocks, threadsPerBlock>>>(
         img->width,
