@@ -10,4 +10,5 @@
 /code/main-c
 /code/main-cu
 /code/main-omp
+/code/main-full-cu
 build
