@@ -316,5 +316,6 @@ int main(int argc, char **argv) {
     free(img->data);
     cudaFree(cudaImgData);
     cudaFree(cudaBlurKernel);
+    cudaFree(cudaMask);
     return 0;
 }
