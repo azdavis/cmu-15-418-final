@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
     int tpWall = img->height / TPWALLDENOM;
 
     // Get color distribution
-    int *color_counts = malloc(buckets * buckets * buckets * sizeof(int));
+    int *color_counts = malloc(BUCKETS * BUCKETS * BUCKETS * sizeof(int));
     if (color_counts == NULL) {
         exit(EXIT_FAILURE);
     }
