@@ -23,13 +23,15 @@ int main(int argc, char **argv) {
     if (img == NULL) {
         exit(EXIT_FAILURE);
     }
+    int W = img->width;
+    int H = img->height;
 
     printf("load image: %lf\n", currentSeconds() - start);
     start = currentSeconds();
 
-    int ltWall = img->width / LTRTWALLDENOM;
-    int rtWall = (img->width * (LTRTWALLDENOM - 1)) / LTRTWALLDENOM;
-    int tpWall = img->height / TPWALLDENOM;
+    int ltWall = W / LTRTWALLDENOM;
+    int rtWall = (W * (LTRTWALLDENOM - 1)) / LTRTWALLDENOM;
+    int tpWall = H / TPWALLDENOM;
 
     int *color_counts = calloc(BUCKETS * BUCKETS * BUCKETS, sizeof(int));
     if (color_counts == NULL) {
@@ -37,9 +39,9 @@ int main(int argc, char **argv) {
     }
 
     range rs[] = {
-        {0, ltWall, 0, img->height},
-        {rtWall, img->width, 0, img->height},
-        {0, img->width, 0, tpWall},
+        {0, ltWall, 0, H},
+        {rtWall, W, 0, H},
+        {0, W, 0, tpWall},
     };
 
     int i, j, ri;
@@ -62,26 +64,26 @@ int main(int argc, char **argv) {
     start = currentSeconds();
 
     int totalBCPix =
-        ltWall * img->height +
-        (img->width - rtWall) * img->height +
-        tpWall * img->width;
+        ltWall * H +
+        (W - rtWall) * H +
+        tpWall * W;
 
     int bcThresh = BCTHRESH_DECIMAL * totalBCPix;
 
-    char *oldMask = calloc(img->width * img->height, sizeof(char));
+    char *oldMask = calloc(W * H, sizeof(char));
     if (oldMask == NULL) {
         exit(EXIT_FAILURE);
     }
 
     #pragma omp parallel for shared(i) private(j)
-    for (i = 0; i < img->height; i++) {
-        for (j = 0; j < img->width; j++) {
+    for (i = 0; i < H; i++) {
+        for (j = 0; j < W; j++) {
             PPMPixel *pt = getPixel(j, i, img);
             unsigned char r = pt->red / BUCKET_SIZE;
             unsigned char g = pt->green / BUCKET_SIZE;
             unsigned char b = pt->blue / BUCKET_SIZE;
             if (color_counts[getBucketIdx(r, g, b)] < bcThresh) {
-                oldMask[i * img->width + j] = 1;
+                oldMask[i * W + j] = 1;
             }
         }
     }
@@ -89,28 +91,28 @@ int main(int argc, char **argv) {
     printf("get oldMask: %lf\n", currentSeconds() - start);
     start = currentSeconds();
 
-    char *mask = calloc(img->width * img->height, sizeof(char));
+    char *mask = calloc(W * H, sizeof(char));
     if (mask == NULL) {
         exit(EXIT_FAILURE);
     }
-    memcpy(mask, oldMask, img->width * img->height * sizeof(char));
+    memcpy(mask, oldMask, W * H * sizeof(char));
 
     #pragma omp parallel for shared(i) private(j)
-    for (i = 2; i < img->height - 2; i++) {
-        for (j = 2; j < img->width - 2; j++) {
-            char this = oldMask[i * img->width + j];
+    for (i = 2; i < H - 2; i++) {
+        for (j = 2; j < W - 2; j++) {
+            char this = oldMask[i * W + j];
             if (this == 0) {
                 int borderSum =
-                    oldMask[(i - 1) * img->width + j] +
-                    oldMask[i * img->width + j - 1] +
-                    oldMask[(i + 1) * img->width + j] +
-                    oldMask[i * img->width + j + 1] +
-                    oldMask[(i - 2) * img->width + j] +
-                    oldMask[i * img->width + j - 2] +
-                    oldMask[(i + 2) * img->width + j] +
-                    oldMask[i * img->width + j + 2];
+                    oldMask[(i - 1) * W + j] +
+                    oldMask[i * W + j - 1] +
+                    oldMask[(i + 1) * W + j] +
+                    oldMask[i * W + j + 1] +
+                    oldMask[(i - 2) * W + j] +
+                    oldMask[i * W + j - 2] +
+                    oldMask[(i + 2) * W + j] +
+                    oldMask[i * W + j + 2];
                 if (borderSum >= 2) {
-                    mask[i * img->width + j] = 1;
+                    mask[i * W + j] = 1;
                 }
             }
         }
@@ -135,17 +137,15 @@ int main(int argc, char **argv) {
         }
     }
 
-    PPMPixel *blurData = calloc(img->width * img->height, sizeof(PPMPixel));
+    PPMPixel *blurData = calloc(W * H, sizeof(PPMPixel));
     if (blurData == NULL) {
         exit(EXIT_FAILURE);
     }
 
-    int width = img->width;
-    int height = img->height;
     int row, col;
     #pragma omp parallel for shared(row) private(col)
-    for (row = 0; row < height; row++) {
-        for (col = 0; col < width; col++) {
+    for (row = 0; row < H; row++) {
+        for (col = 0; col < W; col++) {
             float count = 0;
             int i_k, j_k;
             float red = 0;
@@ -157,9 +157,9 @@ int main(int argc, char **argv) {
                     int i = row - (FILTER_SIZE / 2) + i_k;
                     int j = col - (FILTER_SIZE / 2) + j_k;
 
-                    if (i < 0 || i >= height || j < 0 || j >= width) {
+                    if (i < 0 || i >= H || j < 0 || j >= W) {
                         continue;
-                    } else if (mask[i * width + j] == 1) {
+                    } else if (mask[i * W + j] == 1) {
                         continue;
                     }
                     PPMPixel *pt = getPixel(j, i, img);
@@ -172,9 +172,9 @@ int main(int argc, char **argv) {
             if (count == 0) {
                 continue;
             }
-            blurData[row * width + col].red = (unsigned char)(red / count);
-            blurData[row * width + col].green = (unsigned char)(green / count);
-            blurData[row * width + col].blue = (unsigned char)(blue / count);
+            blurData[row * W + col].red = (unsigned char)(red / count);
+            blurData[row * W + col].green = (unsigned char)(green / count);
+            blurData[row * W + col].blue = (unsigned char)(blue / count);
         }
     }
 
@@ -182,13 +182,13 @@ int main(int argc, char **argv) {
     start = currentSeconds();
 
     #pragma omp parallel for shared(i) private(j)
-    for (i = 0; i < height; i++) {
-        for (j = 0; j < width; j++) {
-            if (mask[i * width + j] == 1) {
+    for (i = 0; i < H; i++) {
+        for (j = 0; j < W; j++) {
+            if (mask[i * W + j] == 1) {
                 PPMPixel *pt = getPixel(j, i, img);
-                blurData[i * width + j].red = pt->red;
-                blurData[i * width + j].green = pt->green;
-                blurData[i * width + j].blue = pt->blue;
+                blurData[i * W + j].red = pt->red;
+                blurData[i * W + j].green = pt->green;
+                blurData[i * W + j].blue = pt->blue;
             }
         }
     }
