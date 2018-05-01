@@ -79,6 +79,9 @@ __global__ void blur(
     if (row < 0 || row >= height || col < 0 || col >= width) {
         return;
     }
+    if (mask[row * width + col] == 1) {
+        return;
+    }
 
     float count = 0;
     int i_k, j_k;
@@ -242,6 +245,7 @@ int main(int argc, char **argv) {
     memcpy(mask, oldMask, img->width * img->height * sizeof(char));
 
     // Clean up mask
+
     for (i = 2; i < img->height - 2; i++) {
         for (j = 2; j < img->width - 2; j++) {
             char thisPx = oldMask[i * img->width + j];
@@ -292,20 +296,6 @@ int main(int argc, char **argv) {
         cudaMemcpyDeviceToHost
     );
 
-    // Put filter on mask
-    int height = img->height;
-    int width = img->width;
-
-    for (i = 0; i < height; i++) {
-        for (j = 0; j < width; j++) {
-            if (mask[i * width + j] == 1) {
-                PPMPixel *pt = getPixel(j, i, img);
-                blurData[i * width + j].red = pt->red;
-                blurData[i * width + j].green = pt->green;
-                blurData[i * width + j].blue = pt->blue;
-            }
-        }
-    }
     printf("get blurData: %lf\n", currentSeconds() - start);
     start = currentSeconds();
 
