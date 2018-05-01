@@ -5,12 +5,15 @@ CUDAC = nvcc
 CUDAFLAGS = -O3 -DCUDA -m64 --gpu-architecture compute_61
 OBJS = lib/cycletimer.o lib/ppm.o lib/etc.o
 
-.PHONY: all clean
+.PHONY: all clean regress
 
 all: main-c main-omp main-cu main-full-cu
 
 clean:
 	rm -rf main-c main-omp main-cu main-full-cu lib/*.o
+
+regress: all
+	./regress.sh
 
 main-c: main.c $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^

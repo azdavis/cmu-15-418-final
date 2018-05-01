@@ -2,8 +2,6 @@
 
 set -efux
 
-make main-c main-cu
-
 for image in elephant.ppm; do
     time ./main-c img/$image c.ppm
     time ./main-cu img/$image cu.ppm
