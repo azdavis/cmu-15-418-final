@@ -17,17 +17,17 @@
 \begin{tabular}{l|l|l|l|l|l}
     Image (size in px) & C & OMP & OMP Speedup & Cuda & Cuda Speedup \\
     \hline
-    Large Elephant 2594x3888 & 138.19s & 15.01s & 9.2x & 0.922s & 149.88x \\
+    Large Elephant 2594x3888 & 111.52s & 9.972s & 11.19x & 0.748s & 150.43x \\
 \end{tabular}
 
 \begin{tabular}{l|l|l|l|l|l}
     Task & C & OMP & OMP Speedup & CUDA & CUDA Speedup\\
     \hline
-    Load Image & 0.0185s & 0.0161s & - & 0.0144s & -\\
+    Load Image & 0.0123s & 0.0159s & - & 0.0077s & -\\
     CUDA Move Memory & - & - & - & 0.1815s & -\\
-    Generate Mask & 0.1490s & 0.0609s & 2.44x & 0.0142s & 10.49x\\
-    Blur & 137.1922s & 14.477s & 9.48x & 0.1729s & 793.48x \\
-    Write Image & 0.4036s & 0.4047s & - & 0.4705s & -
+    Generate Mask & 0.1500s & 0.0608s & 2.44x & 0.0131s & 11.45x\\
+    Blur & 111.6798s & 9.507s & 11.75x & 0.1949s & 573.01x \\
+    Write Image & 0.3258s & 0.3596s & - & 0.3186 & -
 \end{tabular}
 
 \end{document}
