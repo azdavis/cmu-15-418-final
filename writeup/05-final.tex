@@ -14,20 +14,20 @@
 \begin{document}
 \maketitle
 
-\begin{tabular}{l|l|l|l|l}
-    Image (size in px) & Python & C & Cuda & Speedup \\
+\begin{tabular}{l|l|l|l|l|l}
+    Image (size in px) & C & OMP & OMP Speedup & Cuda & Cuda Speedup \\
     \hline
-    TODO & TODO & TODO & TODO & TODO \\
-    TODO & TODO & TODO & TODO & TODO \\
-    TODO & TODO & TODO & TODO & TODO
+    Large Elephant 2594x3888 & 138.19s & 15.01s & 9.2x & 0.922s & 149.88x \\
 \end{tabular}
 
-\begin{tabular}{l|l|l|l}
-    Task & C & Cuda & Speedup From Parallelism\\
+\begin{tabular}{l|l|l|l|l|l}
+    Task & C & OMP & OMP Speedup & CUDA & CUDA Speedup\\
     \hline
-    TODO & TODO & TODO & TODO \\
-    TODO & TODO & TODO & TODO \\
-    TODO & TODO & TODO & TODO
+    Load Image & 0.0185s & 0.0161s & - & 0.0144s & -\\
+    CUDA Move Memory & - & - & - & 0.1815s & -\\
+    Generate Mask & 0.1490s & 0.0609s & 2.44x & 0.0142s & 10.49x\\
+    Blur & 137.1922s & 14.477s & 9.48x & 0.1729s & 793.48x \\
+    Write Image & 0.4036s & 0.4047s & - & 0.4705s & -
 \end{tabular}
 
 \end{document}
