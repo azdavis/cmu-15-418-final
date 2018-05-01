@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
     }
 
     int row, col;
-    #pragma omp parallel for shared(row) private(col)
+    #pragma omp parallel for schedule(dynamic) shared(row) private(col)
     for (row = 0; row < H; row++) {
         for (col = 0; col < W; col++) {
             // Foreground Pixel
