@@ -146,6 +146,11 @@ int main(int argc, char **argv) {
     #pragma omp parallel for shared(row) private(col)
     for (row = 0; row < H; row++) {
         for (col = 0; col < W; col++) {
+            // Foreground Pixel
+            if (mask[row * W + col] == 1) {
+                continue;
+            }
+            // BG Pixel
             float count = 0;
             int i_k, j_k;
             float red = 0;
