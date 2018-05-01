@@ -43,7 +43,7 @@ __global__ void getColorDist(
     if (i >= height || j >= width) {
         return;
     }
-    if (j >= ltWall && j < rtWall && i > tpWall) {
+    if (j >= ltWall && j < rtWall && i >= tpWall) {
         return;
     }
 
