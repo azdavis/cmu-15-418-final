@@ -15,6 +15,9 @@ clean:
 regress: all
 	./run.sh img/elephant.ppm
 
+benchmark: all
+	./run.sh img/large_elephant.ppm
+
 main-c: main.c $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
 
