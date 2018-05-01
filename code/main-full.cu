@@ -28,6 +28,34 @@ static inline __device__ int cudaGetBucketIdx(int r, int g, int b) {
     return r * BUCKETS * BUCKETS + g * BUCKETS + b;
 }
 
+__global__ void getColorDist(
+    int width,
+    int height,
+    int *color_counts,
+    PPMPixel *imgData,
+    int ltWall,
+    int rtWall,
+    int tpWall
+) {
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (i >= height || j >= width) {
+        return;
+    }
+    if (j >= ltWall && j < rtWall && i > tpWall) {
+        return;
+    }
+
+    PPMPixel pt = imgData[i * width + j];
+    int bucketIdx = cudaGetBucketIdx(
+                    pt.red / BUCKET_SIZE,
+                    pt.green / BUCKET_SIZE,
+                    pt.blue / BUCKET_SIZE);
+
+    atomicAdd(&color_counts[bucketIdx], 1);
+}
+
 __global__ void initMask(
     int width,
     int height,
@@ -271,27 +299,26 @@ int main(int argc, char **argv) {
     int tpWall = img->height / TPWALLDENOM;
 
     // Get color distribution
-    range rs[] = {
-        {0, ltWall, 0, img->height},
-        {rtWall, img->width, 0, img->height},
-        {0, img->width, 0, tpWall},
-    };
 
-    int i, j, ri;
-    for (ri = 0; ri < 3; ri++) {
-        range r = rs[ri];
-        for (i = r.ymin; i < r.ymax; i++) {
-            for (j = r.xmin; j < r.xmax; j++) {
-                PPMPixel *pt = getPixel(j, i, img);
-                color_counts[
-                    getBucketIdx(
-                        pt->red / BUCKET_SIZE,
-                        pt->green / BUCKET_SIZE,
-                        pt->blue / BUCKET_SIZE)
-                ] += 1;
-            }
-        }
-    }
+    cudaMemcpy(cudaColorCounts, color_counts,
+        BUCKETS * BUCKETS * BUCKETS * sizeof(int),
+        cudaMemcpyHostToDevice);
+
+    // Dims for every pixel
+    dim3 threadsPerBlock(SQ_DIM, SQ_DIM);
+    dim3 blocks(div_ceil(img->width, SQ_DIM), div_ceil(img->height, SQ_DIM));
+
+    getColorDist<<<blocks, threadsPerBlock>>>(
+        img->width,
+        img->height,
+        cudaColorCounts,
+        cudaImgData,
+        ltWall,
+        rtWall,
+        tpWall
+    );
+    CUDA_CHECK;
+
     printf("get color_counts: %lf\n", currentSeconds() - start);
     start = currentSeconds();
 
@@ -302,17 +329,9 @@ int main(int argc, char **argv) {
 
     int bcThresh = BCTHRESH_DECIMAL * totalBCPix;
 
-    cudaMemcpy(cudaColorCounts, color_counts,
-        BUCKETS * BUCKETS * BUCKETS * sizeof(int),
-        cudaMemcpyHostToDevice);
-
     cudaMemcpy(cudaOldMask, oldMask,
         img->width * img->height * sizeof(char),
         cudaMemcpyHostToDevice);
-
-    // Dims for every pixel
-    dim3 threadsPerBlock(SQ_DIM, SQ_DIM);
-    dim3 blocks(div_ceil(img->width, SQ_DIM), div_ceil(img->height, SQ_DIM));
 
     initMask<<<blocks, threadsPerBlock>>>(
         img->width,
