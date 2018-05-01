@@ -13,7 +13,7 @@ clean:
 	rm -rf main-c main-omp main-cu main-full-cu lib/*.o
 
 regress: all
-	./regress.sh
+	./run.sh img/elephant.ppm
 
 main-c: main.c $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
