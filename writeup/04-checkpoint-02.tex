@@ -39,11 +39,12 @@ is also impressive, we do not explicitly include it in the table below because
 the focus of the project is to consider the speedup gained specifically by
 utilizing parallelism, not by choosing a ``fast'' language. We have also
 omitted some python results because they take too long to run.
-
+\\
+Images are with 50x50 size blur \\
 \begin{tabular}{l|l|l|l|l}
     Image (size in px) & Python & C & Cuda & Speedup \\
     \hline
-    Elephant 389x584 & 2m39s & 2.84s & 0.345s & 8.23x \\
+    Elephant 389x584 & 51m10s & 2.84s & 0.345s & 8.23x \\
     Tiger 1400x845 & - & 18.1s & 0.328s & 55.19x \\
     Large Elephant 2594x3888 & - & 134.37s & 1.040s & 129.17x \\
 \end{tabular}
