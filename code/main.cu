@@ -317,7 +317,6 @@ int main(int argc, char **argv) {
         rtWall,
         tpWall
     );
-    CUDA_CHECK;
 
     printf("get color_counts: %lf\n", currentSeconds() - start);
     start = currentSeconds();
