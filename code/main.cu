@@ -53,7 +53,14 @@ __global__ void getColorDist(
                     pt.green / BUCKET_SIZE,
                     pt.blue / BUCKET_SIZE);
 
-    atomicAdd(&color_counts[bucketIdx], 1);
+
+    if (j < ltWall && i < tpWall) {
+        atomicAdd(&color_counts[bucketIdx], 2);
+    } else if (i >= rtWall && i < tpWall) {
+        atomicAdd(&color_counts[bucketIdx], 2);
+    } else {
+        atomicAdd(&color_counts[bucketIdx], 1);
+    }
 }
 
 __global__ void initMask(
