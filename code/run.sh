@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -efux
+set -efu
 
 if [ $# -ne 1 ]; then
     echo "usage: $0 <infile>"
