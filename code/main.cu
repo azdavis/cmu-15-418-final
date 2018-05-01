@@ -6,6 +6,7 @@
 #include "lib/etc.h"
 #include "lib/ppm.h"
 
+#ifdef DEBUG
 #define CUDA_CHECK cudaCheck(cudaPeekAtLastError(), __FILE__, __LINE__)
 static inline void cudaCheck(cudaError_t code, const char *file, int line) {
     if (code == cudaSuccess) {
@@ -14,6 +15,9 @@ static inline void cudaCheck(cudaError_t code, const char *file, int line) {
     fprintf(stderr, "%s:%d: %s\n", file, line, cudaGetErrorString(code));
     exit(EXIT_FAILURE);
 }
+#else
+#define CUDA_CHECK ((void) 0)
+#endif
 
 static inline __host__ __device__ int div_ceil(int n, int d) {
     return (n + (d - 1)) / d;
