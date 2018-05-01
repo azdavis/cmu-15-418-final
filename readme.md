@@ -1,6 +1,6 @@
 # Parallel Portrait Mode
 
-cmu 15-418 final project
+a cmu 15-418 final project
 
 ## authors
 
