@@ -27,12 +27,10 @@ int main(int argc, char **argv) {
     printf("load image: %lf\n", currentSeconds() - start);
     start = currentSeconds();
 
-    // Get Walls
     int ltWall = img->width / LTRTWALLDENOM;
     int rtWall = (img->width * (LTRTWALLDENOM - 1)) / LTRTWALLDENOM;
     int tpWall = img->height / TPWALLDENOM;
 
-    // Get color distribution
     int *color_counts = calloc(BUCKETS * BUCKETS * BUCKETS, sizeof(int));
     if (color_counts == NULL) {
         exit(EXIT_FAILURE);
@@ -97,7 +95,6 @@ int main(int argc, char **argv) {
     }
     memcpy(mask, oldMask, img->width * img->height * sizeof(char));
 
-    // Clean up mask
     #pragma omp parallel for shared(i) private(j)
     for (i = 2; i < img->height - 2; i++) {
         for (j = 2; j < img->width - 2; j++) {
@@ -122,13 +119,11 @@ int main(int argc, char **argv) {
     printf("get mask: %lf\n", currentSeconds() - start);
     start = currentSeconds();
 
-    // Blur
     printf("finished mask, starting blur\n");
     float *blurKernel = calloc(FILTER_SIZE * FILTER_SIZE, sizeof(float));
     if (blurKernel == NULL) {
         exit(EXIT_FAILURE);
     }
-    // Bokeh Circle Blur
     #pragma omp parallel for shared(i) private(j)
     for (i = 0; i < FILTER_SIZE; i++) {
         for (j = 0; j < FILTER_SIZE; j++) {
@@ -186,7 +181,6 @@ int main(int argc, char **argv) {
     printf("get blurData: %lf\n", currentSeconds() - start);
     start = currentSeconds();
 
-    // Put filter on mask
     #pragma omp parallel for shared(i) private(j)
     for (i = 0; i < height; i++) {
         for (j = 0; j < width; j++) {
@@ -198,7 +192,6 @@ int main(int argc, char **argv) {
             }
         }
     }
-
 
     PPMPixel *oldData = img->data;
     img->data = blurData;
