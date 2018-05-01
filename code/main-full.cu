@@ -65,7 +65,6 @@ __global__ void blur(
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int sqIdx = threadIdx.y * SQ_DIM + threadIdx.x;
 
-
     // Load Kernel into shared mem
     __shared__ float sharedBlurKernel[FILTER_SIZE * FILTER_SIZE];
     int blurKernelCopyLen = div_ceil(FILTER_SIZE * FILTER_SIZE,
@@ -272,41 +271,34 @@ int main(int argc, char **argv) {
 
     printf("get oldMask: %lf\n", currentSeconds() - start);
     start = currentSeconds();
-    memcpy(mask, oldMask, img->width * img->height * sizeof(char));
 
-    // Clean up mask
-    for (i = 2; i < img->height - 2; i++) {
-        for (j = 2; j < img->width - 2; j++) {
-            char thisPx = oldMask[i * img->width + j];
-            if (thisPx == 0) {
-                int borderSum =
-                    oldMask[(i - 1) * img->width + j] +
-                    oldMask[i * img->width + j - 1] +
-                    oldMask[(i + 1) * img->width + j] +
-                    oldMask[i * img->width + j + 1] +
-                    oldMask[(i - 2) * img->width + j] +
-                    oldMask[i * img->width + j - 2] +
-                    oldMask[(i + 2) * img->width + j] +
-                    oldMask[i * img->width + j + 2];
-                if (borderSum >= 2) {
-                    mask[i * img->width + j] = 1;
-                }
-            }
-        }
-    }
+    char *cudaOldMask;
+    cudaMalloc(&cudaOldMask, img->width * img->height * sizeof(char));
+    cudaMemcpy(cudaOldMask, oldMask,
+        img->width * img->height * sizeof(char),
+        cudaMemcpyHostToDevice);
+    char *cudaMask;
+    cudaMalloc(&cudaMask, img->width * img->height * sizeof(char));
+    cudaMemcpy(cudaMask, oldMask,
+        img->width * img->height * sizeof(char),
+        cudaMemcpyHostToDevice);
+
+    // Dims for every pixel
+    dim3 threadsPerBlock(SQ_DIM, SQ_DIM);
+    dim3 blocks(div_ceil(img->width, SQ_DIM), div_ceil(img->height, SQ_DIM));
+
+    buildMask<<<blocks, threadsPerBlock>>>(
+        img->width,
+        img->height,
+        cudaOldMask,
+        cudaMask
+    );
+
     printf("get mask: %lf\n", currentSeconds() - start);
     start = currentSeconds();
 
     // Blur
     printf("finished mask, starting blur\n");
-    char *cudaMask;
-    cudaMalloc(&cudaMask, img->width * img->height * sizeof(char));
-    cudaMemcpy(cudaMask, mask,
-        img->width * img->height * sizeof(char),
-        cudaMemcpyHostToDevice);
-
-    dim3 threadsPerBlock(SQ_DIM, SQ_DIM);
-    dim3 blocks(div_ceil(img->width, SQ_DIM), div_ceil(img->height, SQ_DIM));
 
     blur<<<blocks, threadsPerBlock>>>(
         img->width,
