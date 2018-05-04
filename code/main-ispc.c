@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "lib/test_ispc.h"
+#include "lib/portrait_ispc.h"
 
 int main(void) {
     int x = 2;

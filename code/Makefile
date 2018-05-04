@@ -9,7 +9,7 @@ OBJS = lib/cycletimer.o lib/ppm.o lib/etc.o
 
 .PHONY: all help clean regress benchmark results
 
-all: main-c main-omp main-cu test ## make all 4 implementations
+all: main-c main-omp main-cu main-ispc ## make all 4 implementations
 
 help: ## show this help
 	@grep -F '##' Makefile | grep -Fv '@grep' | sed -E 's/:.*##/:/'
@@ -35,7 +35,7 @@ main-omp: main.c $(OBJS) ## the C implementation with OMP on
 main-cu: main.cu $(OBJS) ## the CUDA implementation
 	$(CUDAC) $(CUDAFLAGS) -o $@ $^
 
-test: test.c lib/test_ispc.o lib/test_ispc.h
+main-ispc: main-ispc.c lib/portrait_ispc.o lib/portrait_ispc.h
 	$(CC) $(CFLAGS) -o $@ $^
 
 %.o: %.c %.h
