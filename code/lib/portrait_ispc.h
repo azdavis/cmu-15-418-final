@@ -34,6 +34,7 @@ namespace ispc { /* namespace */
 #if defined(__cplusplus) && (! defined(__ISPC_NO_EXTERN_C) || !__ISPC_NO_EXTERN_C )
 extern "C" {
 #endif // __cplusplus
+    extern void blur(int32_t width, int32_t height, int8_t * imgData, float * blurKernel, int8_t * blurData, int8_t * mask);
     extern int32_t func(int32_t x, int32_t y);
 #if defined(__cplusplus) && (! defined(__ISPC_NO_EXTERN_C) || !__ISPC_NO_EXTERN_C )
 } /* end extern C */
