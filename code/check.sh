@@ -7,7 +7,7 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
-for x in c cu omp; do
+for x in c ispc; do
     time ./main-$x $1 $x.ppm
     if [ $x = c ]; then
         continue
