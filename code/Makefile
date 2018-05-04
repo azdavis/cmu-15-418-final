@@ -35,7 +35,7 @@ main-omp: main.c $(OBJS) ## the C implementation with OMP on
 main-cu: main.cu $(OBJS) ## the CUDA implementation
 	$(CUDAC) $(CUDAFLAGS) -o $@ $^
 
-main-ispc: main-ispc.c lib/portrait_ispc.o lib/portrait_ispc.h
+main-ispc: main-ispc.c lib/portrait_ispc.o lib/portrait_ispc.h $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
 
 %.o: %.c %.h
