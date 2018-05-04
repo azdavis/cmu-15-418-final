@@ -47,15 +47,16 @@ int main(int argc, char **argv) {
     int i, j, ri;
     for (ri = 0; ri < 3; ri++) {
         range r = rs[ri];
+        #pragma omp parallel for shared(i) private(j)
         for (i = r.ymin; i < r.ymax; i++) {
             for (j = r.xmin; j < r.xmax; j++) {
                 PPMPixel *pt = getPixel(j, i, img);
-                color_counts[
-                    getBucketIdx(
+                int idx = getBucketIdx(
                         pt->red / BUCKET_SIZE,
                         pt->green / BUCKET_SIZE,
-                        pt->blue / BUCKET_SIZE)
-                ] += 1;
+                        pt->blue / BUCKET_SIZE);
+                #pragma omp atomic
+                color_counts[idx] += 1;
             }
         }
     }
