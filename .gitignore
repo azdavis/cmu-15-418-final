@@ -9,5 +9,6 @@
 .DS_Store
 /code/main-c
 /code/main-cu
+/code/main-ispc
 /code/main-omp
 build
