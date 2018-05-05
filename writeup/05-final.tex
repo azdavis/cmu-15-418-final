@@ -14,6 +14,74 @@
 \begin{document}
 \maketitle
 
+\section{Overview}
+
+We implemented portrait mode in parallel.
+Portrait mode has traditionally been done by high end DSLR camera hardware,
+which the foreground of the subject is in focus and the background is blurred.
+We have chosen to use a software-only image processing approach to this problem,
+segmenting the image into the foreground and blurring the background.
+
+On our largest images, we were able to achieve 150x speedup with CUDA on GPUs
+and 11x speedup with OpenMP on CPUs.
+
+\begin{figure}[!htb]
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{large_elephant.jpg}
+        \caption{Input Image}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{large_elephant_portrait.jpg}
+        \caption{Output Portrait Mode Image}
+    \end{minipage}\hfill
+\end{figure}
+
+\section{Algorithm}
+
+We used a simplified version of the grab-cut algorithm, with the idea of getting
+the color distribution of the background to find the foreground.
+Our algorithm takes in input image and returns the image in portrait mode.
+Each image is represented as an array of pixels, with each pixel representing
+a red, green, and blue value.
+
+\begin{enumerate}
+    \item
+        Designiate the borders of the image as the background. Top, left, and
+        right $\tfrac{1}{8}$ of image.
+    \item
+        Get a color distribution of the background region. Group colors together
+        based on a certain threshold.
+    \item
+        Filter colors that make up less than 1 percent of the background area.
+    \item
+        Create a foreground mask by finding every pixel with a color not
+        in the background color distrubution.
+    \item
+        For every unmasked pixel, add it to the mask if two of its neighboring
+        pixels were part of the mask.
+    \item
+        Blur all the pixels that are not within the foreground mask. We used a
+        circular filter to emulate the bokeh effect.
+    \item
+        For each pixel in the mask, add the original pixel of the image into
+        the blurred version of the image.
+\end{enumerate}
+
+\begin{figure}[!htb]
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.5\linewidth]{border.jpg}
+        \caption{Background Region (Step 1)}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.5\linewidth]{mask.jpg}
+        \caption{Foreground Mask (Step 5)}
+    \end{minipage}\hfill
+\end{figure}
+
 \begin{tabular}{l|l|l|l|l|l}
     Image (size in px) & C & OMP & OMP Speedup & Cuda & Cuda Speedup \\
     \hline
