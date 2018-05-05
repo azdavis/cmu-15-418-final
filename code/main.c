@@ -14,10 +14,7 @@ int main(int argc, char **argv) {
     char *infile = argv[1];
     char *outfile = argv[2];
 
-    double start;
-
-    printf("begin\n");
-    start = currentSeconds();
+    double start = currentSeconds();
 
     PPMImage *img = readPPM(infile);
     if (img == NULL) {
@@ -25,9 +22,6 @@ int main(int argc, char **argv) {
     }
     int W = img->width;
     int H = img->height;
-
-    printf("load image: %lf\n", currentSeconds() - start);
-    start = currentSeconds();
 
     int ltWall = W / LTRTWALLDENOM;
     int rtWall = (W * (LTRTWALLDENOM - 1)) / LTRTWALLDENOM;
@@ -46,7 +40,7 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    printf("malloc memory: %lf\n", currentSeconds() - start);
+    printf("{init:%lf", currentSeconds() - start);
     start = currentSeconds();
 
     range rs[] = {
@@ -70,7 +64,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf("get color_counts: %lf\n", currentSeconds() - start);
+    printf(",color_counts:%lf", currentSeconds() - start);
     start = currentSeconds();
 
     int totalBCPix =
@@ -93,7 +87,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf("get oldMask: %lf\n", currentSeconds() - start);
+    printf(",old_mask:%lf", currentSeconds() - start);
     start = currentSeconds();
 
     memcpy(mask, oldMask, W * H * sizeof(char));
@@ -119,10 +113,9 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf("get mask: %lf\n", currentSeconds() - start);
+    printf(",new_mask:%lf", currentSeconds() - start);
     start = currentSeconds();
 
-    printf("finished mask, starting blur\n");
     #pragma omp parallel for shared(i) private(j)
     for (i = 0; i < FILTER_SIZE; i++) {
         for (j = 0; j < FILTER_SIZE; j++) {
@@ -175,9 +168,6 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf("get blurData: %lf\n", currentSeconds() - start);
-    start = currentSeconds();
-
     #pragma omp parallel for shared(i) private(j)
     for (i = 0; i < H; i++) {
         for (j = 0; j < W; j++) {
@@ -193,7 +183,7 @@ int main(int argc, char **argv) {
     PPMPixel *oldData = img->data;
     img->data = blurData;
 
-    printf("use blurData: %lf\n", currentSeconds() - start);
+    printf(",blur_data:%lf", currentSeconds() - start);
     start = currentSeconds();
 
     errno = 0;
@@ -202,12 +192,12 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    printf("write image: %lf\n", currentSeconds() - start);
 
     free(oldData);
     free(color_counts);
     free(blurKernel);
     free(img);
     free(img->data);
+    printf(",clean_up:%lf}", currentSeconds() - start);
     return 0;
 }

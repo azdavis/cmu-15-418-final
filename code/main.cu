@@ -227,18 +227,12 @@ int main(int argc, char **argv) {
     char *infile = argv[1];
     char *outfile = argv[2];
 
-    double start;
-
-    printf("begin\n");
-    start = currentSeconds();
+    double start = currentSeconds();
 
     PPMImage *img = readPPM(infile);
     if (img == NULL) {
         exit(EXIT_FAILURE);
     }
-
-    printf("load image: %lf\n", currentSeconds() - start);
-    start = currentSeconds();
 
     int *color_counts =
         (int *)calloc(BUCKETS * BUCKETS * BUCKETS, sizeof(int));
@@ -298,8 +292,9 @@ int main(int argc, char **argv) {
     char *cudaMask;
     cudaMalloc(&cudaMask, img->width * img->height * sizeof(char));
 
-    printf("malloc and cudamalloc and memcpy: %lf\n", currentSeconds() - start);
+    printf("{init:%lf", currentSeconds() - start);
     start = currentSeconds();
+
     // Get Walls
     int ltWall = img->width / LTRTWALLDENOM;
     int rtWall = (img->width * (LTRTWALLDENOM - 1)) / LTRTWALLDENOM;
@@ -325,7 +320,7 @@ int main(int argc, char **argv) {
         tpWall
     );
 
-    printf("get color_counts: %lf\n", currentSeconds() - start);
+    printf(",color_counts:%lf", currentSeconds() - start);
     start = currentSeconds();
 
     int totalBCPix =
@@ -348,7 +343,7 @@ int main(int argc, char **argv) {
         bcThresh
     );
 
-    printf("get oldMask: %lf\n", currentSeconds() - start);
+    printf(",old_mask:%lf", currentSeconds() - start);
     start = currentSeconds();
 
     cudaMemcpy(cudaMask, cudaOldMask,
@@ -362,11 +357,10 @@ int main(int argc, char **argv) {
         cudaMask
     );
 
-    printf("get mask: %lf\n", currentSeconds() - start);
+    printf(",new_mask:%lf", currentSeconds() - start);
     start = currentSeconds();
 
     // Blur
-    printf("finished mask, starting blur\n");
 
     blur<<<blocks, threadsPerBlock>>>(
         img->width,
@@ -385,7 +379,7 @@ int main(int argc, char **argv) {
         cudaMemcpyDeviceToHost
     );
 
-    printf("get blurData: %lf\n", currentSeconds() - start);
+    printf(",blur_data:%lf", currentSeconds() - start);
     start = currentSeconds();
 
     PPMPixel *oldData = img->data;
@@ -396,7 +390,6 @@ int main(int argc, char **argv) {
     if (errno != 0) {
         exit(EXIT_FAILURE);
     }
-    printf("write image: %lf\n", currentSeconds() - start);
 
     free(oldData);
     free(color_counts);
@@ -407,5 +400,6 @@ int main(int argc, char **argv) {
     cudaFree(cudaBlurKernel);
     cudaFree(cudaMask);
     cudaFree(cudaOldMask);
+    printf(",clean_up:%lf}", currentSeconds() - start);
     return 0;
 }
