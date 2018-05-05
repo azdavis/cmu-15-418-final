@@ -8,7 +8,7 @@
 
 int main(int argc, char **argv) {
     if (argc != 3) {
-        printf("usage: %s <infile> <outfile>\n", argv[0]);
+        fprintf(stderr, "usage: %s <infile> <outfile>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
     char *infile = argv[1];
