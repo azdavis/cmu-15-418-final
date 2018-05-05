@@ -34,7 +34,6 @@ time_items = [
     u"color_counts",
     u"old_mask",
     u"new_mask",
-    u"new_mask",
     u"blur",
     u"clean_up",
 ]
