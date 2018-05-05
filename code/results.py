@@ -66,31 +66,18 @@ print("")
 print("============================== results ==============================")
 print("")
 
+table_begin = "\\begin{tabular}{l|l|l|l|l|l}"
+row_header = "    Item & C & OMP & Speedup & CUDA & Speedup \\\\"
+row = "    {} & {:.5f} & {:.5f} & {:.5f} & {:.5f} & {:.5f} \\\\"
+
 for in_f in in_fnames:
     print("\\subsection{" + in_f + "}")
-    print("\\begin{tabular}{l|l|l|l|l}")
-    print("    Item & C & OMP & Speedup & CUDA & Speedup \\\\")
+    print(table_begin)
+    print(row_header)
     print("    \\hline")
     for ti in time_items:
-        print(
-            "    " +
-            # Item
-            str(ti) +
-            " & " +
-            # C
-            "TODO" +
-            " & " +
-            # OMP
-            "TODO" +
-            " & " +
-            # Speedup
-            "TODO" +
-            " & " +
-            # CUDA
-            "TODO" +
-            " & " +
-            # Speedup
-            "TODO" +
-            " \\\\"
-        )
+        c = data[C][in_f][ti]
+        omp = data[OMP][in_f][ti]
+        cuda = data[CUDA][in_f][ti]
+        print(row.format(str(ti), c, omp, c / omp, cuda, c / cuda))
     print("\\end{tabular}")
