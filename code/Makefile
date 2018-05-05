@@ -1,4 +1,4 @@
-CC = cc
+CC = gcc
 CFLAGS = -Wall -O3 -Wno-unknown-pragmas
 OMPFLAGS = -fopenmp -DOMP
 CUDAC = nvcc
