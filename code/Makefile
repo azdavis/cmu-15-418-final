@@ -13,10 +13,10 @@ clean:
 	rm -rf main-c main-omp main-cu lib/*.o
 
 regress: all
-	./run.sh img/elephant.ppm
+	./check.sh img/elephant.ppm
 
 benchmark: all
-	./run.sh img/large_elephant.ppm
+	./check.sh img/large_elephant.ppm
 
 results: all
 	./results.py
