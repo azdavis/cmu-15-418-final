@@ -32,8 +32,8 @@ programs = [
 time_items = [
     u"init",
     u"color_counts",
-    u"old_mask",
-    u"new_mask",
+    u"build_mask",
+    u"refine_mask",
     u"blur",
     u"clean_up",
 ]
