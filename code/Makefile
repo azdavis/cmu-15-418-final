@@ -5,7 +5,7 @@ CUDAC = nvcc
 CUDAFLAGS = -O3 -DCUDA -m64 --gpu-architecture compute_61
 OBJS = lib/cycletimer.o lib/ppm.o lib/etc.o
 
-.PHONY: all clean regress
+.PHONY: all clean regress benchmark results
 
 all: main-c main-omp main-cu
 
@@ -17,6 +17,9 @@ regress: all
 
 benchmark: all
 	./run.sh img/large_elephant.ppm
+
+results: all
+	./results.py
 
 main-c: main.c $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
