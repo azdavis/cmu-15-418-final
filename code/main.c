@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    printf("{init:%lf", currentSeconds() - start);
+    printf("{\"init\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     range rs[] = {
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf(",color_counts:%lf", currentSeconds() - start);
+    printf(",\"color_counts\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     int totalBCPix =
@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf(",old_mask:%lf", currentSeconds() - start);
+    printf(",\"old_mask\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     memcpy(mask, oldMask, W * H * sizeof(char));
@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf(",new_mask:%lf", currentSeconds() - start);
+    printf(",\"new_mask\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     #pragma omp parallel for shared(i) private(j)
@@ -183,7 +183,7 @@ int main(int argc, char **argv) {
     PPMPixel *oldData = img->data;
     img->data = blurData;
 
-    printf(",blur_data:%lf", currentSeconds() - start);
+    printf(",\"blur_data\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     errno = 0;
@@ -198,6 +198,6 @@ int main(int argc, char **argv) {
     free(blurKernel);
     free(img);
     free(img->data);
-    printf(",clean_up:%lf}", currentSeconds() - start);
+    printf(",\"clean_up\":%lf}", currentSeconds() - start);
     return 0;
 }

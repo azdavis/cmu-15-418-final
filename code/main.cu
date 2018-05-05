@@ -292,7 +292,7 @@ int main(int argc, char **argv) {
     char *cudaMask;
     cudaMalloc(&cudaMask, img->width * img->height * sizeof(char));
 
-    printf("{init:%lf", currentSeconds() - start);
+    printf("{\"init\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     // Get Walls
@@ -320,7 +320,7 @@ int main(int argc, char **argv) {
         tpWall
     );
 
-    printf(",color_counts:%lf", currentSeconds() - start);
+    printf(",\"color_counts\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     int totalBCPix =
@@ -343,7 +343,7 @@ int main(int argc, char **argv) {
         bcThresh
     );
 
-    printf(",old_mask:%lf", currentSeconds() - start);
+    printf(",\"old_mask\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     cudaMemcpy(cudaMask, cudaOldMask,
@@ -357,7 +357,7 @@ int main(int argc, char **argv) {
         cudaMask
     );
 
-    printf(",new_mask:%lf", currentSeconds() - start);
+    printf(",\"new_mask\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     // Blur
@@ -379,7 +379,7 @@ int main(int argc, char **argv) {
         cudaMemcpyDeviceToHost
     );
 
-    printf(",blur_data:%lf", currentSeconds() - start);
+    printf(",\"blur_data\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     PPMPixel *oldData = img->data;
@@ -400,6 +400,6 @@ int main(int argc, char **argv) {
     cudaFree(cudaBlurKernel);
     cudaFree(cudaMask);
     cudaFree(cudaOldMask);
-    printf(",clean_up:%lf}", currentSeconds() - start);
+    printf(",\"clean_up\":%lf}", currentSeconds() - start);
     return 0;
 }
