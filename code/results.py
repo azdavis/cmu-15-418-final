@@ -20,7 +20,7 @@ in_fnames = [
 programs = [
     "./main-c",
     "./main-omp",
-    "./main-cu"
+    "./main-cu",
 ]
 
 def dict_sum(a):
