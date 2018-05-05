@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
-import subprocess
+from __future__ import print_function
 import json
 import os
+import subprocess
+import sys
 
 iters = 10
 
@@ -53,7 +55,7 @@ for prog in programs:
     for in_f in in_fnames:
         data[prog][in_f] = None
         for i in range(iters):
-            print(prog, in_f, i)
+            print(prog, in_f, i, file=sys.stderr)
             out = subprocess.check_output([prog, in_f, out_fname])
             new = json.loads(out)
             cur = data[prog][in_f]
@@ -62,22 +64,26 @@ for prog in programs:
 
 os.remove(out_fname)
 
-print("")
-print("============================== results ==============================")
-print("")
-
 table_begin = "\\begin{tabular}{l|l|l|l|l|l}"
-row_header = "    Item & C & OMP & Speedup & CUDA & Speedup \\\\"
-row = "    {} & {:.5f} & {:.5f} & {:.5f} & {:.5f} & {:.5f} \\\\"
+row_header = "    Item & C & OMP & Speedup & CUDA & Speedup"
+row = "{} & {:.5f} & {:.5f} & {:.5f} & {:.5f} & {:.5f}"
+with_slash = "\\\\  "
+no_slash = "    "
 
 for in_f in in_fnames:
     print("\\subsection{" + in_f + "}")
     print(table_begin)
     print(row_header)
-    print("    \\hline")
+    print(with_slash + "\\hline")
+    first = True
     for ti in time_items:
         c = data[C][in_f][ti]
         omp = data[OMP][in_f][ti]
         cuda = data[CUDA][in_f][ti]
+        if first:
+            print(no_slash, end="")
+        else:
+            print(with_slash, end="")
+        first = False
         print(row.format(str(ti), c, omp, c / omp, cuda, c / cuda))
     print("\\end{tabular}")
