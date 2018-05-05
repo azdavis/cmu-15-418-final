@@ -69,6 +69,16 @@ a red, green, and blue value.
         the blurred version of the image.
 \end{enumerate}
 
+The blur is the most computationally intensive part of the algorithm. Each pixel
+of the blurred image needs to compute the average RGB values for a circle
+of pixels around it. However, the blur is data parallel, as each pixel is
+independent.
+
+However, each step of the algorithm hsa to be finished before the next step.
+This requires synchronization after each step.
+
+
+
 \begin{figure}[!htb]
     \begin{minipage}{0.48\textwidth}
         \centering
