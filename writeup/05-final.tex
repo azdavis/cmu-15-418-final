@@ -83,6 +83,12 @@ parenthesis.
     \end{minipage}\hfill
 \end{figure}
 
+\subsection{Data Structures}
+We stored the color distribution by creating color buckets for every RGB value.
+Essentially, all colors in one bucket would be within 15 red, green, and blue
+value. This results in $\tfrac{255/15}^3$ different buckets.
+
+\subsection{Background}
 The blur is the most computationally intensive part of the algorithm. Each pixel
 of the blurred image needs to compute the average RGB values for a circle
 of pixels around it. However, the blur is data parallel, as each pixel is
@@ -101,7 +107,7 @@ Python's NumPy before moving on to sequential C and then parallelism.
 We utilized the NVIDIA 1080x GPUs in the Gates Clusters with CUDA.
 
 \subsection{Color Counts}
-
+Our color distribution
 
 \subsection{Blur}
 We were able to take advantage of the data parallelism for the blur, as each
