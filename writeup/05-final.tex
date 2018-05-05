@@ -43,8 +43,6 @@ and 11x speedup with OpenMP on CPUs.
 We used a simplified version of the grab-cut algorithm, with the idea of getting
 the color distribution of the background to find the foreground.
 Our algorithm takes in input image and returns the image in portrait mode.
-Each image is represented as an array of pixels, with each pixel representing
-a red, green, and blue value.
 
 Each step of the algorithm will be referred to its shortened name in
 parenthesis.
@@ -53,12 +51,12 @@ parenthesis.
         Designiate the borders of the image as the background. Top, left, and
         right $\tfrac{1}{8}$ of image.
     \item
-        Get a color distribution of the background region. Group colors together
-        based on a certain threshold. (Color Counts)
+        Get a color distribution of the background region. For each background
+        pixel, increment the appropriate color count bucket. (Color Counts)
     \item
         Create a foreground mask by finding every pixel with a color not
-        in the background color distrubution. Filter colors that make up
-        less than 1 percent of the background area. (Build Mask)
+        in the background color distribution. Filter background colors that
+        make up less than 1 percent of the background area. (Build Mask)
     \item
         For every unmasked pixel, add it to the mask if two of its neighboring
         pixels were part of the mask. (Refine Mask)
@@ -84,9 +82,20 @@ parenthesis.
 \end{figure}
 
 \subsection{Data Structures}
-We stored the color distribution by creating color buckets for every RGB value.
+Each image is represented as a struct with the width, height, and an array of
+pixels. Each pixel contains a red, green, and blue value. The size of the array
+is the number of pixels in the image.
+
+We stored the color counts by creating color buckets for every RGB value.
 Essentially, all colors in one bucket would be within 15 red, green, and blue
 value. This results in $\left(\tfrac{255}{15}\right)^3$ different buckets.
+So, we are able to store the color counts with an array, with each element
+representing the count for that bucket.
+
+The mask is simply an array of chars the size of the number of pixels in the
+image. If the value in the mask is 1, the corresponding pixel is in the
+foreground. Otherwise, it is in the background. We chose chars to minimize the
+size of the data structure.
 
 \subsection{Background}
 The blur is the most computationally intensive part of the algorithm. Each pixel
