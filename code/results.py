@@ -6,21 +6,21 @@ import os
 
 iters = 10
 
-out_fname = "out.ppm"
+out_fname = "./out.ppm"
 
 in_fnames = [
-    "img/bluejay.ppm",
-    "img/elephant.ppm",
-    "img/flower.ppm",
-    "img/large_elephant.ppm",
-    "img/purp.ppm",
-    "img/tiger.ppm",
+    "./img/bluejay.ppm",
+    "./img/elephant.ppm",
+    "./img/flower.ppm",
+    "./img/large_elephant.ppm",
+    "./img/purp.ppm",
+    "./img/tiger.ppm",
 ]
 
 programs = [
-    "main-c",
-    "main-omp",
-    "main-cu"
+    "./main-c",
+    "./main-omp",
+    "./main-cu"
 ]
 
 data = {}
