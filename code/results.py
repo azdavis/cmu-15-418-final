@@ -39,6 +39,7 @@ for prog in programs:
     for in_f in in_fnames:
         data[prog][in_f] = None
         for i in range(iters):
+            print(prog, in_f, i)
             out = subprocess.check_output([prog, in_f, out_fname])
             new = json.loads(out)
             cur = data[prog][in_f]
