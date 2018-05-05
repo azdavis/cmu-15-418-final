@@ -112,8 +112,10 @@ our algorithm, so we implemented it in CUDA and OpenMP.
 To develop and solidify our algorithm, we first wrote an implementation with
 Python's NumPy before moving on to sequential C and then parallelism.
 
-\section{CUDA on GPUS}
-We utilized the NVIDIA 1080x GPUs in the Gates Clusters with CUDA.
+\section{CUDA on GPU}
+We utilized the NVIDIA 1080x GPUs in the Gates Clusters with CUDA. The
+general strategy for CUDA was to parallelize across the pixels in the image
+to take advantage of the high number of ALUs and threads.
 
 \subsection{Color Counts}
 To get the color counts, we assigned each thread to each pixel. Each thread then
@@ -158,8 +160,16 @@ access to be from shared memory.
 
 \begin{center}
 \includegraphics[scale=0.3]{mapping.jpg} \\
-Thread mapping and shared memory
+Thread mapping and shared memory for CUDA blur
 \end{center}
+
+\section{OpenMP on CPU}
+We utilized the 16 core CPUs in the Gates Clusters with OpenMP. For CPUs,
+there was not enough threads to parallelize across every pixel like on GPUs.
+So, we chose to parallelize across rows of the image, keeping arithmetic
+intensity high while using parallelism.
+
+
 
 \section{Results}
 
