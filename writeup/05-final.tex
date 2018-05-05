@@ -116,7 +116,20 @@ Python's NumPy before moving on to sequential C and then parallelism.
 We utilized the NVIDIA 1080x GPUs in the Gates Clusters with CUDA.
 
 \subsection{Color Counts}
-Our color distribution
+To get the color counts, we assigned each thread to each pixel. Each thread then
+did an atomic add to appropriate bucket in color counts. An atomic add was
+needed because multiple pixels could simultaneously have the same color.
+
+We also tried assigning one thread to one color to iterate through the image,
+but that was repeating the sequential algorithm of looking at each pixel.
+
+Another implementation was to create copies of the color counts data structure
+for each thread to process, but one of our timing bottlenecks was performing
+cudaMallocs to initialize memory in CUDA. (discussed later on)
+
+So, we moved forward with the atomic strategy. We initially thought the
+contention all the threads would slow this part of the algorithm, but our
+timing showed us atomic allowed this step to be performed in almost 0 time.
 
 \subsection{Blur}
 We were able to take advantage of the data parallelism for the blur, as each
