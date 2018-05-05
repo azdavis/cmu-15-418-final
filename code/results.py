@@ -17,10 +17,14 @@ in_fnames = [
     "./img/tiger.ppm",
 ]
 
+C = "./main-c"
+OMP = "./main-omp"
+CUDA = "./main-cu"
+
 programs = [
-    "./main-c",
-    "./main-omp",
-    "./main-cu",
+    C,
+    OMP,
+    CUDA,
 ]
 
 time_items = [
