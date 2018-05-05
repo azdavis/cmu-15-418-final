@@ -23,8 +23,6 @@ programs = [
     "./main-cu"
 ]
 
-data = {}
-
 def dict_sum(a):
     ret = 0
     for x in a:
@@ -33,6 +31,8 @@ def dict_sum(a):
 
 def dict_is_lt(a, b):
     return dict_sum(a) - dict_sum(b) < 0
+
+data = {}
 
 for prog in programs:
     data[prog] = {}
