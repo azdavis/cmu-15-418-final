@@ -46,36 +46,31 @@ Our algorithm takes in input image and returns the image in portrait mode.
 Each image is represented as an array of pixels, with each pixel representing
 a red, green, and blue value.
 
+Each step of the algorithm will be referred to its shortened name in
+parenthesis.
 \begin{enumerate}
     \item
         Designiate the borders of the image as the background. Top, left, and
         right $\tfrac{1}{8}$ of image.
     \item
         Get a color distribution of the background region. Group colors together
-        based on a certain threshold.
+        based on a certain threshold. (Color Distribution)
     \item
         Filter colors that make up less than 1 percent of the background area.
+        (Filter)
     \item
         Create a foreground mask by finding every pixel with a color not
-        in the background color distrubution.
+        in the background color distrubution. (Build Mask)
     \item
         For every unmasked pixel, add it to the mask if two of its neighboring
-        pixels were part of the mask.
+        pixels were part of the mask. (Refine Mask)
     \item
         Blur all the pixels that are not within the foreground mask. We used a
-        circular filter to emulate the bokeh effect.
+        convolution with a circular filter to emulate the bokeh effect. (Blur)
     \item
         For each pixel in the mask, add the original pixel of the image into
         the blurred version of the image.
 \end{enumerate}
-
-The blur is the most computationally intensive part of the algorithm. Each pixel
-of the blurred image needs to compute the average RGB values for a circle
-of pixels around it. However, the blur is data parallel, as each pixel is
-independent.
-
-However, each step of the algorithm hsa to be finished before the next step.
-This requires synchronization after each step.
 
 \begin{figure}[!htb]
     \begin{minipage}{0.48\textwidth}
@@ -89,6 +84,48 @@ This requires synchronization after each step.
         \caption{Foreground Mask (Step 5)}
     \end{minipage}\hfill
 \end{figure}
+
+The blur is the most computationally intensive part of the algorithm. Each pixel
+of the blurred image needs to compute the average RGB values for a circle
+of pixels around it. However, the blur is data parallel, as each pixel is
+independent.
+
+However, each step of the algorithm has to be finished before the next step.
+This requires synchronization after each step.
+
+\section{Approach}
+We were interested in comparing the GPU and CPU implementations of
+our algorithm, so we implemented it in CUDA and OpenMP.
+To develop and solidify our algorithm, we first wrote an implementation with
+Python's NumPy before moving on to sequential C and then parallelism.
+
+\section{CUDA on GPUS}
+We utilized the NVIDIA 1080x GPUs in the Gates Clusters with CUDA.
+
+\subsection{Color Distribution}
+
+
+\subsection{Blur}
+We were able to take advantage of the data parallelism for the blur, as each
+pixel's computation was indepedent from those of other pixels. So, each pixel
+is mapped to one CUDA thread. Additionally, pixels spatially close are mapped to
+the same block. This allowed us to take advantage of the high
+amount of threads in each SM. This mapping significantly decreased the
+arithmetic computation per thread, but we realized that we had a memory
+bottleneck.
+
+We noticed that the pixels close together needed to access the same neighboring
+pixels to perform the convolution. So, we loaded every pixel needed for that
+block's blur into shared memory. The kernel that contained the weights for how
+much each neighboring pixel contributed to the average was also loaded into
+shared memory. By having each thread load data into shared
+memory, the cost of loading it is very low while allowing every memory
+access to be from shared memory.
+
+\begin{center}
+\includegraphics[scale=0.3]{mapping.jpg} \\
+Thread mapping and shared memory
+\end{center}
 
 \section{Results}
 
