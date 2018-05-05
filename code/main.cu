@@ -343,7 +343,7 @@ int main(int argc, char **argv) {
         bcThresh
     );
 
-    printf(",\"old_mask\":%lf", currentSeconds() - start);
+    printf(",\"build_mask\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     cudaMemcpy(cudaMask, cudaOldMask,
@@ -357,7 +357,7 @@ int main(int argc, char **argv) {
         cudaMask
     );
 
-    printf(",\"new_mask\":%lf", currentSeconds() - start);
+    printf(",\"refine_mask\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     // Blur

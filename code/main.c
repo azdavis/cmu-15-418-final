@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf(",\"old_mask\":%lf", currentSeconds() - start);
+    printf(",\"build_mask\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     memcpy(mask, oldMask, W * H * sizeof(char));
@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf(",\"new_mask\":%lf", currentSeconds() - start);
+    printf(",\"refine_mask\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     #pragma omp parallel for shared(i) private(j)
