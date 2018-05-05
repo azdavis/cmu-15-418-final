@@ -37,6 +37,25 @@ int main(int argc, char **argv) {
     if (color_counts == NULL) {
         exit(EXIT_FAILURE);
     }
+    char *oldMask = calloc(W * H, sizeof(char));
+    if (oldMask == NULL) {
+        exit(EXIT_FAILURE);
+    }
+    char *mask = calloc(W * H, sizeof(char));
+    if (mask == NULL) {
+        exit(EXIT_FAILURE);
+    }
+    float *blurKernel = calloc(FILTER_SIZE * FILTER_SIZE, sizeof(float));
+    if (blurKernel == NULL) {
+        exit(EXIT_FAILURE);
+    }
+    PPMPixel *blurData = calloc(W * H, sizeof(PPMPixel));
+    if (blurData == NULL) {
+        exit(EXIT_FAILURE);
+    }
+
+    printf("malloc memory: %lf\n", currentSeconds() - start);
+    start = currentSeconds();
 
     range rs[] = {
         {0, ltWall, 0, H},
@@ -69,11 +88,6 @@ int main(int argc, char **argv) {
 
     int bcThresh = BCTHRESH_DECIMAL * totalBCPix;
 
-    char *oldMask = calloc(W * H, sizeof(char));
-    if (oldMask == NULL) {
-        exit(EXIT_FAILURE);
-    }
-
     #pragma omp parallel for shared(i) private(j)
     for (i = 0; i < H; i++) {
         for (j = 0; j < W; j++) {
@@ -90,10 +104,6 @@ int main(int argc, char **argv) {
     printf("get oldMask: %lf\n", currentSeconds() - start);
     start = currentSeconds();
 
-    char *mask = calloc(W * H, sizeof(char));
-    if (mask == NULL) {
-        exit(EXIT_FAILURE);
-    }
     memcpy(mask, oldMask, W * H * sizeof(char));
 
     #pragma omp parallel for shared(i) private(j)
@@ -121,10 +131,6 @@ int main(int argc, char **argv) {
     start = currentSeconds();
 
     printf("finished mask, starting blur\n");
-    float *blurKernel = calloc(FILTER_SIZE * FILTER_SIZE, sizeof(float));
-    if (blurKernel == NULL) {
-        exit(EXIT_FAILURE);
-    }
     #pragma omp parallel for shared(i) private(j)
     for (i = 0; i < FILTER_SIZE; i++) {
         for (j = 0; j < FILTER_SIZE; j++) {
@@ -134,11 +140,6 @@ int main(int argc, char **argv) {
                 blurKernel[i * FILTER_SIZE + j] = 1.0;
             }
         }
-    }
-
-    PPMPixel *blurData = calloc(W * H, sizeof(PPMPixel));
-    if (blurData == NULL) {
-        exit(EXIT_FAILURE);
     }
 
     int row, col;
