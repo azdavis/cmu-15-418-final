@@ -63,7 +63,7 @@ for prog in programs:
 
 os.remove(out_fname)
 
-table_begin = "\\begin{tabular}{l|l|l|l|l|l}"
+table_begin = "\\begin{tabular}{r|r|r|r|r|r}"
 row_header = "    Item & C (s) & OMP (s) & Speedup & CUDA (s) & Speedup"
 row = "{} & {:.5f} & {:.5f} & {:.5f} & {:.5f} & {:.5f}"
 with_slash = "\\\\  "
