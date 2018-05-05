@@ -131,6 +131,14 @@ So, we moved forward with the atomic strategy. We initially thought the
 contention all the threads would slow this part of the algorithm, but our
 timing showed us atomic allowed this step to be performed in almost 0 time.
 
+\subsection{Build Mask and Refine Mask}
+The CUDA implementation of build mask and refine mask were more straight
+forward. Each thread was simply mapped to one pixel.
+
+We tried to compute both steps within one launch, but realized we needed to
+synchronize or communicate between warps. The overhead of another launch was
+less, so we just kept the two steps in two launches.
+
 \subsection{Blur}
 We were able to take advantage of the data parallelism for the blur, as each
 pixel's computation was indepedent from those of other pixels. So, each pixel
