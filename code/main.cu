@@ -379,7 +379,7 @@ int main(int argc, char **argv) {
         cudaMemcpyDeviceToHost
     );
 
-    printf(",\"blur_data\":%lf", currentSeconds() - start);
+    printf(",\"blur\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     PPMPixel *oldData = img->data;

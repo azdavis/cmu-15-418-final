@@ -183,7 +183,7 @@ int main(int argc, char **argv) {
     PPMPixel *oldData = img->data;
     img->data = blurData;
 
-    printf(",\"blur_data\":%lf", currentSeconds() - start);
+    printf(",\"blur\":%lf", currentSeconds() - start);
     start = currentSeconds();
 
     errno = 0;
