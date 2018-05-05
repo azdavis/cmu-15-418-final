@@ -34,23 +34,15 @@ int main(int argc, char **argv) {
     int tpWall = H / TPWALLDENOM;
 
     int *color_counts = calloc(BUCKETS * BUCKETS * BUCKETS, sizeof(int));
-    if (color_counts == NULL) {
-        exit(EXIT_FAILURE);
-    }
     char *oldMask = calloc(W * H, sizeof(char));
-    if (oldMask == NULL) {
-        exit(EXIT_FAILURE);
-    }
     char *mask = calloc(W * H, sizeof(char));
-    if (mask == NULL) {
-        exit(EXIT_FAILURE);
-    }
     float *blurKernel = calloc(FILTER_SIZE * FILTER_SIZE, sizeof(float));
-    if (blurKernel == NULL) {
-        exit(EXIT_FAILURE);
-    }
     PPMPixel *blurData = calloc(W * H, sizeof(PPMPixel));
-    if (blurData == NULL) {
+    if (color_counts == NULL ||
+        oldMask == NULL ||
+        mask == NULL ||
+        blurKernel == NULL ||
+        blurData == NULL) {
         exit(EXIT_FAILURE);
     }
 
