@@ -192,7 +192,6 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-
     free(oldData);
     free(color_counts);
     free(blurKernel);
