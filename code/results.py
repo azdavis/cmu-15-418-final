@@ -23,6 +23,16 @@ programs = [
     "./main-cu",
 ]
 
+time_items = [
+    u"init",
+    u"color_counts",
+    u"old_mask",
+    u"new_mask",
+    u"new_mask",
+    u"blur",
+    u"clean_up",
+]
+
 def dict_sum(a):
     ret = 0
     for x in a:
@@ -47,4 +57,36 @@ for prog in programs:
                 data[prog][in_f] = new
 
 os.remove(out_fname)
-print(data)
+
+print("")
+print("============================== results ==============================")
+print("")
+
+for in_f in in_fnames:
+    print("\\subsection{" + in_f + "}")
+    print("\\begin{tabular}{l|l|l|l|l}")
+    print("    Item & C & OMP & Speedup & CUDA & Speedup \\\\")
+    print("    \\hline")
+    for ti in time_items:
+        print(
+            "    " +
+            # Item
+            str(ti) +
+            " & " +
+            # C
+            "TODO" +
+            " & " +
+            # OMP
+            "TODO" +
+            " & " +
+            # Speedup
+            "TODO" +
+            " & " +
+            # CUDA
+            "TODO" +
+            " & " +
+            # Speedup
+            "TODO" +
+            " \\\\"
+        )
+    print("\\end{tabular}")
