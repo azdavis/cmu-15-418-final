@@ -6,6 +6,7 @@ CUDAFLAGS = -O3 -DCUDA -m64 --gpu-architecture compute_61
 ISPC = /usr/local/depot/ispc-v1.9.1-linux/ispc
 ISPFLAGS = -O3 --target=avx1-i32x8 --arch=x86-64
 OBJS = lib/cycletimer.o lib/ppm.o lib/etc.o
+ISPC_DEPS = $(OBJS) lib/portrait_ispc.o lib/portrait_ispc.h
 
 .PHONY: all help clean regress benchmark results
 
@@ -35,7 +36,7 @@ main-omp: main.c $(OBJS) ## the C implementation with OMP on
 main-cu: main.cu $(OBJS) ## the CUDA implementation
 	$(CUDAC) $(CUDAFLAGS) -o $@ $^
 
-main-ispc: main-ispc.c lib/portrait_ispc.o lib/portrait_ispc.h $(OBJS)
+main-ispc: main-ispc.c $(ISPC_DEPS)
 	$(CC) $(CFLAGS) -o $@ $^
 
 %.o: %.c %.h
