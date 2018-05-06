@@ -368,6 +368,27 @@ speedup.
 \includegraphics[scale=0.8]{cpu.jpg}
 \end{center}
 
+It was very interesting to compare two different CPU parallel frameworks on the
+same code and same hardware. Both approaches used dynamic scheduling and
+small granularity to ensure equal work per worker. However, ISPC utilized SIMD
+instructions in the blur process. However, using SIMD in ISPC did not increase
+speedup over OMP. This is mainly because the ISPC compiler told us we had
+several gather and scatter operations. One large barrier was when the member of
+a gang accessed each red color value from the pixel. Since there is also a
+green and blue value per pixel, the memory was not contiguous and needed
+a gather to read and scatter to write. Additionally, our weights were stored
+as floats and the colors were stored as unsigned int8, and the ISPC compiler
+told us that doing this conversion was very costly. The OMP and ISPC
+implementations were both very close in time and speedup, but the OMP turned out
+to be slightly better at the end.
+
+\section{Work Distribution}
+Ariel and Jerry both performed equal work. Ariel did many of the OpenMP
+optimizations, wrote the Makefiles, built the testing framework, and set up
+all of the different parallel environments. Jerry helped with the OpenMP and
+wrote the ISPC and CUDA optimizations. We both also developed the python and
+C++ sequential implementations.
+
 \section{Additional Data}
 \subsection{Elephant ($\mathbf{389 \times 584}$ px)}
 
