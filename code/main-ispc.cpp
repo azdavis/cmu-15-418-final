@@ -127,46 +127,8 @@ int main(int argc, char **argv) {
         }
     }
 
-    int row, col;
-    #pragma omp parallel for schedule(dynamic) shared(row) private(col)
-    for (row = 0; row < H; row++) {
-        for (col = 0; col < W; col++) {
-            // Foreground Pixel
-            if (mask[row * W + col] == 1) {
-                continue;
-            }
-            // BG Pixel
-            float count = 0;
-            int i_k, j_k;
-            float red = 0;
-            float green = 0;
-            float blue = 0;
-            for (i_k = 0; i_k < FILTER_SIZE; i_k++) {
-                for (j_k = 0; j_k < FILTER_SIZE; j_k++) {
-                    float weight = blurKernel[i_k * FILTER_SIZE + j_k];
-                    int i = row - (FILTER_SIZE / 2) + i_k;
-                    int j = col - (FILTER_SIZE / 2) + j_k;
-
-                    if (i < 0 || i >= H || j < 0 || j >= W) {
-                        continue;
-                    } else if (mask[i * W + j] == 1) {
-                        continue;
-                    }
-                    PPMPixel *pt = getPixel(j, i, img);
-                    red += weight * (pt->red);
-                    green += weight * (pt->green);
-                    blue += weight * (pt->blue);
-                    count += weight;
-                }
-            }
-            if (count == 0) {
-                continue;
-            }
-            blurData[row * W + col].red = (unsigned char)(red / count);
-            blurData[row * W + col].green = (unsigned char)(green / count);
-            blurData[row * W + col].blue = (unsigned char)(blue / count);
-        }
-    }
+    // ISPC
+    blur(W, H, img->data, blurKernel, blurData, mask);
 
     #pragma omp parallel for shared(i) private(j)
     for (i = 0; i < H; i++) {
