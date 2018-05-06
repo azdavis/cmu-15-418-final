@@ -20,9 +20,6 @@ help: ## show this help
 clean: ## rm all generated files
 	rm -rf main-cpp main-omp main-cu main-ispc lib/*.o lib/*_ispc.hpp results.tex
 
-regress: all ## check all progs have the same output on a small test case
-	./check.sh img/elephant.ppm
-
 results.tex: all ## summarize timing results for each prog on each img
 	./mk-results.py >$@
 
