@@ -82,14 +82,17 @@ for in_f in in_fnames:
         data[in_f][prog] = None
         for i in range(iters):
             out_f = in_f.replace(".ppm", "") + prog.replace("./", "-") + ".ppm"
-            print(prog, in_f, i, file=sys.stderr)
+            print("run {} on {} iter {} of {}... ".format(
+                prog, in_f, i + 1, iters), file=sys.stderr, end="")
             out = subprocess.check_output([prog, in_f, out_f])
             if check is None and prog == cpp_prog:
+                print("create ref img", file=sys.stderr)
                 check = out_f
             elif subprocess.call(["cmp", out_f, check]) != 0:
-                print("correctness FAILED")
+                print("does not match ref img", file=sys.stderr)
                 sys.exit(1)
             else:
+                print("matches ref img", file=sys.stderr)
                 os.remove(out_f)
             new = json.loads(out)
             cur = data[in_f][prog]
