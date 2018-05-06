@@ -1,7 +1,7 @@
 CXX = g++
 CFLAGS = -Wall -O3 -Wno-unknown-pragmas
 OMPFLAGS = -fopenmp -DOMP
-CUDAC = nvcc
+CUDAC = /usr/local/depot/cuda-8.0/bin/nvcc
 CUDAFLAGS = -O3 -DCUDA -m64 --gpu-architecture compute_61
 ISPC = /usr/local/depot/ispc-v1.9.1-linux/ispc
 ISPFLAGS = -O3 --target=avx1-i32x8 --arch=x86-64
