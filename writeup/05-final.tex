@@ -169,7 +169,15 @@ there was not enough threads to parallelize across every pixel like on GPUs.
 So, we chose to parallelize across rows of the image, keeping arithmetic
 intensity high while using parallelism.
 
+\subsection{Color Counts}
+We chose not to parallelize the color counts step in our algorithm. From our
+profiling, getting the color counts made up less than 0.03 percent of our
+time, and that overhead with parallelism would not increase our speedup.
 
+We first tried the atomic strategy we used for CUDA. Each thread was assigned
+a row and performed an atomic add to a color bucket for each background pixel.
+However, the overhead from gaining exclusive control to the bucket made the
+implementation slower than sequential.
 
 \section{Results}
 
