@@ -4,10 +4,10 @@ export uniform int func(uniform int x, uniform int y) {
 
 task void blur_task(uniform int width,
                     uniform int height,
-                    uniform int8 imgData[],
+                    uniform unsigned int8 imgData[],
                     uniform float blurKernel[],
-                    uniform int8 blurData[],
-                    uniform int8 mask[],
+                    uniform unsigned int8 blurData[],
+                    uniform unsigned int8 mask[],
                     uniform int rowsPerTask) {
 
     uniform int ystart = taskIndex * rowsPerTask;
@@ -53,10 +53,10 @@ task void blur_task(uniform int width,
 
 export void blur(uniform int width,
                  uniform int height,
-                 uniform int8 imgData[],
+                 uniform unsigned int8 imgData[],
                  uniform float blurKernel[],
-                 uniform int8 blurData[],
-                 uniform int8 mask[]) {
+                 uniform unsigned int8 blurData[],
+                 uniform unsigned int8 mask[]) {
 
     uniform int taskNum = height;
     uniform int rowsPerTask = height / taskNum; // 1 row per task
