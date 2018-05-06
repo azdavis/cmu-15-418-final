@@ -85,5 +85,13 @@ for in_f in in_fnames:
         else:
             print(with_slash, end="")
         first = False
-        print(row.format(disp, cpp, omp, cpp / omp, cuda, cpp / cuda, ispc, cpp / ispc))
+        print(row.format(disp,
+            cpp,
+            omp,
+            cpp / omp,
+            cuda,
+            cpp / cuda,
+            ispc,
+            cpp / ispc
+        ))
     print("\\end{tabular}")
