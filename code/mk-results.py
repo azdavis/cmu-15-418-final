@@ -74,7 +74,7 @@ row_header = no_slash + (
 )
 float_str = " & {:.4f}"
 
-def print_line(title, get, sums=None):
+def print_row(title, get, sums=None):
     print(title, end="")
     cpp_time = 0
     for prog in programs:
@@ -101,8 +101,8 @@ for in_f in in_fnames:
         print(no_slash if first else with_slash, end="")
         first = False
         get = lambda prog: data[prog][in_f][ti]
-        print_line(str(ti).replace("_", " "), get, sums)
+        print_row(str(ti).replace("_", " "), get, sums)
     print(slash_hline)
     print(no_slash, end="")
-    print_line("total", lambda prog: sums[prog])
+    print_row("total", lambda prog: sums[prog])
     print("\\end{tabular}")
