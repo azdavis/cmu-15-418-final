@@ -1,11 +1,6 @@
 # Parallel Portrait Mode
 
-a cmu 15-418 final project
-
-## authors
-
-- Ariel Davis (azdavis)
-- Jerry Yu (jerryy)
+by Ariel Davis (azdavis) and Jerry Yu (jerryy)
 
 ## dependencies
 
