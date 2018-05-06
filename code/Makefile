@@ -6,8 +6,8 @@ CUDAFLAGS = -O3 -DCUDA -m64 --gpu-architecture compute_61
 ISPC = /usr/local/depot/ispc-v1.9.1-linux/ispc
 ISPFLAGS = -O3 --target=avx1-i32x8 --arch=x86-64
 OBJS = lib/cycletimer.o lib/ppm.o lib/etc.o
-ISPC_DEPS = $(OBJS) lib/portrait_ispc.o lib/portrait_ispc.hpp lib/tasksys.o
-ISPC_FLAGS = -lpthread
+ISPCDEPS = $(OBJS) lib/portrait_ispc.o lib/portrait_ispc.hpp lib/tasksys.o
+ISPCFLAGS = -lpthread
 
 .PHONY: all help clean regress benchmark
 
@@ -37,8 +37,8 @@ main-omp: main.cpp $(OBJS) ## the CPP implementation with OMP on
 main-cu: main.cu $(OBJS) ## the CUDA implementation
 	$(CUDAC) $(CUDAFLAGS) -o $@ $^
 
-main-ispc: main-ispc.cpp $(ISPC_DEPS) ## the ISPC + OMP implementation
-	$(CXX) $(CFLAGS) $(ISPC_FLAGS) $(OMPFLAGS) -o $@ $^
+main-ispc: main-ispc.cpp $(ISPCDEPS) ## the ISPC + OMP implementation
+	$(CXX) $(CFLAGS) $(ISPCFLAGS) $(OMPFLAGS) -o $@ $^
 
 lib/tasksys.o: lib/tasksys.cpp
 	$(CXX) $(CFLAGS) -c -o $@ $<
