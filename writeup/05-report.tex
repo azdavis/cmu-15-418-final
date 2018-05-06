@@ -181,7 +181,7 @@ Thread mapping and shared memory for CUDA blur
 
 \section{OpenMP on CPU}
 
-We utilized the 16 core CPUs in the Gates Clusters with OpenMP. For CPUs, there
+We utilized the 16 thread CPUs in the Gates Clusters with OpenMP. For CPUs, there
 was not enough threads to parallelize across every pixel like on GPUs. So, we
 chose to parallelize across rows of the image, keeping arithmetic intensity
 high while using parallelism.
@@ -254,23 +254,70 @@ program.
 \subsection{Total}
 Below are the times and speedup we achieved for each method. Each of the times
 are taken from the minimum of 10 times we ran the program. The speedup is
-the time compared with optimized C++ version.\\
+the time compared with optimized single-threaded C++ version.\\
 
-\subsection{Total}
-\begin{tabular}{r|r|r|r|r|r|r|r|r}
-    Image & Size & C++ & OMP & Speedup & ISPC & Speedup & CUDA & Speedup
+\begin{tabular}{r|r|r|r|r|r}
+    Image & Size & C++ & OMP  & ISPC & CUDA
 \\  \hline
-    Elephant & $389 \times 584$ & 2.0887 & 0.1930 & 10.8240 & 0.2170 & 9.6238 & 0.1409 & 14.8264
-\\  Bluejay & $1200 \times 832$ & 11.8096 & 1.0632 & 11.1078 & 1.2070 & 9.7846 & 0.2034 & 58.0582
-\\  Tiger & $1400 \times 845$ & 14.6917 & 1.3536 & 10.8540 & 1.5463 & 9.5010 & 0.1950 & 75.3517
-\\  Flower & $2242 \times 2112$ & 72.0560 & 6.0286 & 11.9523 & 6.1216 & 11.7707 & 0.3859 & 186.7298
-\\  Purp & $2944 \times 2609$ & 88.9941 & 7.5728 & 11.7518 & 7.6757 & 11.5943 & 0.6067 & 146.6925
-\\  Large Elephant & $2592 \times 3888$ & 113.2247 & 9.8219 & 11.5278 & 10.7315 & 10.5507 & 0.7369 & 153.6602
+    Elephant & $389 \times 584$ & 2.0887s & 0.1930s  & 0.2170s & 0.1409s
+\\  Bluejay & $1200 \times 832$ & 11.8096s & 1.0632s  & 1.2070s  & 0.2034s
+\\  Tiger & $1400 \times 845$ & 14.6917s & 1.3536s  & 1.5463s  & 0.1950s
+\\  Flower & $2242 \times 2112$ & 72.0560s & 6.0286s  & 6.1216s  & 0.3859s
+\\  Purp & $2944 \times 2609$ & 88.9941s & 7.5728s  & 7.6757s  & 0.6067s
+\\  Large Elephant & $2592 \times 3888$ & 113.2247s  & 9.8219s  & 10.7315s & 0.7369s
 \end{tabular}
+
+\begin{tabular}{r|r|r|r|r|r|r|r}
+    Image & Size & OMP Speedup & ISPC Speedup & CUDA Speedup
+\\  \hline
+    Elephant & $389 \times 584$ & 10.8240x & 9.6238x & 14.8264x
+\\  Bluejay & $1200 \times 832$ & 11.1078x & 9.7846x & 58.0582x
+\\  Tiger & $1400 \times 845$ & 10.8540x & 9.5010x & 75.3517x
+\\  Flower & $2242 \times 2112$ & 11.9523x & 11.7707x & 186.7298x
+\\  Purp & $2944 \times 2609$ & 11.7518x & 11.5943x & 146.6925x
+\\  Large Elephant & $2592 \times 3888$ & 10.7315x & 10.5507x & 153.6602x
+\end{tabular}
+
+Overall, we were satisfied with the speedup we achieved. With the CPUS having
+16 hyperthreads, we were able to acheive 11x speedup with OMP and ISPC.
+With GPUs, we achieved 150x speedup over the CPU sequential implementation,
+reducing operations that took minutes to less than a second.
+
+It was also very interesting comparing the performance of many different
+platforms and the changes to implementations we had to make for OMP, ISPC and
+CUDA.
+
+We can see that the GPU implementation easily beats out both CPU
+implementations. This is mostly due to the hardware nature of GPUs, having
+enough threads to be able to parallelize operations per pixel. When we compare
+a 20 SM NVIDA GTX 1080 handling thousands of threads each with a CPU that has 16
+threads, it is easy to see the sheer power of GPUs. GPUs hold true to their
+name as graphical processing units, as they are the ideal hardware to perform
+image operations.
+
+The fundamental difference between are GPU and CPU implementations was that
+with the number of threads availible, we had to parallelize over rows in CPUs
+while we were able to parallelize over pixels in GPUs. We also took advantage
+of different concepts in parallel programming on each platform. For CPUs, we
+explicitly used dynamic scheduling and SIMD. For GPUs, we used shared memory
+with thread blocks.
 
 \begin{center}
 \includegraphics[scale=0.8]{speedup.jpg}
 \end{center}
+
+It is also interesting to see the relationship between the size of the image
+and the speedup achieved. As the image is larger, the arithmetic intensity
+increases. However, the nature of the image itself can also contribute to
+speedup. Because the flower image had a larger region of background, more blur
+was needed and the GPU was able to achieve more speedup than larger images like
+purp.
+
+In addition, we found out that speedup with CPUs was relatively constant
+for each differently sized image, hovering at around 11x. Meanwhile, speedup
+on GPUs heavily fluctuated and significantly increased with image size. This
+is likely due to the higher overhead of launching CUDA threads versus the
+overhead of using threads.
 
 \begin{center}
 \includegraphics[scale=0.8]{time.jpg}
