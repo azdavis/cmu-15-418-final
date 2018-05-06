@@ -8,7 +8,7 @@ if [ $# -ne 1 ]; then
 fi
 
 for x in c cu omp ispc; do
-    ./main-$x $1 $x.ppm
+    ./main-$x $1 $x.ppm >/dev/null
     if [ $x = c ]; then
         continue
     fi
