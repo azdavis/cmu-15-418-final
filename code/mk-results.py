@@ -4,10 +4,9 @@ from __future__ import print_function
 import json
 import subprocess
 import sys
+import os
 
 iters = 10
-
-devnull = "/dev/null"
 
 in_fnames = [
     "./img/bluejay.ppm",
@@ -54,13 +53,23 @@ for prog in programs:
     data[prog] = {}
     for in_f in in_fnames:
         data[prog][in_f] = None
+        check = None
         for i in range(iters):
+            out_f = in_f.replace(".ppm", "") + prog.replace("./", "") + ".ppm"
             print(prog, in_f, i, file=sys.stderr)
-            out = subprocess.check_output([prog, in_f, devnull])
+            out = subprocess.check_output([prog, in_f, out_f])
+            if check is None and prog == cpp_prog:
+                check = out_f
+            elif subprocess.call(["cmp", out_f, check]) != 0:
+                print("correctness FAILED")
+                os.exit(1)
+            else:
+                os.remove(out_f)
             new = json.loads(out)
             cur = data[prog][in_f]
             if cur is None or dict_is_lt(new, cur):
                 data[prog][in_f] = new
+        os.remove(check)
 
 table_begin = "\\begin{tabular}{r|r|r|r|r|r|r|r}"
 with_slash = "\\\\  "
