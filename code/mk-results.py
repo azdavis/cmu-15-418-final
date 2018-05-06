@@ -74,6 +74,20 @@ row_header = no_slash + (
 )
 float_str = " & {:.4f}"
 
+def print_line(title, get, sums=None):
+    print(title, end="")
+    cpp_time = 0
+    for prog in programs:
+        time = get(prog)
+        if sums is not None:
+            sums[prog] += time
+        print(float_str.format(time), end="")
+        if prog == cpp_prog:
+            cpp_time = time
+        else:
+            print(float_str.format(cpp_time / time), end="")
+    print("")
+
 for in_f in in_fnames:
     print("\\subsection{" + in_f + "}")
     print(table_begin)
@@ -89,27 +103,12 @@ for in_f in in_fnames:
         else:
             print(with_slash, end="")
         first = False
-        print(str(ti).replace("_", " "), end="")
-        cpp_time = 0
-        for prog in programs:
-            time = data[prog][in_f][ti]
-            sums[prog] += time
-            print(float_str.format(time), end="")
-            if prog == cpp_prog:
-                cpp_time = time
-            else:
-                print(float_str.format(cpp_time / time), end="")
-        print("")
+        print_line(
+            str(ti).replace("_", " "),
+            lambda prog: data[prog][in_f][ti],
+            sums
+        )
     print(slash_hline)
     print(no_slash, end="")
-    print("total", end="")
-    cpp_time = 0
-    for prog in programs:
-        time = sums[prog]
-        print(float_str.format(time), end="")
-        if prog == cpp_prog:
-            cpp_time = time
-        else:
-            print(float_str.format(cpp_time / time), end="")
-    print("")
+    print_line("total", lambda prog: sums[prog])
     print("\\end{tabular}")
