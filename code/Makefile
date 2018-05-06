@@ -1,5 +1,4 @@
-CC = gcc
-CPP = g++
+CXX = g++
 CFLAGS = -Wall -O3 -Wno-unknown-pragmas
 OMPFLAGS = -fopenmp -DOMP
 CUDAC = nvcc
@@ -7,7 +6,7 @@ CUDAFLAGS = -O3 -DCUDA -m64 --gpu-architecture compute_61
 ISPC = /usr/local/depot/ispc-v1.9.1-linux/ispc
 ISPFLAGS = -O3 --target=avx1-i32x8 --arch=x86-64
 OBJS = lib/cycletimer.o lib/ppm.o lib/etc.o
-ISPC_DEPS = $(OBJS) lib/portrait_ispc.o lib/portrait_ispc.h lib/tasksys.o
+ISPC_DEPS = $(OBJS) lib/portrait_ispc.o lib/portrait_ispc.hpp lib/tasksys.o
 ISPC_FLAGS = -lpthread
 
 .PHONY: all help clean regress benchmark results
@@ -18,7 +17,7 @@ help: ## show this help
 	@grep -F '##' Makefile | grep -Fv '@grep' | sed -E 's/:.*##/:/'
 
 clean: ## rm all generated files
-	rm -rf main-c main-omp main-cu main-ispc lib/*.o lib/*_ispc.h
+	rm -rf main-c main-omp main-cu main-ispc lib/*.o lib/*_ispc.hpp
 
 regress: all ## check all implementations have the same output on a small test case
 	./check.sh img/elephant.ppm
@@ -29,23 +28,23 @@ benchmark: all ## same as regress, but a larger test case
 results: all ## run each implementation a few times for each image, summarize results in LaTeX tables
 	./results.py
 
-main-c: main.c $(OBJS) ## the sequential C implementation
-	$(CC) $(CFLAGS) -o $@ $^
+main-c: main.cpp $(OBJS) ## the sequential C implementation
+	$(CXX) $(CFLAGS) -o $@ $^
 
-main-omp: main.c $(OBJS) ## the C implementation with OMP on
-	$(CC) $(CFLAGS) $(OMPFLAGS) -o $@ $^
+main-omp: main.cpp $(OBJS) ## the C implementation with OMP on
+	$(CXX) $(CFLAGS) $(OMPFLAGS) -o $@ $^
 
 main-cu: main.cu $(OBJS) ## the CUDA implementation
 	$(CUDAC) $(CUDAFLAGS) -o $@ $^
 
 main-ispc: main-ispc.cpp $(ISPC_DEPS)
-	$(CPP) $(CFLAGS) $(ISPC_FLAGS) -o $@ $^
+	$(CXX) $(CFLAGS) $(ISPC_FLAGS) -o $@ $^
 
 lib/tasksys.o: lib/tasksys.cpp
-	$(CPP) $(CFLAGS) -c -o $@ $<
+	$(CXX) $(CFLAGS) -c -o $@ $<
 
-%.o: %.c %.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+%.o: %.cpp %.hpp
+	$(CXX) $(CFLAGS) -c -o $@ $<
 
-%_ispc.o %_ispc.h: %.ispc
-	$(ISPC) $(ISPFLAGS) -o $*_ispc.o -h $*_ispc.h $^
+%_ispc.o %_ispc.hpp: %.ispc
+	$(ISPC) $(ISPFLAGS) -o $*_ispc.o -h $*_ispc.hpp $^

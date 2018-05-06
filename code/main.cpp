@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "lib/cycletimer.h"
-#include "lib/etc.h"
-#include "lib/ppm.h"
+#include "lib/cycletimer.hpp"
+#include "lib/etc.hpp"
+#include "lib/ppm.hpp"
 
 int main(int argc, char **argv) {
     if (argc != 3) {
@@ -27,11 +27,11 @@ int main(int argc, char **argv) {
     int rtWall = (W * (LTRTWALLDENOM - 1)) / LTRTWALLDENOM;
     int tpWall = H / TPWALLDENOM;
 
-    int *color_counts = calloc(BUCKETS * BUCKETS * BUCKETS, sizeof(int));
-    char *oldMask = calloc(W * H, sizeof(char));
-    char *mask = calloc(W * H, sizeof(char));
-    float *blurKernel = calloc(FILTER_SIZE * FILTER_SIZE, sizeof(float));
-    PPMPixel *blurData = calloc(W * H, sizeof(PPMPixel));
+    int *color_counts = (int *) calloc(BUCKETS * BUCKETS * BUCKETS, sizeof(int));
+    char *oldMask = (char *) calloc(W * H, sizeof(char));
+    char *mask = (char *) calloc(W * H, sizeof(char));
+    float *blurKernel = (float *) calloc(FILTER_SIZE * FILTER_SIZE, sizeof(float));
+    PPMPixel *blurData = (PPMPixel *) calloc(W * H, sizeof(PPMPixel));
     if (color_counts == NULL ||
         oldMask == NULL ||
         mask == NULL ||

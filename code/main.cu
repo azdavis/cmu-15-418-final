@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "lib/cycletimer.h"
-#include "lib/etc.h"
-#include "lib/ppm.h"
+#include "lib/cycletimer.hpp"
+#include "lib/etc.hpp"
+#include "lib/ppm.hpp"
 
 #ifdef DEBUG
 #define CUDA_CHECK cudaCheck(cudaPeekAtLastError(), __FILE__, __LINE__)

@@ -20,7 +20,7 @@
 #include <stdio.h>  // fprintf
 #include <stdlib.h> // exit
 
-#include "cycletimer.h"
+#include "cycletimer.hpp"
 
 // This uses the cycle counter of the processor.  Different
 // processors in the system will have different values for this.  If

@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "lib/cycletimer.h"
-#include "lib/etc.h"
-#include "lib/ppm.h"
-#include "lib/portrait_ispc.h"
+#include "lib/cycletimer.hpp"
+#include "lib/etc.hpp"
+#include "lib/ppm.hpp"
+#include "lib/portrait_ispc.hpp"
 
 int main(int argc, char **argv) {
     if (argc != 3) {

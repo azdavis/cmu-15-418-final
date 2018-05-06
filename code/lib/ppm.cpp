@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "ppm.h"
+#include "ppm.hpp"
 
 // https://stackoverflow.com/questions/2693631
 

@@ -4,7 +4,7 @@
 *.pyc
 *.swp
 *.tar
-*_ispc.h
+*_ispc.hpp
 *~
 .__afs*
 .DS_Store
