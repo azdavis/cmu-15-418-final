@@ -5,6 +5,7 @@
 #include "lib/cycletimer.h"
 #include "lib/etc.h"
 #include "lib/ppm.h"
+#include "lib/portrait_ispc.h"
 
 int main(int argc, char **argv) {
     if (argc != 3) {
@@ -128,7 +129,14 @@ int main(int argc, char **argv) {
     }
 
     // ISPC
-    blur(W, H, img->data, blurKernel, blurData, mask);
+    ispc::blur(
+        W,
+        H,
+        (uint8_t*) img->data,
+        blurKernel,
+        (uint8_t*) blurData,
+        (uint8_t*) mask
+    );
 
     #pragma omp parallel for shared(i) private(j)
     for (i = 0; i < H; i++) {
