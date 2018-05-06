@@ -98,16 +98,10 @@ for in_f in in_fnames:
         sums[prog] = 0
     first = True
     for ti in time_items:
-        if first:
-            print(no_slash, end="")
-        else:
-            print(with_slash, end="")
+        print(no_slash if first else with_slash, end="")
         first = False
-        print_line(
-            str(ti).replace("_", " "),
-            lambda prog: data[prog][in_f][ti],
-            sums
-        )
+        get = lambda prog: data[prog][in_f][ti]
+        print_line(str(ti).replace("_", " "), get, sums)
     print(slash_hline)
     print(no_slash, end="")
     print_line("total", lambda prog: sums[prog])
