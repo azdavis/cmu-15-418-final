@@ -1,10 +1,6 @@
 #ifndef ETC_H
 #define ETC_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define LTRTWALLDENOM 7
 #define TPWALLDENOM 8
 #define BUCKET_SIZE 32
@@ -20,9 +16,5 @@ typedef struct {
 } range;
 
 int getBucketIdx(int r, int g, int b);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
