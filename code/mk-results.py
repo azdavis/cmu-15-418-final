@@ -72,56 +72,44 @@ row_header = no_slash + (
     "CUDA & Speedup & "
     "ISPC & Speedup"
 )
-row = (
-    "{} & {:.4f} & "
-    "{:.4f} & {:.4f} & "
-    "{:.4f} & {:.4f} & "
-    "{:.4f} & {:.4f}"
-)
+float_str = " & {:.4f}"
 
 for in_f in in_fnames:
     print("\\subsection{" + in_f + "}")
     print(table_begin)
     print(row_header)
     print(slash_hline)
-    cpp_sum = 0
-    omp_sum = 0
-    cuda_sum = 0
-    ispc_sum = 0
+    sums = {}
+    for prog in programs:
+        sums[prog] = 0
     first = True
     for ti in time_items:
-        disp = str(ti).replace("_", " ")
-        cpp = data[cpp_prog][in_f][ti]
-        omp = data[omp_prog][in_f][ti]
-        cuda = data[cuda_prog][in_f][ti]
-        ispc = data[ispc_prog][in_f][ti]
-        cpp_sum += cpp
-        omp_sum += omp
-        cuda_sum += cuda
-        ispc_sum += ispc
         if first:
             print(no_slash, end="")
         else:
             print(with_slash, end="")
         first = False
-        print(row.format(disp,
-            cpp,
-            omp,
-            cpp / omp,
-            cuda,
-            cpp / cuda,
-            ispc,
-            cpp / ispc
-        ))
+        print(str(ti).replace("_", " "), end="")
+        cpp_time = 0
+        for prog in programs:
+            time = data[prog][in_f][ti]
+            sums[prog] += time
+            print(float_str.format(time), end="")
+            if prog == cpp_prog:
+                cpp_time = time
+            else:
+                print(float_str.format(cpp_time / time), end="")
+        print("")
     print(slash_hline)
-    print(no_slash + row.format(
-        "total",
-        cpp_sum,
-        omp_sum,
-        cpp_sum / omp_sum,
-        cuda_sum,
-        cpp_sum / cuda_sum,
-        ispc_sum,
-        cpp_sum / ispc_sum
-    ))
+    print(no_slash, end="")
+    print("total", end="")
+    cpp_time = 0
+    for prog in programs:
+        time = sums[prog]
+        print(float_str.format(time), end="")
+        if prog == cpp_prog:
+            cpp_time = time
+        else:
+            print(float_str.format(cpp_time / time), end="")
+    print("")
     print("\\end{tabular}")
