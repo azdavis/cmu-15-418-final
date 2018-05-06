@@ -88,12 +88,12 @@ for in_f in in_fnames:
             if check is None and prog == cpp_prog:
                 print("create ref img", file=sys.stderr)
                 check = out_f
-            elif subprocess.call(["cmp", out_f, check]) != 0:
-                print("does not match ref img", file=sys.stderr)
-                sys.exit(1)
-            else:
+            elif subprocess.call(["cmp", out_f, check]) == 0:
                 print("matches ref img", file=sys.stderr)
                 os.remove(out_f)
+            else:
+                print("does not match ref img", file=sys.stderr)
+                sys.exit(1)
             new = json.loads(out)
             cur = data[in_f][prog]
             if cur is None or dict_is_lt(new, cur):
