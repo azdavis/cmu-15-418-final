@@ -12,7 +12,7 @@ ISPCFLAGS = -lpthread
 .SUFFIXES:
 .PHONY: all help clean regress
 
-all: main-cpp main-omp main-cu main-ispc ## make all 4 implementations
+all: main-cpp main-omp main-cu main-ispc ## make all 4 progs
 
 help: ## show this help
 	@grep -F '##' Makefile | grep -Fv '@grep' | sed -E 's/:.*##/:/'
@@ -20,22 +20,22 @@ help: ## show this help
 clean: ## rm all generated files
 	rm -rf main-cpp main-omp main-cu main-ispc lib/*.o lib/*_ispc.hpp results.tex
 
-regress: all ## check all implementations have the same output on a small test case
+regress: all ## check all progs have the same output on a small test case
 	./check.sh img/elephant.ppm
 
-results.tex: all ## run each implementation a few times for each image, summarize results in LaTeX tables
+results.tex: all ## summarize timing results for each prog on each img
 	./mk-results.py >$@
 
-main-cpp: main.cpp $(OBJS) ## the sequential CPP implementation
+main-cpp: main.cpp $(OBJS) ## the sequential CPP prog
 	$(CXX) $(CFLAGS) -o $@ $^
 
-main-omp: main.cpp $(OBJS) ## the CPP implementation with OMP on
+main-omp: main.cpp $(OBJS) ## the CPP prog with OMP on
 	$(CXX) $(CFLAGS) $(OMPFLAGS) -o $@ $^
 
-main-cu: main.cu $(OBJS) ## the CUDA implementation
+main-cu: main.cu $(OBJS) ## the CUDA prog
 	$(CUDAC) $(CUDAFLAGS) -o $@ $^
 
-main-ispc: main-ispc.cpp $(ISPCDEPS) ## the ISPC + OMP implementation
+main-ispc: main-ispc.cpp $(ISPCDEPS) ## the ISPC + OMP prog
 	$(CXX) $(CFLAGS) $(ISPCFLAGS) $(OMPFLAGS) -o $@ $^
 
 %.o: %.cpp %.hpp
