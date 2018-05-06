@@ -251,8 +251,11 @@ program.
 
 \section{Results}
 
-Times are in seconds under each method. Each of the times are taken from the
-minimum of 10 times we ran the program.\\
+\subsection{Total}
+Below are the times and speedup we achieved for each method. Each of the times
+are taken from the minimum of 10 times we ran the program. The speedup is
+the time compared with optimized C++ version.\\
+
 \subsection{Total}
 \begin{tabular}{r|r|r|r|r|r|r|r|r}
     Image & Size & C++ & OMP & Speedup & ISPC & Speedup & CUDA & Speedup
@@ -266,11 +269,11 @@ minimum of 10 times we ran the program.\\
 \end{tabular}
 
 \begin{center}
-\includegraphics[scale=1]{time.jpg}
+\includegraphics[scale=0.8]{speedup.jpg}
 \end{center}
 
 \begin{center}
-\includegraphics[scale=1]{speedup.jpg}
+\includegraphics[scale=0.8]{time.jpg}
 \end{center}
 
 \subsection{Elephant ($\mathbf{389 \times 584}$ px)}
