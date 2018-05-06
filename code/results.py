@@ -76,7 +76,7 @@ for in_f in in_fnames:
     first = True
     for ti in time_items:
         disp = str(ti).replace("_", " ")
-        c = data[cpp_prog][in_f][ti]
+        cpp = data[cpp_prog][in_f][ti]
         omp = data[omp_prog][in_f][ti]
         cuda = data[cuda_prog][in_f][ti]
         ispc = data[ispc_prog][in_f][ti]
@@ -85,5 +85,5 @@ for in_f in in_fnames:
         else:
             print(with_slash, end="")
         first = False
-        print(row.format(disp, c, omp, c / omp, cuda, c / cuda, ispc, c / ispc))
+        print(row.format(disp, cpp, omp, cpp / omp, cuda, cpp / cuda, ispc, cpp / ispc))
     print("\\end{tabular}")
