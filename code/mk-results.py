@@ -93,7 +93,7 @@ for in_f in in_fnames:
                 print("matches ref img", file=sys.stderr)
                 os.remove(out_f)
             else:
-                print("does not match ref img", file=sys.stderr)
+                print("DOES NOT match ref img", file=sys.stderr)
                 sys.exit(1)
             new = json.loads(out)
             cur = data[in_f][prog]
