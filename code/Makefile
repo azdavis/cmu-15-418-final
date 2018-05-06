@@ -26,7 +26,7 @@ benchmark: all ## same as regress, but a larger test case
 	./check.sh img/large_elephant.ppm
 
 results.tex: all ## run each implementation a few times for each image, summarize results in LaTeX tables
-	./results.py >$@
+	./mk-results.py >$@
 
 main-cpp: main.cpp $(OBJS) ## the sequential CPP implementation
 	$(CXX) $(CFLAGS) -o $@ $^
