@@ -21,11 +21,13 @@ in_fnames = [
 c_prog = "./main-c"
 omp_prog = "./main-omp"
 cuda_prog = "./main-cu"
+ispc_prog = "./main-ispc"
 
 programs = [
     c_prog,
     omp_prog,
     cuda_prog,
+    ispc_prog,
 ]
 
 time_items = [
@@ -61,8 +63,8 @@ for prog in programs:
                 data[prog][in_f] = new
 
 table_begin = "\\begin{tabular}{r|r|r|r|r|r}"
-row_header = "    Item & C (s) & OMP (s) & Speedup & CUDA (s) & Speedup"
-row = "{} & {:.5f} & {:.5f} & {:.5f} & {:.5f} & {:.5f}"
+row_header = "    Item & C (s) & OMP (s) & Speedup & CUDA (s) & Speedup & ISPC (s) & Speedup"
+row = "{} & {:.5f} & {:.5f} & {:.5f} & {:.5f} & {:.5f} & {:.5f} & {:.5f}"
 with_slash = "\\\\  "
 no_slash = "    "
 
@@ -77,10 +79,11 @@ for in_f in in_fnames:
         c = data[c_prog][in_f][ti]
         omp = data[omp_prog][in_f][ti]
         cuda = data[cuda_prog][in_f][ti]
+        ispc = data[ispc_prog][in_f][ti]
         if first:
             print(no_slash, end="")
         else:
             print(with_slash, end="")
         first = False
-        print(row.format(disp, c, omp, c / omp, cuda, c / cuda))
+        print(row.format(disp, c, omp, c / omp, cuda, c / cuda, ispc, c / ispc))
     print("\\end{tabular}")
