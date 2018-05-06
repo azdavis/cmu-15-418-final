@@ -2,10 +2,8 @@ TEXC = pdflatex
 TEXFLAGS = -halt-on-error -output-directory=build
 
 .SUFFIXES:
-.PHONY: cur all clean
+.PHONY: all clean
 .PRECIOUS: build/%.pdf
-
-cur: build/05-final.pdf
 
 all: $(patsubst %.tex,build/%.pdf,$(wildcard *.tex))
 
