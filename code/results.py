@@ -18,13 +18,13 @@ in_fnames = [
     "./img/tiger.ppm",
 ]
 
-c_prog = "./main-c"
+cpp_prog = "./main-cpp"
 omp_prog = "./main-omp"
 cuda_prog = "./main-cu"
 ispc_prog = "./main-ispc"
 
 programs = [
-    c_prog,
+    cpp_prog,
     omp_prog,
     cuda_prog,
     ispc_prog,
@@ -76,7 +76,7 @@ for in_f in in_fnames:
     first = True
     for ti in time_items:
         disp = str(ti).replace("_", " ")
-        c = data[c_prog][in_f][ti]
+        c = data[cpp_prog][in_f][ti]
         omp = data[omp_prog][in_f][ti]
         cuda = data[cuda_prog][in_f][ti]
         ispc = data[ispc_prog][in_f][ti]

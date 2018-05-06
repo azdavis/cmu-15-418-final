@@ -61,7 +61,7 @@ PPMImage *readPPM(const char *fname) {
         return NULL;
     }
 
-    if (fread(img->data, 3 * img->width, img->height, fp) != img->height) {
+    if (fread(img->data, 3 * img->width, img->height, fp) != (size_t) img->height) {
         fprintf(stderr, "Error loading image '%s'\n", fname);
         return NULL;
     }

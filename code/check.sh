@@ -7,12 +7,12 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
-for x in c cu omp ispc; do
+for x in cpp cu omp ispc; do
     ./main-$x $1 $x.ppm >/dev/null
-    if [ $x = c ]; then
+    if [ $x = cpp ]; then
         continue
     fi
-    if cmp c.ppm $x.ppm; then
+    if cmp cpp.ppm $x.ppm; then
         echo "Results for '$x' on '$1' match"
         rm $x.ppm
     else
@@ -21,4 +21,4 @@ for x in c cu omp ispc; do
     fi
 done
 
-rm c.ppm
+rm cpp.ppm

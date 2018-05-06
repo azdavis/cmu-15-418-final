@@ -8,7 +8,7 @@
 *~
 .__afs*
 .DS_Store
-/code/main-c
+/code/main-cpp
 /code/main-cu
 /code/main-ispc
 /code/main-omp

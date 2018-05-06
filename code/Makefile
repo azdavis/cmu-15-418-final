@@ -11,13 +11,13 @@ ISPC_FLAGS = -lpthread
 
 .PHONY: all help clean regress benchmark results
 
-all: main-c main-omp main-cu main-ispc ## make all 4 implementations
+all: main-cpp main-omp main-cu main-ispc ## make all 4 implementations
 
 help: ## show this help
 	@grep -F '##' Makefile | grep -Fv '@grep' | sed -E 's/:.*##/:/'
 
 clean: ## rm all generated files
-	rm -rf main-c main-omp main-cu main-ispc lib/*.o lib/*_ispc.hpp
+	rm -rf main-cpp main-omp main-cu main-ispc lib/*.o lib/*_ispc.hpp
 
 regress: all ## check all implementations have the same output on a small test case
 	./check.sh img/elephant.ppm
@@ -28,16 +28,16 @@ benchmark: all ## same as regress, but a larger test case
 results: all ## run each implementation a few times for each image, summarize results in LaTeX tables
 	./results.py
 
-main-c: main.cpp $(OBJS) ## the sequential C implementation
+main-cpp: main.cpp $(OBJS) ## the sequential CPP implementation
 	$(CXX) $(CFLAGS) -o $@ $^
 
-main-omp: main.cpp $(OBJS) ## the C implementation with OMP on
+main-omp: main.cpp $(OBJS) ## the CPP implementation with OMP on
 	$(CXX) $(CFLAGS) $(OMPFLAGS) -o $@ $^
 
 main-cu: main.cu $(OBJS) ## the CUDA implementation
 	$(CUDAC) $(CUDAFLAGS) -o $@ $^
 
-main-ispc: main-ispc.cpp $(ISPC_DEPS)
+main-ispc: main-ispc.cpp $(ISPC_DEPS) ## the ISPC implementation
 	$(CXX) $(CFLAGS) $(ISPC_FLAGS) -o $@ $^
 
 lib/tasksys.o: lib/tasksys.cpp
