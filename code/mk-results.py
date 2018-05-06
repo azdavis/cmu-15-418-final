@@ -98,7 +98,7 @@ for in_f in in_fnames:
                 # it should be that prog == cpp_prog
                 print("create ref img", file=sys.stderr)
                 check = out_f
-            elif subprocess.call(["cmp", out_f, check]) == 0:
+            elif subprocess.call(["cmp", check, out_f]) == 0:
                 print("matches ref img", file=sys.stderr)
                 os.remove(out_f)
             else:
