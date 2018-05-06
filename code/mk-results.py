@@ -66,10 +66,10 @@ table_begin = "\\begin{tabular}{r|r|r|r|r|r|r|r}"
 with_slash = "\\\\  "
 no_slash = "    "
 row_header = no_slash + (
-    "Item & C++ (s) & "
-    "OMP (s) & Speedup & "
-    "CUDA (s) & Speedup & "
-    "ISPC (s) & Speedup"
+    "Item & C++ & "
+    "OMP & Speedup & "
+    "CUDA & Speedup & "
+    "ISPC & Speedup"
 )
 row = (
     "{} & {:.4f} & "
