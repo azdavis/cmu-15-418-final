@@ -115,10 +115,15 @@ This requires synchronization after each step.
 
 We were interested in comparing the GPU and CPU implementations of our
 algorithm, so we implemented it in CUDA and OpenMP. To develop and solidify our
-algorithm, we first wrote an implementation with Python's NumPy before moving
-on to sequential C and then parallelism. We experimented with several edge
-detection, gradient, and snake methods and decided the color distribution
-method gave us the best accuracy for foreground detection.
+algorithm, we first wrote an implementation with Python's NumPy.
+We experimented with several edge detection, gradient, and snake methods and
+decided the color distribution method gave us the best accuracy for foreground
+detection.
+
+We then implemented the sequential C++ before prallelism. To our suprise, the
+sequential C++ version was significantly faster than the unoptimized python. The
+python program took 51 minutes for our smallest elephant image with a blur
+filter size of 50px, and our C++ version took 2.5 seconds for the same results.
 
 \section{CUDA on GPU}
 
