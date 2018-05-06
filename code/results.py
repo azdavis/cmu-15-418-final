@@ -18,14 +18,14 @@ in_fnames = [
     "./img/tiger.ppm",
 ]
 
-C = "./main-c"
-OMP = "./main-omp"
-CUDA = "./main-cu"
+c_prog = "./main-c"
+omp_prog = "./main-omp"
+cuda_prog = "./main-cu"
 
 programs = [
-    C,
-    OMP,
-    CUDA,
+    c_prog,
+    omp_prog,
+    cuda_prog,
 ]
 
 time_items = [
@@ -74,9 +74,9 @@ for in_f in in_fnames:
     first = True
     for ti in time_items:
         disp = str(ti).replace("_", " ")
-        c = data[C][in_f][ti]
-        omp = data[OMP][in_f][ti]
-        cuda = data[CUDA][in_f][ti]
+        c = data[c_prog][in_f][ti]
+        omp = data[omp_prog][in_f][ti]
+        cuda = data[cuda_prog][in_f][ti]
         if first:
             print(no_slash, end="")
         else:
