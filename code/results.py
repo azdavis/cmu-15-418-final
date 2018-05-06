@@ -73,6 +73,10 @@ for in_f in in_fnames:
     print(table_begin)
     print(row_header)
     print(with_slash + "\\hline")
+    cpp_sum = 0
+    omp_sum = 0
+    cuda_sum = 0
+    ispc_sum = 0
     first = True
     for ti in time_items:
         disp = str(ti).replace("_", " ")
@@ -80,6 +84,10 @@ for in_f in in_fnames:
         omp = data[omp_prog][in_f][ti]
         cuda = data[cuda_prog][in_f][ti]
         ispc = data[ispc_prog][in_f][ti]
+        cpp_sum += cpp
+        omp_sum += omp
+        cuda_sum += cuda
+        ispc_sum += ispc
         if first:
             print(no_slash, end="")
         else:
@@ -94,4 +102,15 @@ for in_f in in_fnames:
             ispc,
             cpp / ispc
         ))
+    print(with_slash + "\\hline")
+    print(no_slash + row.format(
+        "total",
+        cpp_sum,
+        omp_sum,
+        cpp_sum / omp_sum,
+        cuda_sum,
+        cpp_sum / cuda_sum,
+        ispc_sum,
+        cpp_sum / ispc_sum
+    ))
     print("\\end{tabular}")
