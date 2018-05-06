@@ -12,4 +12,5 @@
 /code/main-cu
 /code/main-ispc
 /code/main-omp
+/code/results.tex
 build
