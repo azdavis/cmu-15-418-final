@@ -65,6 +65,7 @@ for prog in programs:
 table_begin = "\\begin{tabular}{r|r|r|r|r|r|r|r}"
 with_slash = "\\\\  "
 no_slash = "    "
+slash_hline = with_slash + "\\hline"
 row_header = no_slash + (
     "Item & C++ & "
     "OMP & Speedup & "
@@ -82,7 +83,7 @@ for in_f in in_fnames:
     print("\\subsection{" + in_f + "}")
     print(table_begin)
     print(row_header)
-    print(with_slash + "\\hline")
+    print(slash_hline)
     cpp_sum = 0
     omp_sum = 0
     cuda_sum = 0
@@ -112,7 +113,7 @@ for in_f in in_fnames:
             ispc,
             cpp / ispc
         ))
-    print(with_slash + "\\hline")
+    print(slash_hline)
     print(no_slash + row.format(
         "total",
         cpp_sum,
