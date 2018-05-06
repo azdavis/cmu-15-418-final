@@ -16,11 +16,11 @@
 
 \section{Overview}
 
-We implemented portrait mode in parallel.
-Portrait mode has traditionally been done by high end DSLR camera hardware,
-which the foreground of the subject is in focus and the background is blurred.
-We have chosen to use a software-only image processing approach to this problem,
-segmenting the image into the foreground and blurring the background.
+We implemented portrait mode in parallel. Portrait mode has traditionally been
+done by high end DSLR camera hardware, which the foreground of the subject is
+in focus and the background is blurred. We have chosen to use a software-only
+image processing approach to this problem, segmenting the image into the
+foreground and blurring the background.
 
 On our largest images, we were able to achieve 150x speedup with CUDA on GPUs
 and 11x speedup with OpenMP on CPUs.
@@ -40,12 +40,13 @@ and 11x speedup with OpenMP on CPUs.
 
 \section{Algorithm}
 
-We used a simplified version of the grab-cut algorithm, with the idea of getting
-the color distribution of the background to find the foreground.
-Our algorithm takes in input image and returns the image in portrait mode.
+We used a simplified version of the grab-cut algorithm, with the idea of
+getting the color distribution of the background to find the foreground. Our
+algorithm takes in input image and returns the image in portrait mode.
 
 Each step of the algorithm will be referred to its shortened name in
 parenthesis.
+
 \begin{enumerate}
     \item
         Designiate the borders of the image as the background. Top, left, and
@@ -82,14 +83,15 @@ parenthesis.
 \end{figure}
 
 \subsection{Data Structures}
+
 Each image is represented as a struct with the width, height, and an array of
 pixels. Each pixel contains a red, green, and blue value. The size of the array
 is the number of pixels in the image.
 
 We stored the color counts by creating color buckets for every RGB value.
 Essentially, all colors in one bucket would be within 15 red, green, and blue
-value. This results in $\left(\tfrac{255}{15}\right)^3$ different buckets.
-So, we are able to store the color counts with an array, with each element
+value. This results in $\left(\tfrac{255}{15}\right)^3$ different buckets. So,
+we are able to store the color counts with an array, with each element
 representing the count for that bucket.
 
 The mask is simply an array of chars the size of the number of pixels in the
@@ -98,8 +100,9 @@ foreground. Otherwise, it is in the background. We chose chars to minimize the
 size of the data structure.
 
 \subsection{Background}
-The blur is the most computationally intensive part of the algorithm. Each pixel
-of the blurred image needs to compute the average RGB values for a circle
+
+The blur is the most computationally intensive part of the algorithm. Each
+pixel of the blurred image needs to compute the average RGB values for a circle
 of pixels around it. However, the blur is data parallel, as each pixel is
 independent.
 
@@ -107,22 +110,24 @@ However, each step of the algorithm has to be finished before the next step.
 This requires synchronization after each step.
 
 \section{Approach}
-We were interested in comparing the GPU and CPU implementations of
-our algorithm, so we implemented it in CUDA and OpenMP.
-To develop and solidify our algorithm, we first wrote an implementation with
-Python's NumPy before moving on to sequential C and then parallelism. We
-experimented with several edge detection, gradient, and snake methods and
-decided the color distribution method gave us the best accuracy for foreground
-detection.
+
+We were interested in comparing the GPU and CPU implementations of our
+algorithm, so we implemented it in CUDA and OpenMP. To develop and solidify our
+algorithm, we first wrote an implementation with Python's NumPy before moving
+on to sequential C and then parallelism. We experimented with several edge
+detection, gradient, and snake methods and decided the color distribution
+method gave us the best accuracy for foreground detection.
 
 \section{CUDA on GPU}
-We utilized the NVIDIA 1080x GPUs in the Gates Clusters with CUDA. The
-general strategy for CUDA was to parallelize across the pixels in the image
-to take advantage of the high number of ALUs and threads.
+
+We utilized the NVIDIA 1080x GPUs in the Gates Clusters with CUDA. The general
+strategy for CUDA was to parallelize across the pixels in the image to take
+advantage of the high number of ALUs and threads.
 
 \subsection{Color Counts}
-To get the color counts, we assigned each thread to each pixel. Each thread then
-did an atomic add to appropriate bucket in color counts. An atomic add was
+
+To get the color counts, we assigned each thread to each pixel. Each thread
+then did an atomic add to appropriate bucket in color counts. An atomic add was
 needed because multiple pixels could simultaneously have the same color.
 
 We also tried assigning one thread to one color to iterate through the image,
@@ -137,6 +142,7 @@ contention all the threads would slow this part of the algorithm, but our
 timing showed us atomic allowed this step to be performed in almost 0 time.
 
 \subsection{Build Mask and Refine Mask}
+
 The CUDA implementation of build mask and refine mask were more straight
 forward. Each thread was simply mapped to one pixel.
 
@@ -145,21 +151,21 @@ synchronize or communicate between warps. The overhead of another launch was
 less, so we just kept the two steps in two launches.
 
 \subsection{Blur}
+
 We were able to take advantage of the data parallelism for the blur, as each
 pixel's computation was indepedent from those of other pixels. So, each pixel
-is mapped to one CUDA thread. Additionally, pixels spatially close are mapped to
-the same block. This allowed us to take advantage of the high
-amount of threads in each SM. This mapping significantly decreased the
-arithmetic computation per thread, but we realized that we had a memory
-bottleneck.
+is mapped to one CUDA thread. Additionally, pixels spatially close are mapped
+to the same block. This allowed us to take advantage of the high amount of
+threads in each SM. This mapping significantly decreased the arithmetic
+computation per thread, but we realized that we had a memory bottleneck.
 
 We noticed that the pixels close together needed to access the same neighboring
 pixels to perform the convolution. So, we loaded every pixel needed for that
 block's blur into shared memory. The kernel that contained the weights for how
 much each neighboring pixel contributed to the average was also loaded into
-shared memory. By having each thread load data into shared
-memory, the cost of loading it is very low while allowing every memory
-access to be from shared memory.
+shared memory. By having each thread load data into shared memory, the cost of
+loading it is very low while allowing every memory access to be from shared
+memory.
 
 \begin{center}
 \includegraphics[scale=0.3]{mapping.jpg} \\
@@ -167,18 +173,20 @@ Thread mapping and shared memory for CUDA blur
 \end{center}
 
 \section{OpenMP on CPU}
-We utilized the 16 core CPUs in the Gates Clusters with OpenMP. For CPUs,
-there was not enough threads to parallelize across every pixel like on GPUs.
-So, we chose to parallelize across rows of the image, keeping arithmetic
-intensity high while using parallelism.
+
+We utilized the 16 core CPUs in the Gates Clusters with OpenMP. For CPUs, there
+was not enough threads to parallelize across every pixel like on GPUs. So, we
+chose to parallelize across rows of the image, keeping arithmetic intensity
+high while using parallelism.
 
 \subsection{Color Counts}
-We chose not to parallelize the color counts step in our algorithm. From our
-profiling, getting the color counts made up less than 0.03 percent of our
-time, and that overhead with parallelism would not increase our speedup.
 
-We first tried the atomic strategy we used for CUDA. Each thread was assigned
-a row and performed an atomic add to a color bucket for each background pixel.
+We chose not to parallelize the color counts step in our algorithm. From our
+profiling, getting the color counts made up less than 0.03 percent of our time,
+and that overhead with parallelism would not increase our speedup.
+
+We first tried the atomic strategy we used for CUDA. Each thread was assigned a
+row and performed an atomic add to a color bucket for each background pixel.
 However, the overhead from gaining exclusive control to the bucket made the
 implementation around 2x slower than sequential. For large elephant, sequential
 was around 0.038s and with atomic parallel it was 0.95s.
@@ -187,34 +195,38 @@ Additional methods would be to create local copies of the data structures for
 each thread and combining them in parallel.
 
 \subsection{Build Mask and Refine Mask}
+
 We parallelized building and refining the mask by parallelizing over the rows
 of the image. We chose rows because it gave us enough arithmetic computation
 while still giving us the granularity we needed for the computation.
 
-We experimented with using SIMD in the inner loop over each column, but that was
-around 1.5x slower than without SIMD. This is probably because there is an
-uneven workload in one row. Each loop iteration only writes to an array if there
-is a conditional, so there is uneven work that causes SIMD to take longer.
+We experimented with using SIMD in the inner loop over each column, but that
+was around 1.5x slower than without SIMD. This is probably because there is an
+uneven workload in one row. Each loop iteration only writes to an array if
+there is a conditional, so there is uneven work that causes SIMD to take
+longer.
 
 \subsection{Blur}
+
 Similar to the previous steps, we parallelized over the rows for the blur.
-However, the work of each row varied significantly. This is because rows
-with pixels in the foreground are not blurred, saving $50^2$ computations
-with a filter size of 50. So, we used dyanamic scheduling with OpenMP in order
-to distribute the work evenly. With parallelizing over rows and dynamic
+However, the work of each row varied significantly. This is because rows with
+pixels in the foreground are not blurred, saving $50^2$ computations with a
+filter size of 50. So, we used dyanamic scheduling with OpenMP in order to
+distribute the work evenly. With parallelizing over rows and dynamic
 scheduling, we were able to maintain a small granularity while still having
 even work among the threads. With dynamic over static scheduling we were able
-to achieve around 50 percent speedup for blur on large images. (From 15s to 10s)
+to achieve around 50 percent speedup for blur on large images. (From 15s to
+10s)
 
 We also tried adjusting the chunk size with dynamic scheduling in order to
-reduce the amount of overhead with scheduling the work. However, changing
-the chunk size to 5 or 10 did not increase the speed. Increasing chunk size
-only increased the time differences between threads. We also experimented with
-using SIMD over the columns for the inner loop of the blur. However, this
-resulted in a blur that was around the same time as without SIMD. This is
-because new colors for each pixel were not adjacent in memory and required
-scatter operations to write to them. Many of the memory accesses also required
-gather operations, which slowed down the vectorization speedups from SIMD.
+reduce the amount of overhead with scheduling the work. However, changing the
+chunk size to 5 or 10 did not increase the speed. Increasing chunk size only
+increased the time differences between threads. We also experimented with using
+SIMD over the columns for the inner loop of the blur. However, this resulted in
+a blur that was around the same time as without SIMD. This is because new
+colors for each pixel were not adjacent in memory and required scatter
+operations to write to them. Many of the memory accesses also required gather
+operations, which slowed down the vectorization speedups from SIMD.
 
 \section{Results}
 
