@@ -2,13 +2,12 @@
 
 from __future__ import print_function
 import json
-import os
 import subprocess
 import sys
 
 iters = 10
 
-out_fname = "./out.ppm"
+devnull = "/dev/null"
 
 in_fnames = [
     "./img/bluejay.ppm",
@@ -55,13 +54,11 @@ for prog in programs:
         data[prog][in_f] = None
         for i in range(iters):
             print(prog, in_f, i, file=sys.stderr)
-            out = subprocess.check_output([prog, in_f, out_fname])
+            out = subprocess.check_output([prog, in_f, devnull])
             new = json.loads(out)
             cur = data[prog][in_f]
             if cur is None or dict_is_lt(new, cur):
                 data[prog][in_f] = new
-
-os.remove(out_fname)
 
 table_begin = "\\begin{tabular}{r|r|r|r|r|r}"
 row_header = "    Item & C (s) & OMP (s) & Speedup & CUDA (s) & Speedup"
