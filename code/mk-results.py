@@ -73,6 +73,15 @@ def print_row(title, get, sums=None):
             print(float_str.format(cpp_time / time), end="")
     print("")
 
+def get_out_f(in_f, prog, i):
+    return (
+        in_f.replace(".ppm", "") +
+        prog.replace("./", "-") +
+        "-" +
+        str(i) +
+        ".ppm"
+    )
+
 data = {}
 
 for in_f in in_fnames:
@@ -81,7 +90,7 @@ for in_f in in_fnames:
     for prog in programs:
         data[in_f][prog] = None
         for i in range(iters):
-            out_f = in_f.replace(".ppm", "") + prog.replace("./", "-") + ".ppm"
+            out_f = get_out_f(in_f, prog, i)
             print("img {} prog {} ({}/{})... ".format(
                 in_f, prog, i + 1, iters), file=sys.stderr, end="")
             out = subprocess.check_output([prog, in_f, out_f])
