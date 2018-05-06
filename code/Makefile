@@ -9,7 +9,7 @@ OBJS = lib/cycletimer.o lib/ppm.o lib/etc.o
 ISPC_DEPS = $(OBJS) lib/portrait_ispc.o lib/portrait_ispc.hpp lib/tasksys.o
 ISPC_FLAGS = -lpthread
 
-.PHONY: all help clean regress benchmark results
+.PHONY: all help clean regress benchmark
 
 all: main-cpp main-omp main-cu main-ispc ## make all 4 implementations
 
@@ -25,8 +25,8 @@ regress: all ## check all implementations have the same output on a small test c
 benchmark: all ## same as regress, but a larger test case
 	./check.sh img/large_elephant.ppm
 
-results: all ## run each implementation a few times for each image, summarize results in LaTeX tables
-	./results.py
+results.tex: all ## run each implementation a few times for each image, summarize results in LaTeX tables
+	./results.py >$@
 
 main-cpp: main.cpp $(OBJS) ## the sequential CPP implementation
 	$(CXX) $(CFLAGS) -o $@ $^
