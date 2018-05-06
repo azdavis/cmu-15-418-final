@@ -56,7 +56,7 @@ __global__ void getColorDist(
 
     if (j < ltWall && i < tpWall) {
         atomicAdd(&color_counts[bucketIdx], 2);
-    } else if (i >= rtWall && i < tpWall) {
+    } else if (j >= rtWall && i < tpWall) {
         atomicAdd(&color_counts[bucketIdx], 2);
     } else {
         atomicAdd(&color_counts[bucketIdx], 1);
