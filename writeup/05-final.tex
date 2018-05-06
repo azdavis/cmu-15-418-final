@@ -189,14 +189,32 @@ each thread and combining them in parallel.
 \subsection{Build Mask and Refine Mask}
 We parallelized building and refining the mask by parallelizing over the rows
 of the image. We chose rows because it gave us enough arithmetic computation
-while still giving us the granularity we needed for the computation. We
-experimented with using SIMD in the inner loop over each column, but that was
+while still giving us the granularity we needed for the computation.
+
+We experimented with using SIMD in the inner loop over each column, but that was
 around 1.5x slower than without SIMD. This is probably because there is an
 uneven workload in one row. Each loop iteration only writes to an array if there
 is a conditional, so there is uneven work that causes SIMD to take longer.
 
 \subsection{Blur}
+Similar to the previous steps, we parallelized over the rows for the blur.
+However, the work of each row varied significantly. This is because rows
+with pixels in the foreground are not blurred, saving $50^2$ computations
+with a filter size of 50. So, we used dyanamic scheduling with OpenMP in order
+to distribute the work evenly. With parallelizing over rows and dynamic
+scheduling, we were able to maintain a small granularity while still having
+even work among the threads. With dynamic over static scheduling we were able
+to achieve around 50 percent speedup for blur on large images. (From 15s to 10s)
 
+We also tried adjusting the chunk size with dynamic scheduling in order to
+reduce the amount of overhead with scheduling the work. However, changing
+the chunk size to 5 or 10 did not increase the speed. Increasing chunk size
+only increased the time differences between threads. We also experimented with
+using SIMD over the columns for the inner loop of the blur. However, this
+resulted in a blur that was around the same time as without SIMD. This is
+because new colors for each pixel were not adjacent in memory and required
+scatter operations to write to them. Many of the memory accesses also required
+gather operations, which slowed down the vectorization speedups from SIMD.
 
 \section{Results}
 
