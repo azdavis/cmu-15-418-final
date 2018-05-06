@@ -9,6 +9,7 @@ OBJS = lib/cycletimer.o lib/ppm.o lib/etc.o
 ISPCDEPS = $(OBJS) lib/portrait_ispc.o lib/portrait_ispc.hpp lib/tasksys.o
 ISPCFLAGS = -lpthread
 
+.SUFFIXES:
 .PHONY: all help clean regress
 
 all: main-cpp main-omp main-cu main-ispc ## make all 4 implementations
