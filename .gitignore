@@ -1,10 +1,10 @@
-*._ispc.h
 *.jpg
 *.o
 *.ppm
 *.pyc
 *.swp
 *.tar
+*_ispc.h
 *~
 .__afs*
 .DS_Store
