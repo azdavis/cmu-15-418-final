@@ -27,11 +27,11 @@ int main(int argc, char **argv) {
     int rtWall = (W * (LTRTWALLDENOM - 1)) / LTRTWALLDENOM;
     int tpWall = H / TPWALLDENOM;
 
-    int *color_counts = calloc(BUCKETS * BUCKETS * BUCKETS, sizeof(int));
-    char *oldMask = calloc(W * H, sizeof(char));
-    char *mask = calloc(W * H, sizeof(char));
-    float *blurKernel = calloc(FILTER_SIZE * FILTER_SIZE, sizeof(float));
-    PPMPixel *blurData = calloc(W * H, sizeof(PPMPixel));
+    int *color_counts = (int *) calloc(BUCKETS * BUCKETS * BUCKETS, sizeof(int));
+    char *oldMask = (char *) calloc(W * H, sizeof(char));
+    char *mask = (char *) calloc(W * H, sizeof(char));
+    float *blurKernel = (float *) calloc(FILTER_SIZE * FILTER_SIZE, sizeof(float));
+    PPMPixel *blurData = (PPMPixel *) calloc(W * H, sizeof(PPMPixel));
     if (color_counts == NULL ||
         oldMask == NULL ||
         mask == NULL ||
@@ -95,8 +95,8 @@ int main(int argc, char **argv) {
     #pragma omp parallel for shared(i) private(j)
     for (i = 2; i < H - 2; i++) {
         for (j = 2; j < W - 2; j++) {
-            char this = oldMask[i * W + j];
-            if (this == 0) {
+            char c = oldMask[i * W + j];
+            if (c == 0) {
                 int borderSum =
                     oldMask[(i - 1) * W + j] +
                     oldMask[i * W + j - 1] +
