@@ -19,15 +19,27 @@ in_fnames = [
 
 cpp_prog = "./main-cpp"
 omp_prog = "./main-omp"
-cuda_prog = "./main-cu"
 ispc_prog = "./main-ispc"
+cuda_prog = "./main-cu"
 
 programs = [
     cpp_prog,
     omp_prog,
-    cuda_prog,
     ispc_prog,
+    cuda_prog,
 ]
+
+table_begin = "\\begin{tabular}{r|r|r|r|r|r|r|r}"
+with_slash = "\\\\  "
+no_slash = "    "
+slash_hline = with_slash + "\\hline"
+row_header = no_slash + (
+    "Item & C++ & "
+    "OMP & Speedup & "
+    "ISPC & Speedup & "
+    "CUDA & Speedup"
+)
+float_str = " & {:.4f}"
 
 time_items = [
     u"init",
@@ -46,6 +58,20 @@ def dict_sum(a):
 
 def dict_is_lt(a, b):
     return dict_sum(a) - dict_sum(b) < 0
+
+def print_row(title, get, sums=None):
+    print(title, end="")
+    cpp_time = 0
+    for prog in programs:
+        time = get(prog)
+        if sums is not None:
+            sums[prog] += time
+        print(float_str.format(time), end="")
+        if prog == cpp_prog:
+            cpp_time = time
+        else:
+            print(float_str.format(cpp_time / time), end="")
+    print("")
 
 data = {}
 
@@ -70,32 +96,6 @@ for prog in programs:
             if cur is None or dict_is_lt(new, cur):
                 data[prog][in_f] = new
         os.remove(check)
-
-table_begin = "\\begin{tabular}{r|r|r|r|r|r|r|r}"
-with_slash = "\\\\  "
-no_slash = "    "
-slash_hline = with_slash + "\\hline"
-row_header = no_slash + (
-    "Item & C++ & "
-    "OMP & Speedup & "
-    "CUDA & Speedup & "
-    "ISPC & Speedup"
-)
-float_str = " & {:.4f}"
-
-def print_row(title, get, sums=None):
-    print(title, end="")
-    cpp_time = 0
-    for prog in programs:
-        time = get(prog)
-        if sums is not None:
-            sums[prog] += time
-        print(float_str.format(time), end="")
-        if prog == cpp_prog:
-            cpp_time = time
-        else:
-            print(float_str.format(cpp_time / time), end="")
-    print("")
 
 for in_f in in_fnames:
     print("\\subsection{" + in_f + "}")
