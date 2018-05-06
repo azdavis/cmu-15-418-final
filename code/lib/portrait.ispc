@@ -68,4 +68,3 @@ export void blur(uniform int width,
                               mask,
                               rowsPerTask);
 }
-
