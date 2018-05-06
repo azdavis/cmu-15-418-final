@@ -253,8 +253,10 @@ program.
 
 \subsection{Total}
 Below are the times and speedup we achieved for each method. Each of the times
-are taken from the minimum of 10 times we ran the program. The speedup is
-the time compared with optimized single-threaded C++ version.\\
+are taken from the minimum of 10 times we ran the program. We chose the
+minimum of the 10 trials in order to get as close as we could to how long
+the progrma actually took. The speedup is the time compared with optimized
+single-threaded C++ version.\\
 
 \begin{tabular}{r|r|r|r|r|r}
     Image & Size & C++ & OMP  & ISPC & CUDA
@@ -323,6 +325,50 @@ overhead of using threads.
 \includegraphics[scale=0.8]{time.jpg}
 \end{center}
 
+From each timing, we saw an almost linear relationship between time and size
+of image for each implementation. We also saw that taking longer to compute
+did not necessarily mean parallelism was more effective, as we achieved the
+most speedup with Flower.
+
+\subsection{Algorithm Speedup}
+
+Below are the specific speedups for each step of our algorithm. We measure them
+from our largest image Large Elephant, which is $2592 \times 3888$ px.
+
+\begin{tabular}{r|r|r|r|r|r|r|r}
+    Item & C++ & OMP & Speedup & ISPC & Speedup & CUDA & Speedup
+\\  \hline
+    init & 0.0118 & 0.0087 & 1.3505 & 0.0144 & 0.8203 & 0.1803 & 0.0655
+\\  color counts & 0.0283 & 0.0181 & 1.5624 & 0.0285 & 0.9946 & 0.0000 & 726.2308
+\\  build mask & 0.0640 & 0.0152 & 4.2228 & 0.0148 & 4.3311 & 0.0026 & 24.8173
+\\  refine mask & 0.0337 & 0.0162 & 2.0788 & 0.0183 & 1.8463 & 0.0000 & 1984.2353
+\\  blur & 112.7321 & 9.4200 & 11.9673 & 10.3574 & 10.8842 & 0.1695 & 665.0706
+\\  clean up & 0.3547 & 0.3436 & 1.0325 & 0.2981 & 1.1898 & 0.3844 & 0.9228
+\\  \hline
+    total & 113.2247 & 9.8219 & 11.5278 & 10.7315 & 10.5507 & 0.7369 & 153.6602
+\end{tabular}
+
+With almost every step of our algorithm, CUDA was able to achieve significant
+speedup over the sequential implementation. The largest amount of time spent
+for CUDA was the sequential writing the image to the file. CUDA was also
+unique because it had to transfer memory like the image from the CPU to the GPU.
+This led to the second most time spent in the init, which is due to the
+bandwidth of the interconnect. Because most of our time in CUDA was spent in
+file input output, we were satisfied with our implementation.
+
+For the CPU implementations, the bottleneck was the blur operation. Even though
+we were able to achieve speedup in the blur step, it still took most of the
+time. We parallelized across the build mask and refine mask steps, but their
+computational intensity was not high enough to allow for significant speedup.
+Instead, of the overhead of starting the paralleism only lead to around 2 to 4x
+speedup.
+
+\subsection{ISPC vs OMP}
+\begin{center}
+\includegraphics[scale=0.8]{cpu.jpg}
+\end{center}
+
+\section{Additional Data}
 \subsection{Elephant ($\mathbf{389 \times 584}$ px)}
 
 \begin{tabular}{r|r|r|r|r|r|r|r}
@@ -396,21 +442,6 @@ overhead of using threads.
 \\  clean up & 0.3049 & 0.2717 & 1.1221 & 0.2391 & 1.2755 & 0.2952 & 1.0329
 \\  \hline
     total & 88.9941 & 7.5728 & 11.7518 & 7.6757 & 11.5943 & 0.6067 & 146.6925
-\end{tabular}
-
-\subsection{Large Elephant ($\mathbf{2592 \times 3888}$ px)}
-
-\begin{tabular}{r|r|r|r|r|r|r|r}
-    Item & C++ & OMP & Speedup & ISPC & Speedup & CUDA & Speedup
-\\  \hline
-    init & 0.0118 & 0.0087 & 1.3505 & 0.0144 & 0.8203 & 0.1803 & 0.0655
-\\  color counts & 0.0283 & 0.0181 & 1.5624 & 0.0285 & 0.9946 & 0.0000 & 726.2308
-\\  build mask & 0.0640 & 0.0152 & 4.2228 & 0.0148 & 4.3311 & 0.0026 & 24.8173
-\\  refine mask & 0.0337 & 0.0162 & 2.0788 & 0.0183 & 1.8463 & 0.0000 & 1984.2353
-\\  blur & 112.7321 & 9.4200 & 11.9673 & 10.3574 & 10.8842 & 0.1695 & 665.0706
-\\  clean up & 0.3547 & 0.3436 & 1.0325 & 0.2981 & 1.1898 & 0.3844 & 0.9228
-\\  \hline
-    total & 113.2247 & 9.8219 & 11.5278 & 10.7315 & 10.5507 & 0.7369 & 153.6602
 \end{tabular}
 
 \end{document}
