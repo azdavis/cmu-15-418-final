@@ -5,29 +5,32 @@ CUDAC = nvcc
 CUDAFLAGS = -O3 -DCUDA -m64 --gpu-architecture compute_61
 OBJS = lib/cycletimer.o lib/ppm.o lib/etc.o
 
-.PHONY: all clean regress benchmark results
+.PHONY: all help clean regress benchmark results
 
-all: main-c main-omp main-cu
+all: main-c main-omp main-cu ## make all 3 implementations
 
-clean:
+help: ## show this help
+	@grep -F '##' Makefile | grep -Fv '@grep' | sed -E 's/:.*##/:/'
+
+clean: ## rm all generated files
 	rm -rf main-c main-omp main-cu lib/*.o
 
-regress: all
+regress: all ## check all implementations have the same output on a small test case
 	./check.sh img/elephant.ppm
 
-benchmark: all
+benchmark: all ## same as regress, but a larger test case
 	./check.sh img/large_elephant.ppm
 
-results: all
+results: all ## run each implementation a few times for each image, summarize results in LaTeX tables
 	./results.py
 
-main-c: main.c $(OBJS)
+main-c: main.c $(OBJS) ## the sequential C implementation
 	$(CC) $(CFLAGS) -o $@ $^
 
-main-omp: main.c $(OBJS)
+main-omp: main.c $(OBJS) ## the C implementation with OMP on
 	$(CC) $(CFLAGS) $(OMPFLAGS) -o $@ $^
 
-main-cu: main.cu $(OBJS)
+main-cu: main.cu $(OBJS) ## the CUDA implementation
 	$(CUDAC) $(CUDAFLAGS) -o $@ $^
 
 %.o: %.c %.h
