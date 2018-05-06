@@ -37,9 +37,6 @@ main-cu: main.cu $(OBJS) ## the CUDA implementation
 main-ispc: main-ispc.cpp $(ISPCDEPS) ## the ISPC + OMP implementation
 	$(CXX) $(CFLAGS) $(ISPCFLAGS) $(OMPFLAGS) -o $@ $^
 
-lib/tasksys.o: lib/tasksys.cpp
-	$(CXX) $(CFLAGS) -c -o $@ $<
-
 %.o: %.cpp %.hpp
 	$(CXX) $(CFLAGS) -c -o $@ $<
 
