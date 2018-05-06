@@ -95,8 +95,8 @@ int main(int argc, char **argv) {
     #pragma omp parallel for shared(i) private(j)
     for (i = 2; i < H - 2; i++) {
         for (j = 2; j < W - 2; j++) {
-            char this = oldMask[i * W + j];
-            if (this == 0) {
+            char cur = oldMask[i * W + j];
+            if (cur == 0) {
                 int borderSum =
                     oldMask[(i - 1) * W + j] +
                     oldMask[i * W + j - 1] +

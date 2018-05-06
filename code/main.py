@@ -42,10 +42,10 @@ ranges = [
 for xmin, xmax, ymin, ymax in ranges:
     for i in range(ymin, ymax):
         for j in range(xmin, xmax):
-            this = img[i][j]
-            r = this[0] / bucket_size
-            g = this[1] / bucket_size
-            b = this[2] / bucket_size
+            cur = img[i][j]
+            r = cur[0] / bucket_size
+            g = cur[1] / bucket_size
+            b = cur[2] / bucket_size
             color_counts[r][g][b] += 1
 
 # get initial mask
@@ -58,10 +58,10 @@ mask = np.zeros((height, width))
 
 for i in range(height):
     for j in range(width):
-        this = dude[i][j]
-        r = this[0] / bucket_size
-        g = this[1] / bucket_size
-        b = this[2] / bucket_size
+        cur = dude[i][j]
+        r = cur[0] / bucket_size
+        g = cur[1] / bucket_size
+        b = cur[2] / bucket_size
         if color_counts[r][g][b] < bcThresh:
             dude[i][j] = np.array([0,255,0])
             mask[i][j] = 1
@@ -72,8 +72,8 @@ newMask = np.copy(mask, True)
 
 for i in range(2, height-2):
     for j in range(2, width-2):
-        this = mask[i][j]
-        if this == 0:
+        cur = mask[i][j]
+        if cur == 0:
             borderSum = (mask[i-1][j] + mask[i][j-1] +
                          mask[i+1][j] + mask[i][j+1] +
                          mask[i-2][j] + mask[i][j-2] +
