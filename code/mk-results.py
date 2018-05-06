@@ -85,7 +85,8 @@ for in_f in in_fnames:
             print("run {} on {} iter {} of {}... ".format(
                 prog, in_f, i + 1, iters), file=sys.stderr, end="")
             out = subprocess.check_output([prog, in_f, out_f])
-            if check is None and prog == cpp_prog:
+            if check is None:
+                # it should be that prog == cpp_prog
                 print("create ref img", file=sys.stderr)
                 check = out_f
             elif subprocess.call(["cmp", out_f, check]) == 0:
