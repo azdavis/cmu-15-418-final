@@ -62,7 +62,7 @@ for prog in programs:
             if cur is None or dict_is_lt(new, cur):
                 data[prog][in_f] = new
 
-table_begin = "\\begin{tabular}{r|r|r|r|r|r}"
+table_begin = "\\begin{tabular}{r|r|r|r|r|r|r|r}"
 with_slash = "\\\\  "
 no_slash = "    "
 row_header = no_slash + (
