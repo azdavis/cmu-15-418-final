@@ -15,7 +15,7 @@ help: ## show this help
 	@grep -F '##' Makefile | grep -Fv '@grep' | sed -E 's/:.*##/:/'
 
 clean: ## rm all generated files
-	rm -rf main-c main-omp main-cu main-ispc lib/*.o
+	rm -rf main-c main-omp main-cu main-ispc lib/*.o lib/*_ispc.h
 
 regress: all ## check all implementations have the same output on a small test case
 	./check.sh img/elephant.ppm
