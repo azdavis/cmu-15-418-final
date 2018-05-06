@@ -1,7 +1,3 @@
-export uniform int func(uniform int x, uniform int y) {
-    return x + y + 1;
-}
-
 task void blur_task(uniform int width,
                     uniform int height,
                     uniform unsigned int8 imgData[],
