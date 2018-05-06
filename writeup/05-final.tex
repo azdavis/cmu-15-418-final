@@ -110,7 +110,10 @@ This requires synchronization after each step.
 We were interested in comparing the GPU and CPU implementations of
 our algorithm, so we implemented it in CUDA and OpenMP.
 To develop and solidify our algorithm, we first wrote an implementation with
-Python's NumPy before moving on to sequential C and then parallelism.
+Python's NumPy before moving on to sequential C and then parallelism. We
+experimented with several edge detection, gradient, and snake methods and
+decided the color distribution method gave us the best accuracy for foreground
+detection.
 
 \section{CUDA on GPU}
 We utilized the NVIDIA 1080x GPUs in the Gates Clusters with CUDA. The
@@ -177,7 +180,23 @@ time, and that overhead with parallelism would not increase our speedup.
 We first tried the atomic strategy we used for CUDA. Each thread was assigned
 a row and performed an atomic add to a color bucket for each background pixel.
 However, the overhead from gaining exclusive control to the bucket made the
-implementation slower than sequential.
+implementation around 2x slower than sequential. For large elephant, sequential
+was around 0.038s and with atomic parallel it was 0.95s.
+
+Additional methods would be to create local copies of the data structures for
+each thread and combining them in parallel.
+
+\subsection{Build Mask and Refine Mask}
+We parallelized building and refining the mask by parallelizing over the rows
+of the image. We chose rows because it gave us enough arithmetic computation
+while still giving us the granularity we needed for the computation. We
+experimented with using SIMD in the inner loop over each column, but that was
+around 1.5x slower than without SIMD. This is probably because there is an
+uneven workload in one row. Each loop iteration only writes to an array if there
+is a conditional, so there is uneven work that causes SIMD to take longer.
+
+\subsection{Blur}
+
 
 \section{Results}
 
