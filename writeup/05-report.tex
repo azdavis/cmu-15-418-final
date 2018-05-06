@@ -235,6 +235,20 @@ colors for each pixel were not adjacent in memory and required scatter
 operations to write to them. Many of the memory accesses also required gather
 operations, which slowed down the vectorization speedups from SIMD.
 
+\subsection{Blur with ISPC}
+We wanted to explore further possibilities with CPU parallelism, so we
+implemented the blur in parallel with ISPC. Similarly to our strategy with OMP,
+we we chose a dynamic scheduling method, creating a task for each row and
+launching them across the cores. We also utilized SIMD in order to process each
+column. It was interesting to explore the implementation details between ISPC
+and OMP with almost the same algorithm.
+
+We attempted to implement more parts of our algorithm with ISPC to compare, but
+we encountered some bugs in the compiler. Nevertheless, the blur was the
+most computationally intensive part of our algorithm. So, we used a hybrid
+approach with ISPC for the blur and OpenMP parallelism for the rest of the
+program.
+
 \section{Results}
 
 \subsection{Total}
