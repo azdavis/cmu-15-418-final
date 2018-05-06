@@ -63,7 +63,7 @@ for prog in programs:
                 data[prog][in_f] = new
 
 table_begin = "\\begin{tabular}{r|r|r|r|r|r}"
-row_header = "    Item & C (s) & OMP (s) & Speedup & CUDA (s) & Speedup & ISPC (s) & Speedup"
+row_header = "    Item & C++ (s) & OMP (s) & Speedup & CUDA (s) & Speedup & ISPC (s) & Speedup"
 row = "{} & {:.5f} & {:.5f} & {:.5f} & {:.5f} & {:.5f} & {:.5f} & {:.5f}"
 with_slash = "\\\\  "
 no_slash = "    "
