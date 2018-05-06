@@ -75,27 +75,27 @@ def print_row(title, get, sums=None):
 
 data = {}
 
-for prog in programs:
-    data[prog] = {}
-    for in_f in in_fnames:
-        data[prog][in_f] = None
-        check = None
+for in_f in in_fnames:
+    data[in_f] = {}
+    check = None
+    for prog in programs:
+        data[in_f][prog] = None
         for i in range(iters):
-            out_f = in_f.replace(".ppm", "") + prog.replace("./", "") + ".ppm"
+            out_f = in_f.replace(".ppm", "") + prog.replace("./", "-") + ".ppm"
             print(prog, in_f, i, file=sys.stderr)
             out = subprocess.check_output([prog, in_f, out_f])
             if check is None and prog == cpp_prog:
                 check = out_f
             elif subprocess.call(["cmp", out_f, check]) != 0:
                 print("correctness FAILED")
-                os.exit(1)
+                sys.exit(1)
             else:
                 os.remove(out_f)
             new = json.loads(out)
-            cur = data[prog][in_f]
+            cur = data[in_f][prog]
             if cur is None or dict_is_lt(new, cur):
-                data[prog][in_f] = new
-        os.remove(check)
+                data[in_f][prog] = new
+    os.remove(check)
 
 for in_f in in_fnames:
     print("\\subsection{" + in_f + "}")
@@ -109,7 +109,7 @@ for in_f in in_fnames:
     for ti in time_items:
         print(no_slash if first else with_slash, end="")
         first = False
-        get = lambda prog: data[prog][in_f][ti]
+        get = lambda prog: data[in_f][prog][ti]
         print_row(str(ti).replace("_", " "), get, sums)
     print(slash_hline)
     print(no_slash, end="")
