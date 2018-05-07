@@ -95,7 +95,7 @@ for in_f in in_fnames:
         data[in_f][prog] = None
         for i in range(iters):
             out_f = get_out_f(in_f, prog, i)
-            print("img {} prog {} ({}/{})... ".format(
+            print("img: {}, prog: {}, iter: {}/{}... ".format(
                 in_f, prog, i + 1, iters), file=sys.stderr, end="")
             out = subprocess.check_output([prog, in_f, out_f])
             if check is None:
