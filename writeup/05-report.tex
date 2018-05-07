@@ -51,7 +51,7 @@ parenthesis.
 
 \begin{enumerate}
     \item
-        Designiate the borders of the image as the background. Top, left, and
+        Designate the borders of the image as the background. Top, left, and
         right $\tfrac{1}{8}$ of image.
     \item
         Get a color distribution of the background region. For each background
@@ -115,14 +115,14 @@ This requires synchronization after each step.
 
 We were interested in comparing the GPU and CPU implementations of our
 algorithm, so we implemented it in CUDA and OpenMP. To develop and solidify our
-algorithm, we first wrote an implementation with Python's NumPy.
-We experimented with several edge detection, gradient, and snake methods and
+algorithm, we first wrote an implementation with Python's NumPy. We
+experimented with several edge detection, gradient, and snake methods and
 decided the color distribution method gave us the best accuracy for foreground
 detection.
 
-We then implemented the sequential C++ before parallelism. To our suprise, the
-sequential C++ version was significantly faster than the unoptimized python. The
-python program took 51 minutes for our smallest elephant image with a blur
+We then implemented the sequential C++ before parallelism. To our surprise, the
+sequential C++ version was significantly faster than the unoptimized python.
+The python program took 51 minutes for our smallest elephant image with a blur
 filter size of 50px, and our C++ version took 2.5 seconds for the same results.
 
 \section{CUDA on GPU}
@@ -160,7 +160,7 @@ less, so we just kept the two steps in two launches.
 \subsection{Blur}
 
 We were able to take advantage of the data parallelism for the blur, as each
-pixel's computation was indepedent from those of other pixels. So, each pixel
+pixel's computation was independent from those of other pixels. So, each pixel
 is mapped to one CUDA thread. Additionally, pixels spatially close are mapped
 to the same block. This allowed us to take advantage of the high amount of
 threads in each SM. This mapping significantly decreased the arithmetic
@@ -181,10 +181,10 @@ Thread mapping and shared memory for CUDA blur
 
 \section{OpenMP on CPU}
 
-We utilized the 16 thread CPUs in the Gates Clusters with OpenMP. For CPUs, there
-was not enough threads to parallelize across every pixel like on GPUs. So, we
-chose to parallelize across rows of the image, keeping arithmetic intensity
-high while using parallelism.
+We utilized the 16 thread CPUs in the Gates Clusters with OpenMP. For CPUs,
+there was not enough threads to parallelize across every pixel like on GPUs.
+So, we chose to parallelize across rows of the image, keeping arithmetic
+intensity high while using parallelism.
 
 \subsection{Color Counts}
 
@@ -218,7 +218,7 @@ longer.
 Similar to the previous steps, we parallelized over the rows for the blur.
 However, the work of each row varied significantly. This is because rows with
 pixels in the foreground are not blurred, saving $50^2$ computations with a
-filter size of 50. So, we used dyanamic scheduling with OpenMP in order to
+filter size of 50. So, we used dynamic scheduling with OpenMP in order to
 distribute the work evenly. With parallelizing over rows and dynamic
 scheduling, we were able to maintain a small granularity while still having
 even work among the threads. With dynamic over static scheduling we were able
@@ -236,6 +236,7 @@ operations to write to them. Many of the memory accesses also required gather
 operations, which slowed down the vectorization speedups from SIMD.
 
 \subsection{Blur with ISPC}
+
 We wanted to explore further possibilities with CPU parallelism, so we
 implemented the blur in parallel with ISPC. Similarly to our strategy with OMP,
 we we chose a dynamic scheduling method, creating a task for each row and
@@ -244,18 +245,18 @@ column. It was interesting to explore the implementation details between ISPC
 and OMP with almost the same algorithm.
 
 We attempted to implement more parts of our algorithm with ISPC to compare, but
-we encountered some bugs in the compiler. Nevertheless, the blur was the
-most computationally intensive part of our algorithm. So, we used a hybrid
-approach with ISPC for the blur and OpenMP parallelism for the rest of the
-program.
+we encountered some bugs in the compiler. Nevertheless, the blur was the most
+computationally intensive part of our algorithm. So, we used a hybrid approach
+with ISPC for the blur and OpenMP parallelism for the rest of the program.
 
 \section{Results}
 
 \subsection{Total}
+
 Below are the times and speedup we achieved for each method. Each of the times
 are taken from the minimum of 10 times we ran the program. We chose the
 minimum of the 10 trials in order to get as close as we could to how long
-the progrma actually took. The speedup is the time compared with optimized
+the program actually took. The speedup is the time compared with optimized
 single-threaded C++ version.\\
 
 \begin{tabular}{r|r|r|r|r|r}
@@ -281,9 +282,9 @@ single-threaded C++ version.\\
 \end{tabular}
 
 Overall, we were satisfied with the speedup we achieved. With the CPUS having
-16 hyperthreads, we were able to acheive 11x speedup with OMP and ISPC.
-With GPUs, we achieved 150x speedup over the CPU sequential implementation,
-reducing operations that took minutes to less than a second.
+16 hyperthreads, we were able to achieve 11x speedup with OMP and ISPC. With
+GPUs, we achieved 150x speedup over the CPU sequential implementation, reducing
+operations that took minutes to less than a second.
 
 It was also very interesting comparing the performance of many different
 platforms and the changes to implementations we had to make for OMP, ISPC and
@@ -292,13 +293,13 @@ CUDA.
 We can see that the GPU implementation easily beats out both CPU
 implementations. This is mostly due to the hardware nature of GPUs, having
 enough threads to be able to parallelize operations per pixel. When we compare
-a 20 SM NVIDA GTX 1080 handling thousands of threads each with a CPU that has 16
-threads, it is easy to see the sheer power of GPUs. GPUs hold true to their
+a 20 SM NVIDA GTX 1080 handling thousands of threads each with a CPU that has
+16 threads, it is easy to see the sheer power of GPUs. GPUs hold true to their
 name as graphical processing units, as they are the ideal hardware to perform
 image operations.
 
 The fundamental difference between are GPU and CPU implementations was that
-with the number of threads availible, we had to parallelize over rows in CPUs
+with the number of threads available, we had to parallelize over rows in CPUs
 while we were able to parallelize over pixels in GPUs. We also took advantage
 of different concepts in parallel programming on each platform. For CPUs, we
 explicitly used dynamic scheduling and SIMD. For GPUs, we used shared memory
@@ -315,20 +316,20 @@ speedup. Because the flower image had a larger region of background, more blur
 was needed and the GPU was able to achieve more speedup than larger images like
 purp.
 
-In addition, we found out that speedup with CPUs was relatively constant
-for each differently sized image, hovering at around 11x. Meanwhile, speedup
-on GPUs heavily fluctuated and significantly increased with image size. This
-is likely due to the higher overhead of launching CUDA threads versus the
-overhead of using threads.
+In addition, we found out that speedup with CPUs was relatively constant for
+each differently sized image, hovering at around 11x. Meanwhile, speedup on
+GPUs heavily fluctuated and significantly increased with image size. This is
+likely due to the higher overhead of launching CUDA threads versus the overhead
+of using threads.
 
 \begin{center}
 \includegraphics[scale=0.8]{time.jpg}
 \end{center}
 
-From each timing, we saw an almost linear relationship between time and size
-of image for each implementation. We also saw that taking longer to compute
-did not necessarily mean parallelism was more effective, as we achieved the
-most speedup with Flower.
+From each timing, we saw an almost linear relationship between time and size of
+image for each implementation. We also saw that taking longer to compute did
+not necessarily mean parallelism was more effective, as we achieved the most
+speedup with Flower.
 
 \subsection{Algorithm Speedup}
 
@@ -350,18 +351,18 @@ from our largest image Large Elephant, which is $2592 \times 3888$ px.
 
 With almost every step of our algorithm, CUDA was able to achieve significant
 speedup over the sequential implementation. The largest amount of time spent
-for CUDA was the sequential writing the image to the file. CUDA was also
-unique because it had to transfer memory like the image from the CPU to the GPU.
-This led to the second most time spent in the init, which is due to the
-bandwidth of the interconnect. Because most of our time in CUDA was spent in
-file input output, we were satisfied with our implementation.
+for CUDA was the sequential writing the image to the file. CUDA was also unique
+because it had to transfer memory like the image from the CPU to the GPU. This
+led to the second most time spent in the init, which is due to the bandwidth of
+the interconnect. Because most of our time in CUDA was spent in file input
+output, we were satisfied with our implementation.
 
 For the CPU implementations, the bottleneck was the blur operation. Even though
 we were able to achieve speedup in the blur step, it still took most of the
 time. We parallelized across the build mask and refine mask steps, but their
 computational intensity was not high enough to allow for significant speedup.
-Instead, of the overhead of starting the paralleism only lead to around 2 to 4x
-speedup.
+Instead, of the overhead of starting the parallelism only lead to around 2 to
+4x speedup.
 
 \subsection{ISPC vs OMP}
 \begin{center}
@@ -369,45 +370,48 @@ speedup.
 \end{center}
 
 It was very interesting to compare two different CPU parallel frameworks on the
-same code and same hardware. Both approaches used dynamic scheduling and
-small granularity to ensure equal work per worker. However, ISPC utilized SIMD
+same code and same hardware. Both approaches used dynamic scheduling and small
+granularity to ensure equal work per worker. However, ISPC utilized SIMD
 instructions in the blur process. However, using SIMD in ISPC did not increase
 speedup over OMP. This is mainly because the ISPC compiler told us we had
 several gather and scatter operations. One large barrier was when the member of
 a gang accessed each red color value from the pixel. Since there is also a
-green and blue value per pixel, the memory was not contiguous and needed
-a gather to read and scatter to write. Additionally, our weights were stored
-as floats and the colors were stored as unsigned int8, and the ISPC compiler
-told us that doing this conversion was very costly. The OMP and ISPC
-implementations were both very close in time and speedup, but the OMP turned out
-to be slightly better at the end.
+green and blue value per pixel, the memory was not contiguous and needed a
+gather to read and scatter to write. Additionally, our weights were stored as
+floats and the colors were stored as unsigned int8, and the ISPC compiler told
+us that doing this conversion was very costly. The OMP and ISPC implementations
+were both very close in time and speedup, but the OMP turned out to be slightly
+better at the end.
 
 \section{Conclusion}
-Overall, we were able to apply what we learned from 15-418 to speed up an
-image processing application. By developing our application in three
-differnet parallel frameworks, we learned alot about the differences in
-implementation between each framework and their effects on speedup. Each
-platform had their own advantages and disadvantages, mainly rooted in hardware
-like the number of threads or the cost of data transfer.
+
+Overall, we were able to apply what we learned from 15-418 to speed up an image
+processing application. By developing our application in three different
+parallel frameworks, we learned a lot about the differences in implementation
+between each framework and their effects on speedup. Each platform had their
+own advantages and disadvantages, mainly rooted in hardware like the number of
+threads or the cost of data transfer.
 
 In the future, we hope to be able to figure out how to further vectorize our
-CPU code to achieve speedup with SIMD. For example, we could change the
-our iamge data structure to ensure contigious memory acess. We also would like
-to implement our algorithm on parallel image processing frameworks like Hallide.
+CPU code to achieve speedup with SIMD. For example, we could change the our
+image data structure to ensure contiguous memory access. We also would like to
+implement our algorithm on parallel image processing frameworks like Halide.
 
 \section{Work Distribution}
+
 Ariel and Jerry both performed equal work. Ariel did many of the OpenMP
-optimizations, wrote the Makefiles, built the testing framework, and set up
-all of the different parallel environments. Jerry helped with the OpenMP and
-wrote the ISPC and CUDA optimizations. We both also developed the python and
-C++ sequential implementations.
+optimizations, wrote the Makefiles, built the testing framework, and set up all
+of the different parallel environments. Jerry helped with the OpenMP and wrote
+the ISPC and CUDA optimizations. We both also developed the python and C++
+sequential implementations.
 
 \section{References}
+
 Our image segmentation algorithm was a simplified version of the grab cut
-algorithm.
-https://cvg.ethz.ch/teaching/cvl/2012/grabcut-siggraph04.pdf
+algorithm. \url{https://cvg.ethz.ch/teaching/cvl/2012/grabcut-siggraph04.pdf}
 
 \section{Additional Data}
+
 \subsection{Elephant ($\mathbf{389 \times 584}$ px)}
 
 \begin{tabular}{r|r|r|r|r|r|r|r}
