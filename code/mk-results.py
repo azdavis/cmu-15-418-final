@@ -21,7 +21,7 @@ in_fnames = [
     "./img/tiger.ppm",
 ]
 
-# first program is used as reference for correctness
+# first program is used as reference for correctness and speedup
 programs = [
     "./main-cpp",
     "./main-omp",
@@ -63,14 +63,14 @@ def dict_is_lt(a, b):
 
 def print_row(title, get):
     print(title, end="")
-    cpp_time = None
+    ref_time = None
     for prog in programs:
         time = get(prog)
         print(float_str.format(time), end="")
-        if cpp_time is None:
-            cpp_time = time
+        if ref_time is None:
+            ref_time = time
         else:
-            print(float_str.format(cpp_time / time), end="")
+            print(float_str.format(ref_time / time), end="")
     print("")
 
 data = {}
