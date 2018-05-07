@@ -1,18 +1,6 @@
-\documentclass[12pt]{article}
-\usepackage[english]{babel}
-\usepackage[letterpaper,margin=1in]{geometry}
-\usepackage[parfill]{parskip}
-\usepackage{hyperref}
-\usepackage{graphicx}
-\graphicspath{{img/}}
-\frenchspacing
-\author{Ariel Davis (azdavis), Jerry Yu (jerryy)}
-\date{\today}
-\title{15-418 Final Project Proposal Checkpoint}
-\begin{document}
-\maketitle
+# 15-418 Final Project Proposal Checkpoint}
 
-\subsection{Overview}
+### Overview
 
 We have decided to build bokeh portrait mode in parallel.
 
@@ -25,10 +13,7 @@ blur done mainly with image processing. (Google Pixel 2) Many smartphones in
 the market currently use multiple cameras (IPhone X) for depth detection but
 our project will focus on the image processing method.
 
-\begin{center}
-\includegraphics[scale=0.5]{ex.jpg}
-\cite{pixel-ml}
-\end{center}
+![ex.jpg](img/ex.jpg)
 
 Portrait mode can be seperated into two main steps. The first is the segment
 the given image into a foreground and background. Segmentation is done in order
@@ -44,13 +29,12 @@ little dependencies after the blur process. Depending on which segmentation
 algorithm we utilize (options explained in next section), we will also
 implement it in parallel to achieve speedup.
 
-\subsection{Part 1: Segmentation}
+### Part 1: Segmentation
 
 There are several different implementations of foreground/background removal
 and extraction algorithms. In order to maximize parallelism and due to our lack
 of knowledge for machine learning, we will focus on classic computer vision
 methods rather than identifying foreground with convolutional neural nets.
-\cite{pixel-ml}
 
 Some of the main algorithms we have looked at are active contour methods
 (snake), principle component analysis, and graph cut algorithms.
@@ -71,47 +55,41 @@ its energy and the energy of the pixels in the image. The energy is then used
 to make decisions for the points of a snake.
 
 An alternative way to calculate the energy is to apply the Canny Edge Detection
-Algorithm. \cite{canny-edge} It first applies a filter to remove noise in the
-image, finds intensity gradients taking derivatives of the pixels, applies non-
-maximum suppression, applies thresholds to find potential edges, and removing
-weak edges not connected to strong edges. Finding intensity gradients involves
+Algorithm. It first applies a filter to remove noise in the image, finds
+intensity gradients taking derivatives of the pixels, applies non- maximum
+suppression, applies thresholds to find potential edges, and removing weak
+edges not connected to strong edges. Finding intensity gradients involves
 convolving filters in the image to detect the vertical, horizontal and diagonal
 edges. A version of the canny edge detection algorithm is implemented in
-OpenCV. \cite{canny-edge} This can be used to benchmark our parallel
-performance.
+OpenCV. This can be used to benchmark our parallel performance.
 
-\begin{center}
-\includegraphics[scale=0.5]{snake-contour-example.jpg}
-\cite{contour-model}
-\end{center}
+![snake-contour-example.jpg](img/snake-contour-example.jpg)
 
 Each point of the snake has its own energy and the decision to move the point
 is independent to the other points of the snake, so there is opportunity to
 utilize parallelism. OpenMP can be utilized here if there are around 12 points
 used in the snake. There are several implementations of active contour, mainly
-with OpenCV, which can be benchamrked against for performance. \cite{cv-active}
+with OpenCV, which can be benchamrked against for performance.
 
 Other methods of segmentation seemed much more challenging to implement. We
-looked into Principle Component Analysis. \cite{pca-git} \cite{pca-paper} And
-also the default implementaton of foreground extraction on OpenCV, with graph
-cuts. \cite{cv-graphcut} \cite{grabcut-paper}
+looked into Principle Component Analysis. And also the default implementaton of
+foreground extraction on OpenCV, with graph cuts.
 
 By the proposal, we will have solidified the algorithm we will use for
 segmentation.
 
-\subsection{Part 2: Bokeh Blur}
+### Part 2: Bokeh Blur
 
 The Bokeh effect is implemented by applying a filter in the shape of a polygon
 across an image. Values are accumulated by shifting the image in a shape and
 computing a weighted sum. This can be heavily parallelized across CUDA.
-\cite{bokeh}
 
-\subsection{Hardware}
+### Hardware
 
 We will use the gates machines, as they have GPUS if we use CUDA and a high
 number of hyperthreads for OMP processing.
 
-\subsection{Overall}
+### Overall
 
 Overall, we are looking to use CUDAs on GPUs because we are often able to
 parallelize across all the pixels of an image to apply all our filters and
@@ -130,33 +108,14 @@ part of the image as much as possible to reduce this. Like in assignment 2, we
 have to find the best way to map the CUDA cores to the image, in order for
 optimal shared memory and cache access.
 
-\begin{thebibliography}{999}
-\bibitem{pixel-ml}
-\url
-{https://research.googleblog.com/2017/10/portrait-mode-on-pixel-2-and-pixel-2-xl.html}
-\bibitem{contour-model}
-\url
-{https://en.wikipedia.org/wiki/Active_contour_model}
-\bibitem{canny-edge}
-\url
-{http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_canny/py_canny.html}
-\bibitem{cv-active}
-\url
-{http://eric-yuan.me/active-contour-snakes/}
-\bibitem{pca-git}
-\url
-{https://github.com/fastai/numerical-linear-algebra/blob/master/nbs/3.\%20background\%20removal\%20with\%20robust\%20pca.ipynb}
-\bibitem{pca-paper}
-\url
-{http://cdn.intechopen.com/pdfs/30443.pdf}
-\bibitem{cv-graphcut}
-\url
-{https://docs.opencv.org/trunk/d8/d83/tutorial_py_grabcut.html}
-\bibitem{grabcut-paper}
-\url
-{https://dl.acm.org/citation.cfm?id=1015720}
-\bibitem{bokeh}
-\url
-{https://www.scratchapixel.com/lessons/digital-imaging/simple-image-manipulations/bookeh-effect}
-\end{thebibliography}
-\end{document}
+### Citations
+
+- https://research.googleblog.com/2017/10/portrait-mode-on-pixel-2-and-pixel-2-xl.html
+- https://en.wikipedia.org/wiki/Active_contour_model
+- http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_canny/py_canny.html
+- http://eric-yuan.me/active-contour-snakes/
+- https://github.com/fastai/numerical-linear-algebra/blob/master/nbs/3.%20background%20removal%20with%20robust%20pca.ipynb
+- http://cdn.intechopen.com/pdfs/30443.pdf
+- https://docs.opencv.org/trunk/d8/d83/tutorial_py_grabcut.html
+- https://dl.acm.org/citation.cfm?id=1015720
+- https://www.scratchapixel.com/lessons/digital-imaging/simple-image-manipulations/bookeh-effect
