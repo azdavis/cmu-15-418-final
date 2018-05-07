@@ -77,10 +77,6 @@ def print_row(title, get):
             print(float_str.format(cpp_time / time), end="")
     print("")
 
-def update_sums(get, sums):
-    for prog in programs:
-        sums[prog] += get(prog)
-
 def get_out_f(in_f, prog, i):
     return (
         in_f.replace(".ppm", "") +
@@ -132,7 +128,8 @@ for in_f in in_fnames:
         first = False
         get = lambda prog: data[in_f][prog][ti]
         print_row(str(ti).replace("_", " "), get)
-        update_sums(get, sums)
+        for prog in programs:
+            sums[prog] += get(prog)
     print(slash_hline)
     print(no_slash, end="")
     print_row("total", lambda prog: sums[prog])
