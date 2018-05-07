@@ -78,12 +78,10 @@ def print_row(title, get):
     print("")
 
 def get_out_f(in_f, prog, i):
-    return (
-        in_f.replace(".ppm", "") +
-        prog.replace("./", "-") +
-        "-" +
-        str(i) +
-        ".ppm"
+    return "{}-{}-{}.ppm".format(
+        in_f.replace(".ppm", ""),
+        prog.replace("./", ""),
+        i,
     )
 
 data = {}
