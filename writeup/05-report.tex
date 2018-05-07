@@ -121,8 +121,8 @@ decided the color distribution method gave us the best accuracy for foreground
 detection.
 
 We then implemented the sequential C++ before parallelism. To our surprise, the
-sequential C++ version was significantly faster than the unoptimized python.
-The python program took 51 minutes for our smallest elephant image with a blur
+sequential C++ version was significantly faster than the unoptimized Python.
+The Python program took 51 minutes for our smallest elephant image with a blur
 filter size of 50px, and our C++ version took 2.5 seconds for the same results.
 
 \section{CUDA on GPU}
@@ -407,7 +407,7 @@ implement our algorithm on parallel image processing frameworks like Halide.
 Ariel and Jerry both performed equal work. Ariel did many of the OpenMP
 optimizations, wrote the Makefiles, built the testing framework, and set up all
 of the different parallel environments. Jerry helped with the OpenMP and wrote
-the ISPC and CUDA optimizations. We both also developed the python and C++
+the ISPC and CUDA optimizations. We both also developed the Python and C++
 sequential implementations. We both discussed implementation ideas and
 strategies with each other, and collaborated on each report.
 
