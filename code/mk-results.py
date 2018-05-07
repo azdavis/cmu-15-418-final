@@ -12,7 +12,7 @@ if len(sys.argv) != 1:
 
 iters = 10
 
-in_fnames = [
+images = [
     "./img/bluejay.ppm",
     "./img/elephant.ppm",
     "./img/flower.ppm",
@@ -75,36 +75,36 @@ def print_row(title, get):
 
 data = {}
 
-for in_f in in_fnames:
-    data[in_f] = {}
+for img in images:
+    data[img] = {}
     check = None
     for prog in programs:
-        data[in_f][prog] = None
+        data[img][prog] = None
         for i in range(iters):
-            in_f_disp = in_f.replace(".ppm", "")
+            img_disp = img.replace(".ppm", "")
             prog_disp = prog.replace("./", "")
             i_disp = str(i + 1)
-            out_f = "{}-{}-{}.ppm".format(in_f_disp, prog_disp, i_disp)
+            outf = "{}-{}-{}.ppm".format(img_disp, prog_disp, i_disp)
             print("img: {}, prog: {}, iter: {}/{}... ".format(
-                in_f_disp, prog_disp, i_disp, iters), file=sys.stderr, end="")
-            out = subprocess.check_output([prog, in_f, out_f])
+                img_disp, prog_disp, i_disp, iters), file=sys.stderr, end="")
+            time_json = subprocess.check_output([prog, img, outf])
             if check is None:
                 print("create ref img", file=sys.stderr)
-                check = out_f
-            elif subprocess.call(["cmp", check, out_f]) == 0:
+                check = outf
+            elif subprocess.call(["cmp", check, outf]) == 0:
                 print("matches ref img", file=sys.stderr)
-                os.remove(out_f)
+                os.remove(outf)
             else:
                 print("DOES NOT match ref img", file=sys.stderr)
                 sys.exit(1)
-            new = json.loads(out)
-            cur = data[in_f][prog]
+            new = json.loads(time_json)
+            cur = data[img][prog]
             if cur is None or dict_is_lt(new, cur):
-                data[in_f][prog] = new
+                data[img][prog] = new
     os.remove(check)
 
-for in_f in in_fnames:
-    print("\\subsection{" + in_f + "}")
+for img in images:
+    print("\\subsection{" + img + "}")
     print(table_begin)
     print(row_header)
     print(slash_hline)
@@ -115,7 +115,7 @@ for in_f in in_fnames:
     for ti in time_items:
         print(no_slash if first else with_slash, end="")
         first = False
-        get = lambda prog: data[in_f][prog][ti]
+        get = lambda prog: data[img][prog][ti]
         print_row(str(ti).replace("_", " "), get)
         for prog in programs:
             sums[prog] += get(prog)
