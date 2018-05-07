@@ -1,16 +1,6 @@
-\documentclass[12pt]{article}
-\usepackage[english]{babel}
-\usepackage[letterpaper,margin=1in]{geometry}
-\usepackage[parfill]{parskip}
-\usepackage{hyperref}
-\frenchspacing
-\author{Ariel Davis (azdavis), Jerry Yu (jerryy)}
-\date{\today}
-\title{15-418 Final Project Proposal: Portrait Mode}
-\begin{document}
-\maketitle
+# 15-418 Final Project Proposal: Portrait Mode
 
-\section{Summary}
+## Summary
 
 We are going to build portrait mode with bokeh blur on NVIDIA GPUs.
 
@@ -20,7 +10,7 @@ shapes. Recently, smartphone cameras without specialized hardware have gained
 the ability to take portrait mode pictures by using software-only background
 detection and manipulation methods, which is what we will implement.
 
-\section{Background}
+## Background
 
 There are two main stages to our application, extracting the background and
 blurring.
@@ -43,33 +33,25 @@ shape and computing a weighted sum.
 
 Repeat the following steps before snake converges, when each point finds a
 energy difference above a threshold.
-\begin{enumerate}
-    \item
-        Calculate energy values for each pixel
-        \begin{enumerate}
-            \item
-                Get grayscale image by averaging RGB values of each pixel.
-                (Highly parallelizable across pixels)
-            \item
-                Calculate edges by convolving a gaussian filter across the
-                image. (Highly parallelizable across pixels)
-        \end{enumerate}
-    \item
-        Move each point of snake based on energy value. (Parallelizable across
-        point of snake)
-    \item
-        Compute internal energy of snake. (Requires synchronization within a
-        snake)
-\end{enumerate}
 
-When Converged:
-\begin{enumerate}
-    \item
-        Convolve the image with the bokeh filter. (Highly parallelizable across
-        pixels)
-\end{enumerate}
+1.
+    Calculate energy values for each pixel
+    a.
+        Get grayscale image by averaging RGB values of each pixel.
+        (Highly parallelizable across pixels)
+    b.
+        Calculate edges by convolving a gaussian filter across the image.
+        (Highly parallelizable across pixels)
+2.
+    Move each point of snake based on energy value. (Parallelizable across
+    point of snake)
+3.
+    Compute internal energy of snake. (Requires synchronization within a snake)
 
-\section{The Challenge}
+Then, when converged: Convolve the image with the bokeh filter. (Highly
+parallelizable across pixels)
+
+## The Challenge
 
 A challenge is to use parallelism to speed up each step of the portrait mode
 process. A bottleneck in one process can significantly reduce speedup across
@@ -85,16 +67,15 @@ Overall, many of the steps are computationally heavy, with the convolutions of
 filters and calculating gradients in the image. Because we are processing the
 entire image, spatially dividing it up will allow for locality.
 
-\section{Resources}
+## Resources
 
 We will use the Gates cluster machines with the GPUs. We will follow the snake
-implementation outlined in the paper by Kass, Witkin, and Terzopoulous.
-\cite{paper} We are also planning on using the starter code in the github repo
-by adl1995 for implementations of Canny-Edge and Marr Hildreth. \cite{edge} To
-implement the Bokeh effect, we will follow the starter code in the tutorial.
-\cite{bokeh}
+implementation outlined in the paper by Kass, Witkin, and Terzopoulous. We are
+also planning on using the starter code in the github repo by adl1995 for
+implementations of Canny-Edge and Marr Hildreth. To implement the Bokeh effect,
+we will follow the starter code in the tutorial.
 
-\section{Goals and Deliverables}
+## Goals and Deliverables
 
 We plan to be able to implement portrait mode with kernels on a GPU. Any image
 will be taken as an input and the output would make it look like the image was
@@ -104,34 +85,25 @@ operations, we hope to be significantly faster than sequential methods.
 If we have time, we hope to adapt this algorithm to work for videos or gifs.
 Ideally, we can achieve realtime portrait mode in 30 fps. (30ms per image)
 
-\section{Platform Choice}
+## Platform Choice
 
 We will run this on GPUs, which are ideal for image processing. We will do our
 development, testing, and benchmarking on the GHC machines.
 
-\section{Schedule}
+## Schedule
 
-\begin{tabular}{l|l}
-    Date & Item \\
-    \hline
-    2018-04-11 & Proposal \\
-    2018-04-15 & Sequential Python: background detection and manipulation \\
-    2018-04-20 & Sequential C: background detection and manipulation \\
-    2018-05-05 & Parallel CUDA: background detection \\
-    2018-05-06 & Parallel CUDA: background manipulation \\
-    2018-05-07 & Writeup and poster \\
-    2018-05-08 & Presentation
-\end{tabular}
+| Date       | Item                                                     |
+|------------|----------------------------------------------------------|
+| 2018-04-11 | Proposal                                                 |
+| 2018-04-15 | Sequential Python: background detection and manipulation |
+| 2018-04-20 | Sequential C: background detection and manipulation      |
+| 2018-05-05 | Parallel CUDA: background detection                      |
+| 2018-05-06 | Parallel CUDA: background manipulation                   |
+| 2018-05-07 | Writeup and poster                                       |
+| 2018-05-08 | Presentation                                             |
 
-\begin{thebibliography}{999}
-\bibitem{edge}
-\url
-{https://github.com/adl1995/edge-detectors}
-\bibitem{paper}
-\url
-{http://www.cs.ait.ac.th/~mdailey/cvreadings/Kass-Snakes.pdf}
-\bibitem{bokeh}
-\url
-{https://www.scratchapixel.com/lessons/digital-imaging/simple-image-manipulations/bookeh-effect}
-\end{thebibliography}
-\end{document}
+## Citations
+
+- https://github.com/adl1995/edge-detectors
+- http://www.cs.ait.ac.th/~mdailey/cvreadings/Kass-Snakes.pdf
+- https://www.scratchapixel.com/lessons/digital-imaging/simple-image-manipulations/bookeh-effect
