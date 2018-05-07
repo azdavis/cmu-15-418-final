@@ -23,6 +23,7 @@ ispc_prog = "./main-ispc"
 cuda_prog = "./main-cu"
 
 programs = [
+    # cpp_prog must be first
     cpp_prog,
     omp_prog,
     ispc_prog,
@@ -61,13 +62,14 @@ def dict_is_lt(a, b):
 
 def print_row(title, get, sums=None):
     print(title, end="")
-    cpp_time = 0
+    cpp_time = None
     for prog in programs:
         time = get(prog)
         if sums is not None:
             sums[prog] += time
         print(float_str.format(time), end="")
-        if prog == cpp_prog:
+        if cpp_time is None:
+            # cpp_prog must be first
             cpp_time = time
         else:
             print(float_str.format(cpp_time / time), end="")
@@ -95,7 +97,7 @@ for in_f in in_fnames:
                 in_f, prog, i + 1, iters), file=sys.stderr, end="")
             out = subprocess.check_output([prog, in_f, out_f])
             if check is None:
-                # it should be that prog == cpp_prog
+                # cpp_prog must be first
                 print("create ref img", file=sys.stderr)
                 check = out_f
             elif subprocess.call(["cmp", check, out_f]) == 0:
