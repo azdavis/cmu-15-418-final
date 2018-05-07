@@ -5,7 +5,7 @@ import sys
 
 if len(sys.argv) != 3:
     print("usage: " + sys.argv[0] + " <infile> <outfile>")
-    sys.exit()
+    sys.exit(1)
 
 infile = sys.argv[1]
 outfile = sys.argv[2]
