@@ -34,19 +34,14 @@ shape and computing a weighted sum.
 Repeat the following steps before snake converges, when each point finds a
 energy difference above a threshold.
 
-1.
-    Calculate energy values for each pixel
-    a.
-        Get grayscale image by averaging RGB values of each pixel.
+1.  Calculate energy values for each pixel
+    1.  Get grayscale image by averaging RGB values of each pixel.
         (Highly parallelizable across pixels)
-    b.
-        Calculate edges by convolving a gaussian filter across the image.
+    2.  Calculate edges by convolving a gaussian filter across the image.
         (Highly parallelizable across pixels)
-2.
-    Move each point of snake based on energy value. (Parallelizable across
+2.  Move each point of snake based on energy value. (Parallelizable across
     point of snake)
-3.
-    Compute internal energy of snake. (Requires synchronization within a snake)
+3.  Compute internal energy of snake. (Requires synchronization within a snake)
 
 Then, when converged: Convolve the image with the bokeh filter. (Highly
 parallelizable across pixels)
