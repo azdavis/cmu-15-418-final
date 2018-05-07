@@ -21,17 +21,12 @@ in_fnames = [
     "./img/tiger.ppm",
 ]
 
-cpp_prog = "./main-cpp"
-omp_prog = "./main-omp"
-ispc_prog = "./main-ispc"
-cuda_prog = "./main-cu"
-
+# first program is used as reference for correctness
 programs = [
-    # cpp_prog must be first
-    cpp_prog,
-    omp_prog,
-    ispc_prog,
-    cuda_prog,
+    "./main-cpp",
+    "./main-omp",
+    "./main-ispc",
+    "./main-cu",
 ]
 
 table_begin = "\\begin{tabular}{r|r|r|r|r|r|r|r}"
