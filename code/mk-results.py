@@ -86,10 +86,7 @@ for in_f in in_fnames:
         data[in_f][prog] = None
         for i in range(iters):
             out_f = "{}-{}-{}.ppm".format(
-                in_f.replace(".ppm", ""),
-                prog.replace("./", ""),
-                i,
-            )
+                in_f.replace(".ppm", ""), prog.replace("./", ""), i)
             print("img: {}, prog: {}, iter: {}/{}... ".format(
                 in_f, prog, i + 1, iters), file=sys.stderr, end="")
             out = subprocess.check_output([prog, in_f, out_f])
