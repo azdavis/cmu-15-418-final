@@ -33,13 +33,15 @@ table_begin = "\\begin{tabular}{r|r|r|r|r|r|r|r}"
 with_slash = "\\\\  "
 no_slash = "    "
 slash_hline = with_slash + "\\hline"
+float_str = " & {:.4f}"
+
+# order should match programs
 row_header = no_slash + (
     "Item & C++ & "
     "OMP & Speedup & "
     "ISPC & Speedup & "
     "CUDA & Speedup"
 )
-float_str = " & {:.4f}"
 
 time_items = [
     u"init",
