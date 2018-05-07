@@ -1,6 +1,6 @@
 # 15-418 Final Project Proposal Checkpoint}
 
-### Overview
+## Overview
 
 We have decided to build bokeh portrait mode in parallel.
 
@@ -29,7 +29,7 @@ little dependencies after the blur process. Depending on which segmentation
 algorithm we utilize (options explained in next section), we will also
 implement it in parallel to achieve speedup.
 
-### Part 1: Segmentation
+## Part 1: Segmentation
 
 There are several different implementations of foreground/background removal
 and extraction algorithms. In order to maximize parallelism and due to our lack
@@ -78,18 +78,18 @@ foreground extraction on OpenCV, with graph cuts.
 By the proposal, we will have solidified the algorithm we will use for
 segmentation.
 
-### Part 2: Bokeh Blur
+## Part 2: Bokeh Blur
 
 The Bokeh effect is implemented by applying a filter in the shape of a polygon
 across an image. Values are accumulated by shifting the image in a shape and
 computing a weighted sum. This can be heavily parallelized across CUDA.
 
-### Hardware
+## Hardware
 
 We will use the gates machines, as they have GPUS if we use CUDA and a high
 number of hyperthreads for OMP processing.
 
-### Overall
+## Overall
 
 Overall, we are looking to use CUDAs on GPUs because we are often able to
 parallelize across all the pixels of an image to apply all our filters and
@@ -108,7 +108,7 @@ part of the image as much as possible to reduce this. Like in assignment 2, we
 have to find the best way to map the CUDA cores to the image, in order for
 optimal shared memory and cache access.
 
-### Citations
+## Citations
 
 - https://research.googleblog.com/2017/10/portrait-mode-on-pixel-2-and-pixel-2-xl.html
 - https://en.wikipedia.org/wiki/Active_contour_model
