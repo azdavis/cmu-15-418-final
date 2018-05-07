@@ -19,13 +19,13 @@ Repo: \url{https://github.com/azdavis/parallel-portrait-mode}
 \section{Overview}
 
 We implemented portrait mode in parallel. Portrait mode has traditionally been
-done by high end DSLR camera hardware, which the foreground of the subject is
-in focus and the background is blurred. We have chosen to use a software-only
-image processing approach to this problem, segmenting the image into the
-foreground and blurring the background.
+done by high end DSLR camera hardware, in which the foreground is in focus and
+the background is blurred. We have chosen to use a software-only image
+processing approach to this problem, segmenting the image into foreground and
+background, and blurring only the background.
 
-On our largest images, we were able to achieve 150x speedup with CUDA on GPUs
-and 11x speedup with OpenMP on CPUs.
+On our largest images, we were able to achieve upwards of 150x speedup with
+CUDA on GPUs and 11x speedup with OpenMP on CPUs.
 
 \begin{figure}[!htb]
     \begin{minipage}{0.48\textwidth}
@@ -44,7 +44,7 @@ and 11x speedup with OpenMP on CPUs.
 
 We used a simplified version of the grab-cut algorithm, with the idea of
 getting the color distribution of the background to find the foreground. Our
-algorithm takes in input image and returns the image in portrait mode.
+algorithm takes in an input image and returns the image in portrait mode.
 
 Each step of the algorithm will be referred to its shortened name in
 parenthesis.
@@ -90,7 +90,7 @@ Each image is represented as a struct with the width, height, and an array of
 pixels. Each pixel contains a red, green, and blue value. The size of the array
 is the number of pixels in the image.
 
-We stored the color counts by creating color buckets for every RGB value.
+We stored the color counts by creating color buckets for ranges of RGB values.
 Essentially, all colors in one bucket would be within 15 red, green, and blue
 value. This results in $\left(\tfrac{255}{15}\right)^3$ different buckets. So,
 we are able to store the color counts with an array, with each element
@@ -127,7 +127,7 @@ filter size of 50px, and our C++ version took 2.5 seconds for the same results.
 
 \section{CUDA on GPU}
 
-We utilized the NVIDIA 1080x GPUs in the Gates Clusters with CUDA. The general
+We utilized the NVIDIA 1080x GPUs on the GHC machines with CUDA. The general
 strategy for CUDA was to parallelize across the pixels in the image to take
 advantage of the high number of ALUs and threads.
 
@@ -181,10 +181,10 @@ Thread mapping and shared memory for CUDA blur
 
 \section{OpenMP on CPU}
 
-We utilized the 16 thread CPUs in the Gates Clusters with OpenMP. For CPUs,
-there was not enough threads to parallelize across every pixel like on GPUs.
-So, we chose to parallelize across rows of the image, keeping arithmetic
-intensity high while using parallelism.
+We utilized the 16 thread CPUs on the GHC machines with OpenMP. For CPUs, there
+was not enough threads to parallelize across every pixel like on GPUs. So, we
+chose to parallelize across rows of the image, keeping arithmetic intensity
+high while taking advantage of parallelism.
 
 \subsection{Color Counts}
 
@@ -199,7 +199,9 @@ implementation around 2x slower than sequential. For large elephant, sequential
 was around 0.038s and with atomic parallel it was 0.95s.
 
 Additional methods would be to create local copies of the data structures for
-each thread and combining them in parallel.
+each thread and combining them in parallel. But this has the disadvantage of
+requiring much more memory allocation, as well as the cost of the combining
+step.
 
 \subsection{Build Mask and Refine Mask}
 
@@ -371,17 +373,20 @@ Instead, of the overhead of starting the parallelism only lead to around 2 to
 
 It was very interesting to compare two different CPU parallel frameworks on the
 same code and same hardware. Both approaches used dynamic scheduling and small
-granularity to ensure equal work per worker. However, ISPC utilized SIMD
-instructions in the blur process. However, using SIMD in ISPC did not increase
-speedup over OMP. This is mainly because the ISPC compiler told us we had
-several gather and scatter operations. One large barrier was when the member of
-a gang accessed each red color value from the pixel. Since there is also a
-green and blue value per pixel, the memory was not contiguous and needed a
-gather to read and scatter to write. Additionally, our weights were stored as
-floats and the colors were stored as unsigned int8, and the ISPC compiler told
-us that doing this conversion was very costly. The OMP and ISPC implementations
-were both very close in time and speedup, but the OMP turned out to be slightly
-better at the end.
+granularity to ensure equal work per worker.
+
+Although ISPC utilized SIMD instructions in the blur process, using SIMD in
+ISPC did not increase speedup over OMP. We think this is mainly because the
+ISPC compiler told us we had several gather and scatter operations. One
+particular costly operation is when the member of a gang accessed each red
+color value from the pixel. Since there is also a green and blue value per
+pixel, the memory was not contiguous and needed a gather to read and scatter to
+write.
+
+Additionally, our weights were stored as floats and the colors were stored as
+unsigned int8, and the ISPC compiler told us that doing this conversion was
+very costly. The OMP and ISPC implementations were both very close in time and
+speedup, but the OMP turned out to be slightly better at the end.
 
 \section{Conclusion}
 
@@ -403,7 +408,8 @@ Ariel and Jerry both performed equal work. Ariel did many of the OpenMP
 optimizations, wrote the Makefiles, built the testing framework, and set up all
 of the different parallel environments. Jerry helped with the OpenMP and wrote
 the ISPC and CUDA optimizations. We both also developed the python and C++
-sequential implementations.
+sequential implementations. We both discussed implementation ideas and
+strategies with each other, and collaborated on each report.
 
 \section{References}
 
