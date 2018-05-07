@@ -316,7 +316,7 @@ and the speedup achieved. As the image is larger, the arithmetic intensity
 increases. However, the nature of the image itself can also contribute to
 speedup. Because the flower image had a larger region of background, more blur
 was needed and the GPU was able to achieve more speedup than larger images like
-purp.
+Purp.
 
 In addition, we found out that speedup with CPUs was relatively constant for
 each differently sized image, hovering at around 11x. Meanwhile, speedup on
@@ -329,9 +329,9 @@ of using threads.
 \end{center}
 
 From each timing, we saw an almost linear relationship between time and size of
-image for each implementation. We also saw that taking longer to compute did
-not necessarily mean parallelism was more effective, as we achieved the most
-speedup with Flower.
+image for each implementation. Interestingly, we also saw that taking longer to
+compute did not necessarily mean parallelism was more effective, as we achieved
+the most speedup with Flower.
 
 \subsection{Algorithm Speedup}
 
@@ -356,8 +356,8 @@ speedup over the sequential implementation. The largest amount of time spent
 for CUDA was the sequential writing the image to the file. CUDA was also unique
 because it had to transfer memory like the image from the CPU to the GPU. This
 led to the second most time spent in the init, which is due to the bandwidth of
-the interconnect. Because most of our time in CUDA was spent in file input
-output, we were satisfied with our implementation.
+the interconnect. Because most of our time in CUDA was spent in file IO, we
+were satisfied with our implementation.
 
 For the CPU implementations, the bottleneck was the blur operation. Even though
 we were able to achieve speedup in the blur step, it still took most of the
