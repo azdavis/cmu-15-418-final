@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from scipy.misc import imsave
 from scipy.ndimage import imread
 import numpy as np
