@@ -60,13 +60,11 @@ def dict_sum(a):
 def dict_is_lt(a, b):
     return dict_sum(a) - dict_sum(b) < 0
 
-def print_row(title, get, sums=None):
+def print_row(title, get):
     print(title, end="")
     cpp_time = None
     for prog in programs:
         time = get(prog)
-        if sums is not None:
-            sums[prog] += time
         print(float_str.format(time), end="")
         if cpp_time is None:
             # cpp_prog must be first
@@ -74,6 +72,10 @@ def print_row(title, get, sums=None):
         else:
             print(float_str.format(cpp_time / time), end="")
     print("")
+
+def update_sums(get, sums):
+    for prog in programs:
+        sums[prog] += get(prog)
 
 def get_out_f(in_f, prog, i):
     return (
@@ -125,7 +127,8 @@ for in_f in in_fnames:
         print(no_slash if first else with_slash, end="")
         first = False
         get = lambda prog: data[in_f][prog][ti]
-        print_row(str(ti).replace("_", " "), get, sums)
+        print_row(str(ti).replace("_", " "), get)
+        update_sums(get, sums)
     print(slash_hline)
     print(no_slash, end="")
     print_row("total", lambda prog: sums[prog])
