@@ -382,6 +382,19 @@ told us that doing this conversion was very costly. The OMP and ISPC
 implementations were both very close in time and speedup, but the OMP turned out
 to be slightly better at the end.
 
+\section{Conclusion}
+Overall, we were able to apply what we learned from 15-418 to speed up an
+image processing application. By developing our application in three
+differnet parallel frameworks, we learned alot about the differences in
+implementation between each framework and their effects on speedup. Each
+platform had their own advantages and disadvantages, mainly rooted in hardware
+like the number of threads or the cost of data transfer.
+
+In the future, we hope to be able to figure out how to further vectorize our
+CPU code to achieve speedup with SIMD. For example, we could change the
+our iamge data structure to ensure contigious memory acess. We also would like
+to implement our algorithm on parallel image processing frameworks like Hallide.
+
 \section{Work Distribution}
 Ariel and Jerry both performed equal work. Ariel did many of the OpenMP
 optimizations, wrote the Makefiles, built the testing framework, and set up
@@ -425,6 +438,18 @@ https://cvg.ethz.ch/teaching/cvl/2012/grabcut-siggraph04.pdf
     total & 11.8096 & 1.0632 & 11.1078 & 1.2070 & 9.7846 & 0.2034 & 58.0582
 \end{tabular}
 
+\begin{figure}[!htb]
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.75\linewidth]{bluejay.jpg}
+        \caption{Input Image}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.75\linewidth]{bluejay_portrait.jpg}
+        \caption{Output Portrait Mode Image}
+    \end{minipage}\hfill
+\end{figure}
 \subsection{Tiger ($\mathbf{1400 \times 845}$ px)}
 
 \begin{tabular}{r|r|r|r|r|r|r|r}
@@ -440,6 +465,18 @@ https://cvg.ethz.ch/teaching/cvl/2012/grabcut-siggraph04.pdf
     total & 14.6917 & 1.3536 & 10.8540 & 1.5463 & 9.5010 & 0.1950 & 75.3517
 \end{tabular}
 
+\begin{figure}[!htb]
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.75\linewidth]{tiger.jpg}
+        \caption{Input Image}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.75\linewidth]{tiger_portrait.jpg}
+        \caption{Output Portrait Mode Image}
+    \end{minipage}\hfill
+\end{figure}
 \subsection{Flower ($\mathbf{2242 \times 2112}$ px)}
 
 \begin{tabular}{r|r|r|r|r|r|r|r}
@@ -455,6 +492,18 @@ https://cvg.ethz.ch/teaching/cvl/2012/grabcut-siggraph04.pdf
     total & 72.0560 & 6.0286 & 11.9523 & 6.1216 & 11.7707 & 0.3859 & 186.7298
 \end{tabular}
 
+\begin{figure}[!htb]
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.6\linewidth]{flower.jpg}
+        \caption{Input Image}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.6\linewidth]{flower_portrait.jpg}
+        \caption{Output Portrait Mode Image}
+    \end{minipage}\hfill
+\end{figure}
 \subsection{Purp ($\mathbf{2944 \times 2609}$ px)}
 
 \begin{tabular}{r|r|r|r|r|r|r|r}
@@ -470,4 +519,16 @@ https://cvg.ethz.ch/teaching/cvl/2012/grabcut-siggraph04.pdf
     total & 88.9941 & 7.5728 & 11.7518 & 7.6757 & 11.5943 & 0.6067 & 146.6925
 \end{tabular}
 
+\begin{figure}[!htb]
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.75\linewidth]{purp.jpg}
+        \caption{Input Image}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.75\linewidth]{purp_portrait.jpg}
+        \caption{Output Portrait Mode Image}
+    \end{minipage}\hfill
+\end{figure}
 \end{document}
