@@ -6,6 +6,10 @@ import subprocess
 import sys
 import os
 
+if len(sys.argv) != 1:
+    print("usage: {}".format(sys.argv[0]), file=sys.stderr)
+    sys.exit(1)
+
 iters = 10
 
 in_fnames = [
