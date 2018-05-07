@@ -71,7 +71,6 @@ def print_row(title, get):
         time = get(prog)
         print(float_str.format(time), end="")
         if cpp_time is None:
-            # cpp_prog must be first
             cpp_time = time
         else:
             print(float_str.format(cpp_time / time), end="")
@@ -91,7 +90,6 @@ for in_f in in_fnames:
                 in_f, prog, i + 1, iters), file=sys.stderr, end="")
             out = subprocess.check_output([prog, in_f, out_f])
             if check is None:
-                # cpp_prog must be first
                 print("create ref img", file=sys.stderr)
                 check = out_f
             elif subprocess.call(["cmp", check, out_f]) == 0:
