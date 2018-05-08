@@ -2,14 +2,14 @@
 
 by Ariel Davis (azdavis) and Jerry Yu (jerryy)
 
-## dependencies
+## Dependencies
 
-all of the following are available on the CMU GHC machines.
+All of the following are available on the CMU GHC machines.
 
-- GNU make
-- cuda 8.0
-- openmp
-- ispc 1.9.1
-- python 2.7
-- numpy
-- scipy
+- GNU Make
+- CUDA 8.0
+- OpenMP
+- ISPC 1.9.1
+- Python 2.7
+- Numpy
+- Scipy
