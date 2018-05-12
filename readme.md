@@ -1,6 +1,6 @@
 # Parallel Portrait Mode
 
-by Ariel Davis (azdavis) and Jerry Yu (jerryy)
+by Ariel Davis (azdavis) and Jerry Yu (jyu)
 
 ## Dependencies
 
